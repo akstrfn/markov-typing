@@ -1,9 +1,10 @@
 #include <vector>
 #include <iterator>
+#include <iostream>
 #include <ncurses.h>
 
-char sentence[] = "This is a test sentence";
-std::vector<char> buffer;
+std::string sentence = "This is a test sentence";
+std::string typed = "";
 int row, col;
 int y = -1, x = -1;
 int mid_y, mid_x;
@@ -23,29 +24,39 @@ int main()
 
     getmaxyx(stdscr, row, col);
     mid_x = (col - std::size(sentence))/2;
-    mid_y = row/2 - 3;
+    mid_y = row/2;
 
-    mvprintw(mid_y, mid_x, "%s", sentence);
-    move(mid_y + 1, mid_x);
-    for(int i = 0; i != std::size(sentence) - 1; ++i)
-        addch('-');
+    mvprintw(mid_y, mid_x, "%s", sentence.c_str());
 
-    move(mid_y + 2, mid_x);
-    while(buffer.size() != std::size(sentence) - 1){
-        ch = getch();
-        buffer.push_back((int)ch);
+    move(mid_y, mid_x);
+    int old_x, old_y;
+    while(typed.size() != std::size(sentence)){
         getyx(stdscr, y, x);
+        // for debugging
+        old_x = x;
+        old_y = y;
+        move(LINES - 2, 2);
+        clrtobot();
+        printw("Typed: %s", typed.c_str());
+        move(old_y, old_x);
+
+        ch = getch();
         if (ch == KEY_BACKSPACE || ch == '\b' || ch == 127 || ch == KEY_DC) {
-            move(y, --x);
-            delch();
-            buffer.pop_back();
+            if (x != mid_x){
+                move(y, --x);
+                addch(sentence[x - mid_x]);
+                move(y, x);
+                typed.pop_back();
+            }
         } else if (sentence[x - mid_x] == ch) {
             addch(ch | COLOR_PAIR(2));
+            typed.push_back((int)ch);
         } else {
             if (ch == ' ') 
                 addch(ch | COLOR_PAIR(3));
             else 
                 addch(ch | COLOR_PAIR(1));
+            typed.push_back((int)ch);
         }
     }
     //refresh();
