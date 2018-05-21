@@ -29,16 +29,13 @@ int main()
     mvprintw(mid_y, mid_x, "%s", sentence.c_str());
 
     move(mid_y, mid_x);
-    int old_x, old_y;
     while(typed.size() != std::size(sentence)){
         getyx(stdscr, y, x);
         // for debugging
-        old_x = x;
-        old_y = y;
         move(LINES - 2, 2);
         clrtobot();
         printw("Typed: %s", typed.c_str());
-        move(old_y, old_x);
+        move(y, x);
 
         ch = getch();
         if (ch == KEY_BACKSPACE || ch == '\b' || ch == 127 || ch == KEY_DC) {
