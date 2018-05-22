@@ -2,8 +2,8 @@
 #include <iterator>
 #include <iostream>
 #include <ncurses.h>
+#include "generate.h"
 
-std::string sentence = "This is a test sentence";
 std::string typed = "";
 int row, col;
 int y = -1, x = -1;
@@ -13,6 +13,8 @@ int ch;
 //int main(int argc, char *argv[])
 int main()
 {
+    std::string sentence = generate(40);
+
     initscr();
     cbreak();
     noecho();
