@@ -21,7 +21,7 @@ std::string generate(int max_size){
 
     for (int i = 0; i != max_size; ++i){
         if ((i + 1) % 5 != 0)
-            out.push_back(choice(lowercase + symbols + uppercase + numbers));
+            out.push_back(choice(lowercase));
         else
             out.push_back(' ');
     }

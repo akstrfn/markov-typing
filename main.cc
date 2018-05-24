@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include "generate.hh"
 #include "stats.hh"
+#include "probability_matrix.hh"
 
 std::string typed = "";
 int row, col;
@@ -15,6 +16,8 @@ int ch;
 int main()
 {
     std::string sentence = generate(40);
+    sentence = "asdfghjkl";
+    ProbabilityMatrix m(sentence);
 
     initscr();
     cbreak();
@@ -24,6 +27,8 @@ int main()
     init_pair(1, COLOR_RED, COLOR_BLACK);
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
     init_pair(3, COLOR_RED, COLOR_RED);
+
+    printw(m.to_string().c_str());
 
     getmaxyx(stdscr, row, col);
     mid_x = (col - std::size(sentence))/2;
