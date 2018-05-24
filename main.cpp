@@ -32,11 +32,16 @@ int main()
     mvprintw(mid_y, mid_x, "%s", sentence.c_str());
     move(mid_y, mid_x);
 
+    int score{};
+
     while(typed.size() != std::size(sentence)){
         getyx(stdscr, y, x);
-        // for debugging
-        move(LINES - 2, 2);
-        clrtobot();
+        score = missed_characters(typed, sentence);
+        move(LINES - 4, 2);
+        clrtoeol();
+        printw("Errors: %i", score);
+        move(LINES - 3, 2);
+        clrtoeol();
         printw("Typed: %s", typed.c_str());
         move(y, x);
 
@@ -50,20 +55,14 @@ int main()
             }
         } else if (sentence[x - mid_x] == ch) {
             addch(ch | COLOR_PAIR(2));
-            typed.push_back((int)ch);
+            typed.push_back(ch);
         } else {
             if (ch == ' ') 
                 addch(ch | COLOR_PAIR(3));
             else 
                 addch(ch | COLOR_PAIR(1));
-            typed.push_back((int)ch);
+            typed.push_back(ch);
         }
-        auto score = missed_characters(typed, sentence);
-        getyx(stdscr, y, x);
-        move(LINES - 3, 2);
-        clrtobot();
-        printw("Errors: %i", score);
-        move(y, x);
     }
     //refresh();
     while(getch() != KEY_F(1)){ }
