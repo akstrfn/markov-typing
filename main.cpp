@@ -29,8 +29,8 @@ int main()
     mid_y = row/2;
 
     mvprintw(mid_y, mid_x, "%s", sentence.c_str());
-
     move(mid_y, mid_x);
+
     while(typed.size() != std::size(sentence)){
         getyx(stdscr, y, x);
         // for debugging
