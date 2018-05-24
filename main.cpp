@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ncurses.h>
 #include "generate.h"
+#include "stats.h"
 
 std::string typed = "";
 int row, col;
@@ -57,6 +58,12 @@ int main()
                 addch(ch | COLOR_PAIR(1));
             typed.push_back((int)ch);
         }
+        auto score = missed_characters(typed, sentence);
+        getyx(stdscr, y, x);
+        move(LINES - 3, 2);
+        clrtobot();
+        printw("Errors: %i", score);
+        move(y, x);
     }
     //refresh();
     while(getch() != KEY_F(1)){ }

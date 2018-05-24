@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-char choice(const std::string& sequence){
+static char choice(const std::string& sequence){
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, sequence.length() - 1);
