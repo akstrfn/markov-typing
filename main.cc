@@ -2,8 +2,8 @@
 #include <iterator>
 #include <iostream>
 #include <ncurses.h>
-#include "generate.h"
-#include "stats.h"
+#include "generate.hh"
+#include "stats.hh"
 
 std::string typed = "";
 int row, col;
