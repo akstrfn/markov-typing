@@ -32,9 +32,11 @@ public:
         return ss.str();
     }
 
-    void update_element(const char& element, const bool& correct){
-        auto idx = char_map[element];
-        data[idx][idx] = (data[idx][idx] + correct) / 2;
+    void update_element(const char& predecessor,
+                        const char& current_char, const bool& correct){
+        auto from_idx = char_map[predecessor];
+        auto current_idx = char_map[current_char];
+        data[current_idx][from_idx] = (data[current_idx][from_idx] + correct) / 2;
     }
 
 private:
