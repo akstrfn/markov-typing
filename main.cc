@@ -46,16 +46,8 @@ int main()
 
     while(typed.size() != std::size(sentence)){
         getyx(stdscr, y, x);
-        score = missed_characters(typed, sentence);
-        move(LINES - 4, 2);
-        clrtoeol();
-        printw("Errors: %i", score);
-        move(LINES - 3, 2);
-        clrtoeol();
-        printw("Typed: %s", typed.c_str());
-        move(y, x);
-
         ch = getch();
+
         if (ch == KEY_BACKSPACE || ch == '\b' || ch == 127 || ch == KEY_DC) {
             if (x != mid_x){
                 move(y, --x);
@@ -73,6 +65,27 @@ int main()
                 addch(ch | COLOR_PAIR(1));
             typed.push_back(ch);
         }
+
+        // prob matrix update
+        if (typed.length() > 1){ // update only if we have a predecessor
+            bool correct = last_char_correct(typed, sentence);
+            // ignore space for now
+            int pos = typed.length() - 1;
+            char current = typed[pos];
+            char last = sentence[pos - 1];
+            m.update_element(last, current, correct);
+        }
+
+        getyx(stdscr, y, x);
+        score = missed_characters(typed, sentence);
+        move(LINES - 4, 2);
+        clrtoeol();
+        printw("Errors: %i", score);
+        move(LINES - 3, 2);
+        clrtoeol();
+        printw("Typed: %s", typed.c_str());
+        mvprintw(0, 0, m.to_string().c_str());
+        move(y, x);
     }
     //refresh();
     while(getch() != KEY_F(1)){ }
