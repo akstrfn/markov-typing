@@ -15,9 +15,14 @@ int ch;
 //int main(int argc, char *argv[])
 int main()
 {
-    std::string sentence = generate(40);
-    sentence = "asdfghjkl";
-    ProbabilityMatrix m(sentence);
+    std::string lowercase = "qwertyuiopasdfghjklzxcvbnm";
+    std::string uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
+    std::string symbols = "`~!@#$%^&*()-_=+{[]};:'\"\\|,<.>/?";
+    std::string numbers = "0123456789";
+
+    std::string short_chars = "asdfghjkl";
+    std::string sentence = generate(short_chars, 40);
+    ProbabilityMatrix m(short_chars);
 
     initscr();
     cbreak();

@@ -12,16 +12,12 @@ char choice(const std::string& sequence){
     return sequence[dis(gen)];
 }
 
-std::string generate(int max_size){
+std::string generate(const std::string& characters, const int max_size){
     std::string out = "";
-    std::string lowercase = "qwertyuiopasdfghjklzxcvbnm";
-    std::string uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
-    std::string symbols = "`~!@#$%^&*()-_=+{[]};:'\"\\|,<.>/?";
-    std::string numbers = "0123456789";
 
     for (int i = 0; i != max_size; ++i){
         if ((i + 1) % 5 != 0)
-            out.push_back(choice(lowercase));
+            out.push_back(choice(characters));
         else
             out.push_back(' ');
     }
