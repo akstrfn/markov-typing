@@ -21,6 +21,8 @@ std::string generate(const std::string& characters, const int max_size){
         else
             out.push_back(' ');
     }
+    // strip one possible whitespace at the end
+    if (out.back() == ' ') out.pop_back();
     return out;
 }
 #endif /* ifndef GENERATE_H */
