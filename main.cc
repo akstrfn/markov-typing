@@ -5,6 +5,7 @@
 #include "generate.hh"
 #include "stats.hh"
 #include "probability_matrix.hh"
+#include "utils.hh"
 
 std::string typed = "";
 int row, col;
@@ -20,9 +21,8 @@ int main()
     std::string symbols = "`~!@#$%^&*()-_=+{[]};:'\"\\|,<.>/?";
     std::string numbers = "0123456789";
 
-    std::string short_chars = "asdfghjkl";
-    std::string sentence = generate(short_chars, 40);
-    ProbabilityMatrix m(short_chars);
+    std::string sentence = generate(lowercase, 40);
+    ProbabilityMatrix m(lowercase);
 
     initscr();
     cbreak();
@@ -42,22 +42,22 @@ int main()
     mvprintw(mid_y, mid_x, "%s", sentence.c_str());
     move(mid_y, mid_x);
 
-    int score{};
+    int current_errors{};
 
     while(1){
         getyx(stdscr, y, x);
         ch = getch();
 
         if (typed.size() == std::size(sentence)){
-            if (ch == KEY_ENTER || ch == '\n' || ch == 10){
+            if (is_enter(ch)){
                 typed.clear();
-                sentence = generate(short_chars, 40);
+                sentence = generate(sentence, 40);
                 move(mid_y, mid_x);
                 clrtoeol();
                 printw(sentence.c_str());
                 move(mid_y, mid_x);
-            } else if (score != 0
-                       && (ch == KEY_BACKSPACE || ch == '\b' || ch == 127))
+            } else if (current_errors != 0
+                       && is_backspace(ch))
             {
                 // allow backspace
             } else {
@@ -66,15 +66,14 @@ int main()
             }
         }
 
-        if (ch == KEY_ENTER || ch == '\n' || ch == 10)
-            continue;
+        if (is_enter(ch)) continue;
 
-        if (ch == KEY_BACKSPACE || ch == '\b' || ch == 127) {
-            if (score == 0)
-                continue;
-            if (x != mid_x){
+        if (is_backspace(ch)) {
+            // disable backspace if everything is correct
+            if (current_errors == 0) continue;
+            if (!typed.empty()){
                 move(y, --x);
-                addch(sentence[x - mid_x]);
+                addch(sentence[typed.length() - 1]);
                 move(y, x);
                 typed.pop_back();
             }
@@ -90,9 +89,9 @@ int main()
         }
 
         // prob matrix update
-        // update only if we have a predecessor and if there are no mistakes in
-        // the text
-        if (typed.length() > 1 && score == 0){
+        // update only if we have a predecessor and if the movement was not
+        // made with backspace
+        if (typed.length() > 1 && !is_backspace(ch)){
             bool correct = last_char_correct(typed, sentence);
             int pos = typed.length() - 1;
             char current = typed[pos];
@@ -102,16 +101,11 @@ int main()
                 m.update_element(last, current, correct);
         }
 
-        getyx(stdscr, y, x);
-        score = missed_characters(typed, sentence);
-        move(LINES - 4, 2);
-        clrtoeol();
-        printw("Errors: %i", score);
-        move(LINES - 3, 2);
-        clrtoeol();
-        printw("Typed: %s", typed.c_str());
-        mvprintw(0, 0, m.to_string().c_str());
-        move(y, x);
+        current_errors = missed_characters(typed, sentence);
+
+        printnm(LINES - 4, 2, "Errors: " + std::to_string(current_errors));
+        printnm(LINES - 3, 2, "Typed " + typed);
+        printnm(0, 0, m.to_string());
     }
     //refresh();
     while(getch() != KEY_F(1)){ }
