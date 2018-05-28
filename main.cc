@@ -90,13 +90,16 @@ int main()
         }
 
         // prob matrix update
-        if (typed.length() > 1){ // update only if we have a predecessor
+        // update only if we have a predecessor and if there are no mistakes in
+        // the text
+        if (typed.length() > 1 && score == 0){
             bool correct = last_char_correct(typed, sentence);
-            // ignore space for now
             int pos = typed.length() - 1;
             char current = typed[pos];
             char last = sentence[pos - 1];
-            m.update_element(last, current, correct);
+            // ignore space for now
+            if (last != ' ')
+                m.update_element(last, current, correct);
         }
 
         getyx(stdscr, y, x);
