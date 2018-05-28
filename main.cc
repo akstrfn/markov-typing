@@ -79,14 +79,14 @@ int main()
                 typed.pop_back();
             }
         } else if (sentence[x - mid_x] == ch) {
+            typed.push_back(ch);
             addch(ch | COLOR_PAIR(2));
-            typed.push_back(ch);
         } else {
-            if (ch == ' ') 
-                addch(ch | COLOR_PAIR(3));
-            else 
-                addch(ch | COLOR_PAIR(1));
             typed.push_back(ch);
+            if (sentence[typed.length() - 1] == ' ')
+                addch(sentence[typed.length() - 1] | COLOR_PAIR(3));
+            else
+                addch(sentence[typed.length() - 1] | COLOR_PAIR(1));
         }
 
         // prob matrix update
