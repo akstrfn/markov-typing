@@ -5,6 +5,8 @@
 #include <string>
 #include <map>
 #include <sstream>
+#include <fstream>
+#include <iomanip>
 
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct
@@ -23,20 +25,33 @@ public:
     };
     auto to_string(){
         std::stringstream ss;
-        for(auto& row : data){
+        ss << std::fixed << std::setprecision(2) << "    ";
+        for(auto el=characters.begin(); el != characters.end(); ++el){
+            auto tmp = (el == characters.end() - 1) ? "\n"  : ", ";
+            ss << std::setw(4) << *el << tmp;
+        }
+        for(auto i=0ul; i != std::size(data); ++i){
+            auto row = data[i];
+            ss << characters[i] << " | ";
             for(auto el=row.begin(); el != row.end(); ++el){
-                char tmp = (el == row.end() - 1) ? '\n'  : ',';
+                auto tmp = (el == row.end() - 1) ? "\n"  : ", ";
                 ss << *el << tmp;
             }
         }
         return ss.str();
     }
 
+    void write_to_file(const std::string& filename){
+        std::ofstream fs;
+        fs.open(filename);
+        fs << to_string();
+    }
+
     void update_element(const char& predecessor,
                         const char& current_char, const bool& correct){
         auto from_idx = char_map[predecessor];
         auto current_idx = char_map[current_char];
-        data[current_idx][from_idx] = (data[current_idx][from_idx] + correct) / 2;
+        data[from_idx][current_idx] = (data[from_idx][current_idx] + correct) / 2;
     }
 
 private:

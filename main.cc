@@ -33,8 +33,6 @@ int main()
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
     init_pair(3, COLOR_RED, COLOR_RED);
 
-    printw(m.to_string().c_str());
-
     getmaxyx(stdscr, row, col);
     mid_x = (col - std::size(sentence))/2;
     mid_y = row/2;
@@ -51,11 +49,8 @@ int main()
         if (typed.size() == std::size(sentence)){
             if (is_enter(ch)){
                 typed.clear();
-                sentence = generate(sentence, 40);
-                move(mid_y, mid_x);
-                clrtoeol();
-                printw(sentence.c_str());
-                move(mid_y, mid_x);
+                sentence = generate(lowercase, 40);
+                printnm(mid_y, mid_x, sentence.c_str());
             } else if (current_errors != 0
                        && is_backspace(ch))
             {
@@ -105,7 +100,8 @@ int main()
 
         printnm(LINES - 4, 2, "Errors: " + std::to_string(current_errors));
         printnm(LINES - 3, 2, "Typed " + typed);
-        printnm(0, 0, m.to_string());
+        //printnm(0, 0, m.to_string());
+        m.write_to_file("test");
     }
     //refresh();
     while(getch() != KEY_F(1)){ }
