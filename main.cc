@@ -44,11 +44,34 @@ int main()
 
     int score{};
 
-    while(typed.size() != std::size(sentence)){
+    while(1){
         getyx(stdscr, y, x);
         ch = getch();
 
-        if (ch == KEY_BACKSPACE || ch == '\b' || ch == 127 || ch == KEY_DC) {
+        if (typed.size() == std::size(sentence)){
+            if (ch == KEY_ENTER || ch == '\n' || ch == 10){
+                typed.clear();
+                sentence = generate(short_chars, 40);
+                move(mid_y, mid_x);
+                clrtoeol();
+                printw(sentence.c_str());
+                move(mid_y, mid_x);
+            } else if (score != 0
+                       && (ch == KEY_BACKSPACE || ch == '\b' || ch == 127))
+            {
+                // allow backspace
+            } else {
+                // block any new entry of characters since we are at the end
+                continue;
+            }
+        }
+
+        if (ch == KEY_ENTER || ch == '\n' || ch == 10)
+            continue;
+
+        if (ch == KEY_BACKSPACE || ch == '\b' || ch == 127) {
+            if (score == 0)
+                continue;
             if (x != mid_x){
                 move(y, --x);
                 addch(sentence[x - mid_x]);
