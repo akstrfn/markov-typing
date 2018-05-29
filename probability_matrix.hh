@@ -8,6 +8,12 @@
 #include <fstream>
 #include <iomanip>
 
+#include "utils.hh"
+// TODO in this matrix history should be accounted for to lower the oscillation
+// of key probabilities e.g. if guess = 1, miss = 0 then [0, 1, 0, 1, 1] is an
+// array of past performance for the key then some function should be used to
+// map this into 0-1 range. log maybe? linear? weighted average?
+
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct
 class ProbabilityMatrix {
@@ -52,6 +58,18 @@ public:
         auto from_idx = char_map[predecessor];
         auto current_idx = char_map[current_char];
         data[from_idx][current_idx] = (data[from_idx][current_idx] + correct) / 2;
+    }
+
+    std::string generate_sentence(){
+        //sum all rows and use them as weighted probabilites to chose a
+        //starting character after that just chain 4 keys in that row that were
+        //the worst i.e. have the smallest probabilities
+        throw std::runtime_error("Not implemented");
+        std::vector<double> weights(characters.length());
+        for (auto i=0ul; i != characters.length(); ++i){
+            weights[i] = std::accumulate(std::begin(data[i]), std::end(data[i]), 0.0);
+        }
+        char ch = weighted_choice(characters, weights);
     }
 
 private:
