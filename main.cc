@@ -49,8 +49,10 @@ int main()
         if (typed.size() == std::size(sentence)){
             if (is_enter(ch)){
                 typed.clear();
-                sentence = generate(lowercase, 40);
+                // sentence = generate(lowercase, 40);
+                sentence = m.generate_sentence(8);
                 printnm(mid_y, mid_x, sentence.c_str());
+                move(mid_y, mid_x);
             } else if (current_errors != 0
                        && is_backspace(ch))
             {

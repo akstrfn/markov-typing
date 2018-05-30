@@ -1,6 +1,7 @@
 #ifndef SIMPLE_MATRIX_H
 #define SIMPLE_MATRIX_H
 
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <map>
@@ -60,16 +61,44 @@ public:
         data[from_idx][current_idx] = (data[from_idx][current_idx] + correct) / 2;
     }
 
-    std::string generate_sentence(){
+    std::string generate_word(const int word_size){
         //sum all rows and use them as weighted probabilites to chose a
         //starting character after that just chain 4 keys in that row that were
         //the worst i.e. have the smallest probabilities
-        throw std::runtime_error("Not implemented");
         std::vector<double> weights(characters.length());
         for (auto i=0ul; i != characters.length(); ++i){
             weights[i] = std::accumulate(std::begin(data[i]), std::end(data[i]), 0.0);
         }
         char ch = weighted_choice(characters, weights);
+        int ch_idx = char_map[ch];
+        // I need a column to that character since it is where other characters
+        // end in. I need to think more about this weights use rows and this
+        // columns?
+        std::vector<double> column;
+        column.reserve(characters.length());
+        for (auto& row : data)
+            column.push_back(row[ch_idx]);
+
+        //auto zipped = zip(characters, data[ch_idx]); // row
+        auto zipped = zip(characters, column);
+        std::sort(std::begin(zipped), std::end(zipped),
+                  [](const auto& lhs, const auto& rhs){return lhs.second < rhs.second;});
+
+        std::string out = "";
+        for (int i=0; i != word_size; ++i){
+            out.push_back(zipped[i].first);
+        }
+        return out;
+    }
+
+    std::string generate_sentence(const int num_words){
+        std::string sentence = "";
+        for (int i=0; i != num_words; ++i){
+            sentence.append(generate_word(4));
+            sentence.push_back(' ');
+        }
+        if (sentence.back() == ' ') sentence.pop_back();
+        return sentence;
     }
 
 private:
