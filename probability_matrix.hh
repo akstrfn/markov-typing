@@ -56,9 +56,11 @@ public:
 
     void update_element(const char& predecessor,
                         const char& current_char, const bool& correct){
-        auto from_idx = char_map[predecessor];
-        auto current_idx = char_map[current_char];
-        data[from_idx][current_idx] = (data[from_idx][current_idx] + correct) / 2;
+        try {
+            auto from_idx = char_map.at(predecessor);
+            auto current_idx = char_map.at(current_char);
+            data[from_idx][current_idx] = (data[from_idx][current_idx] + correct) / 2;
+        } catch (std::out_of_range) {}
     }
 
     std::string generate_word(const int word_size){
