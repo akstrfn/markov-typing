@@ -3,6 +3,7 @@
 
 #include <string>
 #include <random>
+#include <stdexcept>
 #include <ncurses.h>
 
 bool is_backspace(const int ch){
@@ -36,6 +37,20 @@ auto weighted_choice(const T& container, W weights){
         if (rolling_sum < rnd)
             return container[i];
     }
+}
+
+template <typename F, typename S>
+auto zip(const F& lhs, const S& rhs){
+    if (std::size(lhs) != std::size(rhs)) 
+        throw std::out_of_range("Containers must have the same size");
+    std::vector<std::pair<typename F::value_type, typename S::value_type>> zipped;
+    zipped.reserve(std::size(lhs));
+    auto lhs_iter = std::begin(lhs);
+    auto rhs_iter = std::begin(rhs);
+    while(lhs_iter != std::end(lhs) || rhs_iter != std::end(rhs)){
+        zipped.emplace_back(*lhs_iter++, *rhs_iter++);
+    }
+    return zipped;
 }
 
 #endif /* UTILS_H */
