@@ -3,6 +3,7 @@
 
 #include <string>
 #include <random>
+#include <algorithm>
 #include <stdexcept>
 #include <ncurses.h>
 
@@ -51,6 +52,14 @@ auto zip(const F& lhs, const S& rhs){
         zipped.emplace_back(*lhs_iter++, *rhs_iter++);
     }
     return zipped;
+}
+
+template <typename T, typename E>
+bool is_in(const T& container, const E& el){
+    auto result = std::find(std::begin(container), std::end(container), el);
+    if (result == std::end(container))
+        return false;
+    return true;
 }
 
 #endif /* UTILS_H */
