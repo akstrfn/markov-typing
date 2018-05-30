@@ -72,23 +72,23 @@ public:
             weights[i] = std::accumulate(std::begin(data[i]), std::end(data[i]), 0.0);
         }
         char ch = weighted_choice(characters, weights);
-        int ch_idx = char_map[ch];
-        // I need a column to that character since it is where other characters
-        // end in. I need to think more about this weights use rows and this
-        // columns?
-        std::vector<double> column;
-        column.reserve(characters.length());
-        for (auto& row : data)
-            column.push_back(row[ch_idx]);
-
-        //auto zipped = zip(characters, data[ch_idx]); // row
-        auto zipped = zip(characters, column);
-        std::sort(std::begin(zipped), std::end(zipped),
-                  [](const auto& lhs, const auto& rhs){return lhs.second < rhs.second;});
+        while (1){
+            if (ch == '\000')
+                ch = weighted_choice(characters, weights);
+            else
+                break;
+        }
+        int ch_idx = char_map.at(ch);
 
         std::string out = "";
         for (int i=0; i != word_size; ++i){
-            out.push_back(zipped[i].first);
+            out.push_back(ch);
+
+            auto row = data[ch_idx];
+            auto next = std::min_element(std::begin(row), std::end(row));
+
+            ch_idx = std::distance(std::begin(row), next);
+            ch = characters[ch_idx];
         }
         return out;
     }

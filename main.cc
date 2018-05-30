@@ -21,6 +21,8 @@ int main()
     std::string symbols = "`~!@#$%^&*()-_=+{[]};:'\"\\|,<.>/?";
     std::string numbers = "0123456789";
 
+    // for testing
+    //lowercase = "asdfgj";
     std::string sentence = generate(lowercase, 40);
     ProbabilityMatrix m(lowercase);
 
