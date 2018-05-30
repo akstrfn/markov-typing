@@ -32,10 +32,10 @@ auto weighted_choice(const T& container, W weights){
     std::mt19937 gen(std::random_device{}());
     auto rnd = std::uniform_real_distribution<>{0, sum}(gen);
 
-    auto rolling_sum = 0;
+    double rolling_sum = 0;
     for (int i=0; i != std::size(weights); ++i){
         rolling_sum += weights[i];
-        if (rolling_sum < rnd)
+        if (rnd < rolling_sum)
             return container[i];
     }
 }
