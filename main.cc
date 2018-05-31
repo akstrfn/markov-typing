@@ -110,6 +110,10 @@ int main()
         printnm(LINES - 3, 2, "Typed " + typed);
         //printnm(0, 0, m.to_string());
         m.write_to_file("test");
+        std::ofstream file;
+        file.open(lowercase);
+        file << m.to_csv_string();
+
     }
     //refresh();
     while(getch() != KEY_F(1)){ }

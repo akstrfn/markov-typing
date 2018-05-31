@@ -23,15 +23,17 @@
 // that updates the probabilies.
 
 // Matrix whose each entry is a probability that the next typed characted will
-// be correct
+// be correct based on how frequent they were typed correctly
 class ProbabilityMatrix {
+    std::vector<std::vector<double>> data;
+    std::string characters;
+    std::map<char, int> char_map;
 public:
     ProbabilityMatrix(const std::string& _characters) : characters(_characters)
     {
         auto len = characters.length();
         data.reserve(len);
         for(auto i=0ul; i != len; ++i){
-            // ini matrix with all 0.0
             data.push_back(std::vector<double>(len));
             char_map[characters[i]] = i;
         }
@@ -55,10 +57,31 @@ public:
         return ss.str();
     }
 
+    auto to_csv_string(){
+        std::stringstream ss;
+        ss << std::setprecision(4);
+        for(auto i=0ul; i != std::size(data); ++i){
+            auto row = data[i];
+            for(auto el=row.begin(); el != row.end(); ++el){
+                auto tmp = (el == row.end() - 1) ? "\n"  : ",";
+                ss << *el << tmp;
+            }
+        }
+        return ss.str();
+    }
+
     void write_to_file(const std::string& filename){
         std::ofstream fs;
         fs.open(filename);
         fs << to_string();
+    }
+
+    // TODO finish me
+    void read_from_csv(const std::string& filename){
+        std::ifstream f;
+        f.open(filename);
+        std::string s;
+        std::getline(f, s, ',');
     }
 
     void update_element(const char& predecessor,
@@ -83,7 +106,7 @@ public:
             weights[i] = std::accumulate(std::begin(data[i]), std::end(data[i]), 0.0);
         }
         char ch = weighted_choice(characters, weights);
-        // TODO can avoiding of null character be solved better?
+        // TODO can avoiding the null character be solved better?
         while (1){
             if (ch == '\000')
                 ch = weighted_choice(characters, weights);
@@ -114,11 +137,6 @@ public:
         if (sentence.back() == ' ') sentence.pop_back();
         return sentence;
     }
-
-private:
-    std::vector<std::vector<double>> data;
-    std::string characters;
-    std::map<char, int> char_map;
 };
 
 #endif /* SIMPLE_MATRIX_H */
