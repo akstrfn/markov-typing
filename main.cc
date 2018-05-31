@@ -91,6 +91,10 @@ int main()
         // update only if we have a predecessor and if the movement was not
         // made with backspace
         if (typed.length() > 1 && !is_backspace(ch)){
+            // TODO this still updates the probability if the character was
+            // inaccurate but erased and accurate one gets typed in. This means
+            // that inaccurate typings have less influence than correct ones.
+            // Fix this.
             bool correct = last_char_correct(typed, sentence);
             int pos = typed.length() - 1;
             char current = typed[pos];
