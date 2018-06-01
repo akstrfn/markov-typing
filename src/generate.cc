@@ -1,6 +1,4 @@
-#ifndef GENERATE_H
-#define GENERATE_H
-
+#include "generate.hh"
 #include <random>
 #include <vector>
 #include <string>
@@ -25,4 +23,3 @@ std::string generate(const std::string& characters, const int max_size){
     if (out.back() == ' ') out.pop_back();
     return out;
 }
-#endif /* ifndef GENERATE_H */
