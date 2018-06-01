@@ -34,9 +34,10 @@ char choice(const Seq& sequence){
 }
 
 template <typename Seq, typename W>
-auto weighted_choice(const Seq& sequence, const W& weights){
+auto weighted_choice(Seq& sequence, W& weights){
     auto sum = std::accumulate(std::begin(weights), std::end(weights), 0.0);
     std::mt19937 gen(std::random_device{}());
+    // TODO what happens when sum == 0?
     auto rnd = std::uniform_real_distribution<>{0, sum}(gen);
 
     auto it_w = std::begin(weights);
