@@ -27,17 +27,18 @@ void printnm(const int y, const int x, const std::string& str){
 }
 
 template <typename T, typename W>
-auto weighted_choice(const T& container, W weights){
+auto weighted_choice(const T& container, const W& weights){
     auto sum = std::accumulate(std::begin(weights), std::end(weights), 0.0);
     std::mt19937 gen(std::random_device{}());
     auto rnd = std::uniform_real_distribution<>{0, sum}(gen);
 
+    auto it_w = std::begin(weights);
     double rolling_sum = 0;
-    for (int i=0; i != std::size(weights); ++i){
-        rolling_sum += weights[i];
-        if (rnd < rolling_sum)
-            return container[i];
-    }
+    while (rolling_sum < rnd)
+        rolling_sum += *it_w++;
+
+    // TODO what if container does not have operator[]? Not generic enough.
+    return container[std::distance(std::begin(weights), it_w)];
 }
 
 template <typename F, typename S>
