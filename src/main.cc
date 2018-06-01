@@ -25,8 +25,8 @@ int main()
 
     // for testing
     //lowercase = "asdfgj";
-    std::string sentence = generate(lowercase, 40);
     ProbabilityMatrix m(lowercase);
+    std::string sentence = m.generate_sentence(8);
 
     initscr();
     cbreak();
