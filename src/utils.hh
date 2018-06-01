@@ -5,7 +5,7 @@
 #include <random>
 #include <algorithm>
 #include <stdexcept>
-#include <ncurses.h>
+#include <curses.h>
 
 bool is_backspace(const int ch){
     return  ch == KEY_BACKSPACE || ch == '\b' || ch == 127;

@@ -1,7 +1,9 @@
+#pragma GCC diagnostic ignored "-Wc++98-compat"
+
 #include <vector>
 #include <iterator>
 #include <iostream>
-#include <ncurses.h>
+#include <curses.h>
 #include "generate.hh"
 #include "stats.hh"
 #include "probability_matrix.hh"
