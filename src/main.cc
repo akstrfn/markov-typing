@@ -4,7 +4,6 @@
 #include <iterator>
 #include <iostream>
 #include <curses.h>
-#include "generate.hh"
 #include "stats.hh"
 #include "probability_matrix.hh"
 #include "utils.hh"
