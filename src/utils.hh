@@ -26,6 +26,13 @@ void printnm(const int y, const int x, const std::string& str){
     move(old_y, old_x);
 }
 
+template <typename Seq>
+char choice(const Seq& sequence){
+    std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<> dis(0, std::size(sequence) - 1);
+    return sequence[dis(gen)];
+}
+
 template <typename T, typename W>
 auto weighted_choice(const T& container, const W& weights){
     auto sum = std::accumulate(std::begin(weights), std::end(weights), 0.0);
