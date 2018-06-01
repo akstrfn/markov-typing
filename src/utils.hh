@@ -46,7 +46,7 @@ auto weighted_choice(const Seq& sequence, const W& weights){
 
     auto it = std::begin(sequence);
     std::advance(it, std::distance(std::begin(weights), it_w));
-    return *it;
+    return it;
 }
 
 template <typename F, typename S>
