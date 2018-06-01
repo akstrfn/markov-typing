@@ -33,8 +33,8 @@ char choice(const Seq& sequence){
     return sequence[dis(gen)];
 }
 
-template <typename T, typename W>
-auto weighted_choice(const T& container, const W& weights){
+template <typename Seq, typename W>
+auto weighted_choice(const Seq& sequence, const W& weights){
     auto sum = std::accumulate(std::begin(weights), std::end(weights), 0.0);
     std::mt19937 gen(std::random_device{}());
     auto rnd = std::uniform_real_distribution<>{0, sum}(gen);
@@ -44,8 +44,9 @@ auto weighted_choice(const T& container, const W& weights){
     while (rolling_sum < rnd)
         rolling_sum += *it_w++;
 
-    // TODO what if container does not have operator[]? Not generic enough.
-    return container[std::distance(std::begin(weights), it_w)];
+    auto it = std::begin(sequence);
+    std::advance(it, std::distance(std::begin(weights), it_w));
+    return *it;
 }
 
 template <typename F, typename S>
