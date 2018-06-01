@@ -90,7 +90,7 @@ public:
             auto from_idx = char_map.at(predecessor);
             auto current_idx = char_map.at(current_char);
             data[from_idx][current_idx] = (data[from_idx][current_idx] + correct) / 2;
-        } catch (std::out_of_range) {}
+        } catch (std::out_of_range&) {}
     }
 
     // TODO since always the same element is picked deterministically then

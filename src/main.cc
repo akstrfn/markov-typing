@@ -1,4 +1,4 @@
-#pragma GCC diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wc++98-compat"
 
 #include <vector>
 #include <iterator>
