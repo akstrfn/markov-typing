@@ -16,11 +16,10 @@
 // array of past performance for the key then some function should be used to
 // map this into 0-1 range. log maybe? linear? weighted average?
 
-// TODO when probabilites are rouded at two decimals if characters are typed
-// correctly the probabiblities after a while become all 1 and then it is not
-// useful to generate anything from the matrix anymore. Some sort of time
-// pressure should be added which should also be accounted for in the function
-// that updates the probabilies.
+// TODO if characters are typed correctly often the probabiblities after a
+// while become all 1 and then it is not useful to generate anything from the
+// matrix anymore. Some sort of time pressure should be added which should also
+// be accounted for in the function that updates the probabilies.
 
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct based on how frequent they were typed correctly
@@ -97,32 +96,42 @@ public:
     // sometimes weird combinations come up like buch of same characters one
     // after another like ffff or gfff etc. This means that it should be
     // randomized a bit. Probably weighted choice would do as well.
-    std::string generate_word(const int word_size){
+    std::string generate_word(int word_size){
         //sum all rows and use them as weighted probabilites to chose a
         //starting character after that just chain 4 keys in that row that were
         //the worst i.e. have the smallest probabilities
         std::vector<double> weights(characters.length());
         for (auto i=0ul; i != characters.length(); ++i){
-            weights[i] = std::accumulate(std::begin(data[i]), std::end(data[i]), 0.0);
+            weights[i] = std::accumulate(std::begin(data[i]),
+                                         std::end(data[i]),
+                                         0.0);
         }
-        char ch = weighted_choice(characters, weights);
+        char ch = *weighted_choice(characters, weights);
         // TODO can avoiding the null character be solved better?
         while (1){
             if (ch == '\000')
-                ch = weighted_choice(characters, weights);
+                ch = *weighted_choice(characters, weights);
             else
                 break;
         }
         int ch_idx = char_map.at(ch);
 
         std::string out = "";
-        for (int i=0; i != word_size; ++i){
+        while (word_size--){
             out.push_back(ch);
 
             auto row = data[ch_idx];
-            auto next = std::min_element(std::begin(row), std::end(row));
 
-            ch_idx = std::distance(std::begin(row), next);
+            std::vector<double> inverse_probs;
+            inverse_probs.reserve(std::size(row));
+            std::transform(std::begin(inverse_probs), std::end(inverse_probs),
+                           std::begin(inverse_probs),
+                           [](auto el){ return 1 - el; });
+
+            auto next = weighted_choice(characters, inverse_probs);
+            //auto next = std::min_element(std::begin(row), std::end(row));
+
+            ch_idx = std::distance(std::begin(characters), next);
             ch = characters[ch_idx];
         }
         return out;

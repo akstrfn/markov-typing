@@ -110,9 +110,9 @@ int main()
         printnm(LINES - 4, 2, "Errors: " + std::to_string(current_errors));
         printnm(LINES - 3, 2, "Typed " + typed);
         //printnm(0, 0, m.to_string());
-        m.write_to_file("test");
+        m.write_to_file("matrix_console");
         std::ofstream file;
-        file.open(lowercase);
+        file.open("matrix.csv");
         file << m.to_csv_string();
 
     }
