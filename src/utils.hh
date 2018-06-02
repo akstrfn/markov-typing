@@ -26,6 +26,18 @@ void printnm(const int y, const int x, const std::string& str){
     move(old_y, old_x);
 }
 
+// from: http://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
+template<class T>
+typename std::enable_if_t<!std::numeric_limits<T>::is_integer, bool>
+almost_equal(T x, T y, int ulp)
+{
+    // the machine epsilon has to be scaled to the magnitude of the values used
+    // and multiplied by the desired precision in ULPs (units in the last place)
+    return std::abs(x-y) <= std::numeric_limits<T>::epsilon() * std::abs(x+y) * ulp
+    // unless the result is subnormal
+           || std::abs(x-y) < std::numeric_limits<T>::min();
+}
+
 template <typename Seq>
 char choice(const Seq& sequence){
     std::mt19937 gen(std::random_device{}());
