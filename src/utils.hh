@@ -50,7 +50,10 @@ auto choice(Seq& sequence){
 
 template <typename Seq, typename W>
 auto weighted_choice(Seq& sequence, W& weights){
-    auto sum = std::accumulate(std::begin(weights), std::end(weights), 0.0);
+    double sum = std::accumulate(std::begin(weights), std::end(weights), 0.0);
+    if (almost_equal(sum, 0.0, 2))
+        return choice(sequence);
+
     std::mt19937 gen(std::random_device{}());
     // TODO what happens when sum == 0?
     auto rnd = std::uniform_real_distribution<>{0, sum}(gen);
