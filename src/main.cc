@@ -23,7 +23,7 @@ int main()
     std::string numbers = "0123456789";
 
     // for testing
-    //lowercase = "asdfgj";
+    lowercase = "asdf";
     ProbabilityMatrix m(lowercase);
     std::string sentence = m.generate_sentence(8);
 

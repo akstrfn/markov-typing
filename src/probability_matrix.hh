@@ -92,19 +92,17 @@ public:
         } catch (std::out_of_range&) {}
     }
 
-    // TODO since always the same element is picked deterministically then
-    // sometimes weird combinations come up like buch of same characters one
-    // after another like ffff or gfff etc. This means that it should be
-    // randomized a bit. Probably weighted choice would do as well.
     std::string generate_word(int word_size){
         //sum all rows and use them as weighted probabilites to chose a
         //starting character after that just chain 4 keys in that row that were
         //the worst i.e. have the smallest probabilities
         std::vector<double> weights(characters.length());
         for (auto i=0ul; i != characters.length(); ++i){
-            weights[i] = std::accumulate(std::begin(data[i]),
-                                         std::end(data[i]),
-                                         0.0);
+            // invert weights
+            weights[i] = std::size(data[i])
+                         - std::accumulate(std::begin(data[i]),
+                                           std::end(data[i]),
+                                           0.0);
         }
 
         // string container has null character so repick until ch != \000
@@ -120,16 +118,23 @@ public:
 
             auto row = data[ch_idx];
 
+            // TODO since always the same element is picked deterministically
+            // then sometimes weird combinations come up like buch of same
+            // characters one after another like ffff or gfff etc. This means
+            // that it should be randomized a bit. Probably weighted choice
+            // would do as well.
+
+            // Trying out to randomize choices a bit
             std::vector<double> inverse_probs;
             inverse_probs.reserve(std::size(row));
-            std::transform(std::begin(inverse_probs), std::end(inverse_probs),
-                           std::begin(inverse_probs),
+            std::transform(std::begin(row), std::end(row), std::begin(inverse_probs),
                            [](auto el){ return 1 - el; });
 
             auto next = weighted_choice(characters, inverse_probs);
-            //auto next = std::min_element(std::begin(row), std::end(row));
-
             ch_idx = std::distance(std::begin(characters), next);
+            //auto next = std::min_element(std::begin(row), std::end(row));
+            //ch_idx = std::distance(std::begin(row), next);
+
             ch = characters[ch_idx];
         }
         return out;
