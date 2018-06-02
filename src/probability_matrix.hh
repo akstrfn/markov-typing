@@ -145,6 +145,13 @@ public:
 
         int ch_idx = char_map.at(ch);
 
+        // TODO simulate the state of matrix if the chosen charater would be
+        // picked i.e. update probabilities as letters are chosen
+        // so if accuracy is e.g 0.9 then chosen CharPair has chance of 0.9 to
+        // increase variable correct count by 1 and 0.1 to increase variable
+        // wrong. This should also update the accuracy value before simulating
+        // next character. This allows simulation of a whole sentence the user
+        // would type
         std::string out = "";
         while (word_size--){
             out.push_back(ch);

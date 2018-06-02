@@ -45,6 +45,8 @@ int main()
 
     int current_errors{};
 
+    // TODO add try and catch around while loop and afte C-c is pressed catch
+    // and write matrix to disk to avoid writing all the time.
     while(1){
         getyx(stdscr, y, x);
         ch = getch();
@@ -96,6 +98,9 @@ int main()
             // inaccurate but erased and accurate one gets typed in. This means
             // that inaccurate typings have less influence than correct ones.
             // Fix this.
+            // TODO test this logic more since there are multiple edge cases
+            // that are acting weird such as pressing wrong character instead
+            // of space
             bool correct = last_char_correct(typed, sentence);
             int pos = typed.length() - 1;
             char current = typed[pos];
