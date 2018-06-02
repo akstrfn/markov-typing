@@ -11,20 +11,22 @@
 
 #include "utils.hh"
 
-// TODO in this matrix history should be accounted for to lower the oscillation
-// of key probabilities e.g. if guess = 1, miss = 0 then [0, 1, 0, 1, 1] is an
-// array of past performance for the key then some function should be used to
-// map this into 0-1 range. log maybe? linear? weighted average?
 
-// TODO if characters are typed correctly often the probabiblities after a
-// while become all 1 and then it is not useful to generate anything from the
-// matrix anymore. Some sort of time pressure should be added which should also
-// be accounted for in the function that updates the probabilies.
+struct CharPair {
+    char row_char;
+    char col_char;
+    double probability;
+    size_t correct; //start having one correct typing as an assumption
+    size_t wrong;
+};
+
+// TODO Some sort of time pressure should be added which should also be
+// accounted for in the function that updates the probabilies.
 
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct based on how frequent they were typed correctly
 class ProbabilityMatrix {
-    std::vector<std::vector<double>> data;
+    std::vector<std::vector<CharPair>> data;
     std::string characters;
     std::map<char, int> char_map;
 public:
@@ -33,11 +35,22 @@ public:
         auto len = characters.length();
         data.reserve(len);
         for(auto i=0ul; i != len; ++i){
-            data.push_back(std::vector<double>(len));
             char_map[characters[i]] = i;
+            std::vector<CharPair> row;
+            row.reserve(len);
+            for(auto j=0ul; j != len; ++j){
+                CharPair chp;
+                chp.row_char = characters[i];
+                chp.col_char = characters[j];
+                chp.probability = 1.0/std::size(characters);
+                chp.correct = 1;
+                chp.wrong = 0;
+                row.push_back(chp);
+            }
+            data.push_back(row);
         }
-        
     };
+
     auto to_string(){
         std::stringstream ss;
         ss << std::fixed << std::setprecision(2) << "    ";
@@ -50,7 +63,7 @@ public:
             ss << characters[i] << " | ";
             for(auto el=row.begin(); el != row.end(); ++el){
                 auto tmp = (el == row.end() - 1) ? "\n"  : ", ";
-                ss << *el << tmp;
+                ss << el->probability << tmp;
             }
         }
         return ss.str();
@@ -63,7 +76,7 @@ public:
             auto row = data[i];
             for(auto el=row.begin(); el != row.end(); ++el){
                 auto tmp = (el == row.end() - 1) ? "\n"  : ",";
-                ss << *el << tmp;
+                ss << el->probability << tmp;
             }
         }
         return ss.str();
@@ -83,29 +96,49 @@ public:
         std::getline(f, s, ',');
     }
 
+    // TODO BUG updates when some wrong character instead of space is pressed
     void update_element(const char& predecessor,
-                        const char& current_char, const bool& correct){
+                        const char& current_char,
+                        const bool& correct){
         try {
             auto from_idx = char_map.at(predecessor);
             auto current_idx = char_map.at(current_char);
-            data[from_idx][current_idx] = (data[from_idx][current_idx] + correct) / 2;
+            CharPair* chp = &data[from_idx][current_idx];
+            if (correct)
+                chp->correct += 1;
+            else
+                chp->wrong += 1;
+
+            // TODO total_typed should be separate vector variable for every
+            // row?
+            auto row = data[from_idx];
+            double total_typed =
+                std::accumulate(std::begin(row), std::end(row), 0.0,
+                    [](auto& lhs, auto& rhs){
+                        return lhs + rhs.correct + rhs.wrong;
+                    });
+            // update probabilities in a whole row
+            for (auto& el : data[from_idx])
+                el.probability = el.correct / total_typed;
+
         } catch (std::out_of_range&) {}
     }
 
     std::string generate_word(int word_size){
-        //sum all rows and use them as weighted probabilites to chose a
-        //starting character after that just chain 4 keys in that row that were
-        //the worst i.e. have the smallest probabilities
-        std::vector<double> weights(characters.length());
-        for (auto i=0ul; i != characters.length(); ++i){
-            // invert weights
-            weights[i] = std::size(data[i])
-                         - std::accumulate(std::begin(data[i]),
-                                           std::end(data[i]),
-                                           0.0);
-        }
+        // sum cols to determine weights, the highest sum denotes highest
+        // chance to end up picking that letter in a chain
+        std::vector<double> weights;
+        weights.reserve(characters.length());
+        for (auto& row : data)
+            for (auto j=0ul; j != std::size(row); ++j)
+                weights[j] += row[j].probability;
 
-        // string container has null character so repick until ch != \000
+        // invert probabilities
+        auto max_el = *std::max_element(std::begin(weights), std::end(weights));
+        std::transform(std::begin(weights), std::end(weights), std::begin(weights),
+                       [max_el](const auto& el){ return max_el - el; });
+
+        // get first character
         char ch = '\000';
         while (ch == '\000')
             ch = *weighted_choice(characters, weights);
@@ -118,22 +151,14 @@ public:
 
             auto row = data[ch_idx];
 
-            // TODO since always the same element is picked deterministically
-            // then sometimes weird combinations come up like buch of same
-            // characters one after another like ffff or gfff etc. This means
-            // that it should be randomized a bit. Probably weighted choice
-            // would do as well.
-
             // Trying out to randomize choices a bit
             std::vector<double> inverse_probs;
             inverse_probs.reserve(std::size(row));
             std::transform(std::begin(row), std::end(row), std::begin(inverse_probs),
-                           [](auto el){ return 1 - el; });
+                           [](auto& el){ return 1 - el.probability; });
 
             auto next = weighted_choice(characters, inverse_probs);
             ch_idx = std::distance(std::begin(characters), next);
-            //auto next = std::min_element(std::begin(row), std::end(row));
-            //ch_idx = std::distance(std::begin(row), next);
 
             ch = characters[ch_idx];
         }
