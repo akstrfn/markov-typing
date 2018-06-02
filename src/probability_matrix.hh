@@ -106,14 +106,12 @@ public:
                                          std::end(data[i]),
                                          0.0);
         }
-        char ch = *weighted_choice(characters, weights);
-        // TODO can avoiding the null character be solved better?
-        while (1){
-            if (ch == '\000')
-                ch = *weighted_choice(characters, weights);
-            else
-                break;
-        }
+
+        // string container has null character so repick until ch != \000
+        char ch = '\000';
+        while (ch == '\000')
+            ch = *weighted_choice(characters, weights);
+
         int ch_idx = char_map.at(ch);
 
         std::string out = "";
