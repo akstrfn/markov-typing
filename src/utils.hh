@@ -39,10 +39,13 @@ almost_equal(T x, T y, int ulp)
 }
 
 template <typename Seq>
-char choice(const Seq& sequence){
+auto choice(Seq& sequence){
     std::mt19937 gen(std::random_device{}());
     std::uniform_int_distribution<> dis(0, std::size(sequence) - 1);
-    return sequence[dis(gen)];
+
+    auto it = std::begin(sequence);
+    std::advance(it, dis(gen));
+    return it;
 }
 
 template <typename Seq, typename W>
