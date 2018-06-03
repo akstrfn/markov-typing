@@ -3,7 +3,9 @@
 #include <vector>
 #include <iterator>
 #include <iostream>
+#include <filesystem>
 #include <curses.h>
+
 #include "stats.hh"
 #include "probability_matrix.hh"
 #include "utils.hh"
