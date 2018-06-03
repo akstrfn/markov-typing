@@ -5,12 +5,13 @@ include(GNUInstallDirs)
 
 find_package(Curses REQUIRED)
 
-add_executable(typing
-    src/main.cc
-    )
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-DDEBUG)
+endif()
 
-target_link_libraries(typing
-    curses)
+add_executable(typing src/main.cc)
+
+target_link_libraries(typing curses stdc++fs)
 
 target_compile_features(typing
     PRIVATE
