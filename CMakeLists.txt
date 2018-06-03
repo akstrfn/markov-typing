@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.11)
 project(deliberate_typing)
 
+include(GNUInstallDirs)
+
 find_package(Curses REQUIRED)
 
 add_executable(typing
@@ -20,3 +22,5 @@ target_compile_options(typing
         $<$<CXX_COMPILER_ID:GNU>:-Wall>
         $<$<CXX_COMPILER_ID:Clang>:-Weverything>
     )
+
+install(TARGETS typing DESTINATION "${CMAKE_INSTALL_BINDIR}")
