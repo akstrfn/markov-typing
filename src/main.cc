@@ -112,14 +112,12 @@ int main()
 
         current_errors = missed_characters(typed, sentence);
 
+#ifdef DEBUG
         printnm(LINES - 4, 2, "Errors: " + std::to_string(current_errors));
         printnm(LINES - 3, 2, "Typed " + typed);
         //printnm(0, 0, m.to_string());
         m.write_to_file("matrix_console");
-        std::ofstream file;
-        file.open("matrix.csv");
-        file << m.to_csv_string();
-
+#endif
     }
     // save progress
     std::string fpath;
