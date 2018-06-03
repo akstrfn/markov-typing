@@ -46,11 +46,12 @@ int main()
 
     int current_errors{};
 
-    // TODO add try and catch around while loop and afte C-c is pressed catch
-    // and write matrix to disk to avoid writing all the time.
-    while(1){
+    while(ch != KEY_F(1)){
         getyx(stdscr, y, x);
         ch = getch();
+        auto res = std::find(std::begin(lowercase), std::end(lowercase), ch);
+        if (res == std::end(lowercase) && !is_enter(ch) && !is_backspace(ch) && ch != ' ')
+            continue;
 
         if (typed.size() == std::size(sentence)){
             if (is_enter(ch)){
