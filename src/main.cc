@@ -23,12 +23,13 @@ int main()
     std::string numbers = "0123456789";
 
     // for testing
-    lowercase = "asdf";
+    //lowercase = "asdf";
     ProbabilityMatrix m(lowercase);
     std::string sentence = m.generate_sentence(8);
 
     initscr();
-    cbreak();
+    raw(); // use raw to catch ctrl-c
+    // cbreak();
     noecho();
     keypad(stdscr, 1);
     start_color();
