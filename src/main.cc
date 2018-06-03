@@ -121,8 +121,20 @@ int main()
         file << m.to_csv_string();
 
     }
-    //refresh();
-    while(getch() != KEY_F(1)){ }
+    // save progress
+    std::string fpath;
+    auto path = std::getenv("XDG_DATA_HOME");
+    if (path)
+        fpath = std::string(path) + "Deliberate Typing/matrix.csv";
+    else
+        fpath = std::string(std::getenv("HOME")) + "/.local/share/DeliberateTyping";
+    std::filesystem::create_directories(fpath);
+    fpath += "/matrix.csv";
+
+    // TODO what if there is not even home defined?
+    std::ofstream file{fpath};
+    file << m.to_csv_string();
+
     endwin();
     return 0;
 }
