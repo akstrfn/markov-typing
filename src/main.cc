@@ -101,21 +101,12 @@ int main()
                 addch(sentence[typed.length() - 1] | COLOR_PAIR(1));
         }
 
-        // prob matrix update
-        // update only if we have a predecessor and if the movement was not
-        // made with backspace
+        // Probability matrix update
         if (auto len=typed.length();
                 len > 1  // prevent going past the begining
                 && !is_backspace(ch) // when hitting backspace dont update
                 && !errors[len] // when last character was error dont update it anymore
                 && current_errors == 0){ // don't update if all errors are not cleared
-            // TODO this still updates the probability if the character was
-            // inaccurate but erased and accurate one gets typed in. This means
-            // that inaccurate typings have less influence than correct ones.
-            // Fix this.
-            // TODO test this logic more since there are multiple edge cases
-            // that are acting weird such as pressing wrong character instead
-            // of space
             bool correct = last_char_correct(typed, sentence);
             int pos = typed.length() - 1;
             char current = typed[pos];
