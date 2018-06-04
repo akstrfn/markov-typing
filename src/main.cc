@@ -4,6 +4,7 @@
 #include <iterator>
 #include <iostream>
 #include <filesystem>
+#include <sstream>
 #include <curses.h>
 
 #include "stats.hh"
@@ -47,6 +48,8 @@ int main()
     mvprintw(mid_y, mid_x, "%s", sentence.c_str());
     move(mid_y, mid_x);
 
+    std::vector<short> errors; // really just 0 or 1 is necessary here
+    errors.reserve(50);
     int current_errors{};
 
     while(ch != KEY_F(1)){
@@ -56,16 +59,15 @@ int main()
         if (res == std::end(lowercase) && !is_enter(ch) && !is_backspace(ch) && ch != ' ')
             continue;
 
-        if (typed.size() == std::size(sentence)){
-            if (is_enter(ch)){
+        if (typed.size() == std::size(sentence)) {
+            if (is_enter(ch)) {
                 typed.clear();
+                errors.clear();
                 // sentence = generate(lowercase, 40);
                 sentence = m.generate_sentence(8);
                 printnm(mid_y, mid_x, sentence.c_str());
                 move(mid_y, mid_x);
-            } else if (current_errors != 0
-                       && is_backspace(ch))
-            {
+            } else if (current_errors != 0 && is_backspace(ch)) { 
                 // allow backspace
             } else {
                 // block any new entry of characters since we are at the end
@@ -84,21 +86,29 @@ int main()
                 move(y, x);
                 typed.pop_back();
             }
-        } else if (sentence[x - mid_x] == ch) {
+        } else if (sentence[x - mid_x] == ch) { // correct one
             typed.push_back(ch);
+            if (std::size(typed) > std::size(errors))
+                errors.push_back(0);
             addch(ch | COLOR_PAIR(2));
-        } else {
+        } else { // wrong one
             typed.push_back(ch);
-            if (sentence[typed.length() - 1] == ' ')
+            if (std::size(typed) > std::size(errors))
+                errors.push_back(1);
+            if (sentence[typed.length() - 1] == ' ') //space
                 addch(sentence[typed.length() - 1] | COLOR_PAIR(3));
-            else
+            else //all others
                 addch(sentence[typed.length() - 1] | COLOR_PAIR(1));
         }
 
         // prob matrix update
         // update only if we have a predecessor and if the movement was not
         // made with backspace
-        if (typed.length() > 1 && !is_backspace(ch)){
+        if (auto len=typed.length();
+                len > 1  // prevent going past the begining
+                && !is_backspace(ch) // when hitting backspace dont update
+                && !errors[len] // when last character was error dont update it anymore
+                && current_errors == 0){ // don't update if all errors are not cleared
             // TODO this still updates the probability if the character was
             // inaccurate but erased and accurate one gets typed in. This means
             // that inaccurate typings have less influence than correct ones.
