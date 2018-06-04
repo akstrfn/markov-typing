@@ -88,12 +88,8 @@ public:
         fs << to_string();
     }
 
-    // TODO finish me
+    // TODO use json to save/read to/from disk
     void read_from_csv(const std::string& filename){
-        std::ifstream f;
-        f.open(filename);
-        std::string s;
-        std::getline(f, s, ',');
     }
 
     // TODO BUG updates when some wrong character instead of space is pressed
@@ -119,7 +115,7 @@ public:
                     });
             // update probabilities in a whole row
             for (auto& el : data[from_idx])
-                el.probability = el.correct / total_typed;
+                el.probability = (el.correct + el.wrong) / total_typed;
 
         } catch (std::out_of_range&) {}
     }
