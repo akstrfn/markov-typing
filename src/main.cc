@@ -55,6 +55,9 @@ int main()
     while(ch != KEY_F(1)){
         getyx(stdscr, y, x);
         ch = getch();
+        // TODO BUG: this disallows characters that are not on the list
+        // entirely which is not desired i.e. if lowercase = 'a' then only 'a'
+        // can be typed!
         auto res = std::find(std::begin(lowercase), std::end(lowercase), ch);
         if (res == std::end(lowercase) && !is_enter(ch) && !is_backspace(ch) && ch != ' ')
             continue;
@@ -102,7 +105,7 @@ int main()
         }
 
         // Probability matrix update
-        if (auto len=typed.length();
+        if (auto len=std::size(typed);
                 len > 1  // prevent going past the begining
                 && !is_backspace(ch) // when hitting backspace dont update
                 && !errors[len] // when last character was error dont update it anymore
@@ -111,7 +114,9 @@ int main()
             int pos = typed.length() - 1;
             char current = typed[pos];
             char last = sentence[pos - 1];
-            // ignore space for now
+            // Ignore space entirely for now
+            // TODO (this means that even when mistakes with space are made it
+            // is not counted)
             if (last != ' ')
                 m.update_element(last, current, correct);
         }
@@ -136,7 +141,7 @@ int main()
     std::string fpath;
     auto path = std::getenv("XDG_DATA_HOME");
     if (path)
-        fpath = std::string(path) + "Deliberate Typing/matrix.csv";
+        fpath = std::string(path) + "DeliberateTyping/matrix.csv";
     else
         fpath = std::string(std::getenv("HOME")) + "/.local/share/DeliberateTyping";
     std::filesystem::create_directories(fpath);
