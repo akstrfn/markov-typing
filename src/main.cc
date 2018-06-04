@@ -24,14 +24,15 @@ int main()
     std::string symbols = "`~!@#$%^&*()-_=+{[]};:'\"\\|,<.>/?";
     std::string numbers = "0123456789";
 
-    // for testing
-    //lowercase = "asdf";
+#if DEBUG
+    lowercase = "asdf";
+#endif
     ProbabilityMatrix m(lowercase);
     std::string sentence = m.generate_sentence(8);
 
     initscr();
-    raw(); // use raw to catch ctrl-c
-    // cbreak();
+    raw();
+    // cbreak(); // use to enable ctrl-c
     noecho();
     keypad(stdscr, 1);
     start_color();
@@ -117,13 +118,20 @@ int main()
         current_errors = missed_characters(typed, sentence);
 
 #ifdef DEBUG
-        printnm(LINES - 4, 2, "Errors: " + std::to_string(current_errors));
-        printnm(LINES - 3, 2, "Typed " + typed);
-        //printnm(0, 0, m.to_string());
+        printnm(LINES - 5, 2, "Errors: " + std::to_string(current_errors));
+
+        std::stringstream ss;
+        for (auto& el : errors)
+            ss << el;
+
+        printnm(LINES - 4, 2, "Error: " + ss.str());
+        printnm(LINES - 3, 2, "Typed: " + typed);
         m.write_to_file("matrix_console");
 #endif
     }
-    // save progress
+    // Save progress
+    // TODO check these paths before starting to avoid exercising and then not
+    // being able to save
     std::string fpath;
     auto path = std::getenv("XDG_DATA_HOME");
     if (path)
