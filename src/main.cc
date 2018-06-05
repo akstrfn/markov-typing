@@ -28,8 +28,8 @@ int main()
 #if DEBUG
     lowercase = "asdf";
 #endif
-    ProbabilityMatrix m(lowercase);
-    std::string sentence = m.generate_sentence(8);
+    ProbabilityMatrix ProbMatrix(lowercase);
+    std::string sentence = ProbMatrix.generate_sentence(8);
 
     initscr();
     raw();
@@ -67,7 +67,7 @@ int main()
                 typed.clear();
                 errors.clear();
                 // sentence = generate(lowercase, 40);
-                sentence = m.generate_sentence(8);
+                sentence = ProbMatrix.generate_sentence(8);
                 printnm(mid_y, mid_x, sentence.c_str());
                 move(mid_y, mid_x);
             } else if (current_errors != 0 && is_backspace(ch)) { 
@@ -118,7 +118,7 @@ int main()
             // TODO (this means that even when mistakes with space are made it
             // is not counted)
             if (last != ' ')
-                m.update_element(last, current, correct);
+                ProbMatrix.update_element(last, current, correct);
         }
 
         current_errors = missed_characters(typed, sentence);
@@ -132,7 +132,7 @@ int main()
 
         printnm(LINES - 4, 2, "Error: " + ss.str());
         printnm(LINES - 3, 2, "Typed: " + typed);
-        m.write_to_file("matrix_console");
+        ProbMatrix.write_to_file("matrix_console");
 #endif
     }
     // Save progress
@@ -149,7 +149,7 @@ int main()
 
     // TODO what if there is not even home defined?
     std::ofstream file{fpath};
-    file << m.to_csv_string();
+    file << ProbMatrix.to_csv_string();
 
     endwin();
     return 0;
