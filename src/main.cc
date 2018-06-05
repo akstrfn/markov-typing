@@ -132,7 +132,10 @@ int main()
 
         printnm(LINES - 4, 2, "Error: " + ss.str());
         printnm(LINES - 3, 2, "Typed: " + typed);
-        ProbMatrix.write_to_file("matrix_console");
+
+        std::ofstream fs;
+        fs.open("matrix_console");
+        fs << m.to_string();
 #endif
     }
     // Save progress

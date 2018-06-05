@@ -86,13 +86,6 @@ public:
         return js.dump(2);
     }
 
-    // TODO remove this function
-    void write_to_file(const std::string& filename){
-        std::ofstream fs;
-        fs.open(filename);
-        fs << to_string();
-    }
-
     // TODO use json to save/read to/from disk
     void read_from_json(const std::string& filename){
     }
