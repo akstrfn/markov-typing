@@ -9,12 +9,15 @@
 #include <fstream>
 #include <iomanip>
 
+#include <nlohmann/json.hpp>
+
 #include "utils.hh"
 
+using json = nlohmann::json;
 
 struct CharPair {
-    char row_char;
-    char col_char;
+    char row;
+    char col;
     double probability;
     size_t correct; //start having one correct typing as an assumption
     size_t wrong;
@@ -40,8 +43,8 @@ public:
             row.reserve(len);
             for(auto j=0ul; j != len; ++j){
                 CharPair chp;
-                chp.row_char = characters[i];
-                chp.col_char = characters[j];
+                chp.row = characters[i];
+                chp.col = characters[j];
                 chp.probability = 1.0/std::size(characters);
                 chp.correct = 1;
                 chp.wrong = 0;

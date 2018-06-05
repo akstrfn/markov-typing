@@ -2,8 +2,15 @@ cmake_minimum_required(VERSION 3.11)
 project(deliberate_typing)
 
 include(GNUInstallDirs)
-
 find_package(Curses REQUIRED)
+
+if(NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp)
+    file(DOWNLOAD
+        https://github.com/nlohmann/json/releases/download/v3.1.2/json.hpp
+        ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp
+        )
+endif()
+
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions(-DDEBUG)
@@ -23,6 +30,8 @@ target_compile_options(typing
         $<$<CXX_COMPILER_ID:GNU>:-Wall>
         $<$<CXX_COMPILER_ID:Clang>:-Weverything>
     )
+
+target_include_directories(typing PRIVATE third_party)
 
 # YouCompleteMe setup
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
