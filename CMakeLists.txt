@@ -24,4 +24,10 @@ target_compile_options(typing
         $<$<CXX_COMPILER_ID:Clang>:-Weverything>
     )
 
+# YouCompleteMe setup
+set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
+add_custom_target(link_for_compile_commands ALL
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink
+                  ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json)
+
 install(TARGETS typing DESTINATION "${CMAKE_INSTALL_BINDIR}")
