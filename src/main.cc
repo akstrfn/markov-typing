@@ -149,7 +149,7 @@ int main()
 
     // TODO what if there is not even home defined?
     std::ofstream file{fpath};
-    file << ProbMatrix.to_csv_string();
+    file << ProbMatrix.to_json_string();
 
     endwin();
     return 0;

@@ -72,19 +72,21 @@ public:
         return ss.str();
     }
 
-    auto to_csv_string(){
-        std::stringstream ss;
-        ss << std::setprecision(4);
-        for(auto i=0ul; i != std::size(data); ++i){
-            auto row = data[i];
-            for(auto el=row.begin(); el != row.end(); ++el){
-                auto tmp = (el == row.end() - 1) ? "\n"  : ",";
-                ss << el->probability << tmp;
+    auto to_json_string(){
+        json js;
+        for (auto& row : data){
+            for(auto& el : row){
+                js["ProbabilityMatrix"].push_back({{"row", el.row},
+                                                   {"col", el.col},
+                                                   {"probability", el.probability},
+                                                   {"correct", el.correct},
+                                                   {"wrong", el.wrong}});
             }
         }
-        return ss.str();
+        return js.dump(2);
     }
 
+    // TODO remove this function
     void write_to_file(const std::string& filename){
         std::ofstream fs;
         fs.open(filename);
@@ -92,7 +94,7 @@ public:
     }
 
     // TODO use json to save/read to/from disk
-    void read_from_csv(const std::string& filename){
+    void read_from_json(const std::string& filename){
     }
 
     // TODO BUG updates when some wrong character instead of space is pressed
