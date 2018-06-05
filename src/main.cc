@@ -25,11 +25,22 @@ int main()
     std::string symbols = "`~!@#$%^&*()-_=+{[]};:'\"\\|,<.>/?";
     std::string numbers = "0123456789";
 
+    std::string characters = lowercase + uppercase + symbols + numbers;
+
 #if DEBUG
-    lowercase = "asdf";
+    characters = "asdf";
 #endif
-    ProbabilityMatrix ProbMatrix(lowercase);
+
+    std::string tmppath;
+    tmppath = std::string(std::getenv("HOME")) + "/.local/share/DeliberateTyping/matrix.csv";
+
+
+    ProbabilityMatrix ProbMatrix(characters);
     std::string sentence = ProbMatrix.generate_sentence(8);
+
+    std::filesystem::path tmpfile{tmppath};
+    if (std::filesystem::exists(tmpfile))
+        ProbMatrix.read_from_json(tmppath); // TODO: if loading failed add fallback
 
     initscr();
     raw();
@@ -56,17 +67,17 @@ int main()
         getyx(stdscr, y, x);
         ch = getch();
         // TODO BUG: this disallows characters that are not on the list
-        // entirely which is not desired i.e. if lowercase = 'a' then only 'a'
+        // entirely which is not desired i.e. if characters = 'a' then only 'a'
         // can be typed!
-        auto res = std::find(std::begin(lowercase), std::end(lowercase), ch);
-        if (res == std::end(lowercase) && !is_enter(ch) && !is_backspace(ch) && ch != ' ')
+        auto res = std::find(std::begin(characters), std::end(characters), ch);
+        if (res == std::end(characters) && !is_enter(ch) && !is_backspace(ch) && ch != ' ')
             continue;
 
         if (typed.size() == std::size(sentence)) {
             if (is_enter(ch)) {
                 typed.clear();
                 errors.clear();
-                // sentence = generate(lowercase, 40);
+                // sentence = generate(characters, 40);
                 sentence = ProbMatrix.generate_sentence(8);
                 printnm(mid_y, mid_x, sentence.c_str());
                 move(mid_y, mid_x);

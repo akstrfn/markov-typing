@@ -21,6 +21,8 @@ struct CharPair {
     double probability;
     size_t correct; //start having one correct typing as an assumption
     size_t wrong;
+    std::string row_char;
+    std::string col_char;
 };
 
 // TODO Some sort of time pressure should be added which should also be
@@ -48,7 +50,9 @@ public:
                 chp.probability = 1.0/std::size(characters);
                 chp.correct = 1;
                 chp.wrong = 0;
-                row.push_back(chp);
+                chp.row_char = characters[i];
+                chp.col_char = characters[j];
+                row.push_back(std::move(chp));
             }
             data.push_back(row);
         }
@@ -73,14 +77,18 @@ public:
     }
 
     auto to_json_string(){
+        // lot of info is redundant but its not important for now
         json js;
+        js["Characters"] = characters;
         for (auto& row : data){
             for(auto& el : row){
-                js["ProbabilityMatrix"].push_back({{"row", el.row},
-                                                   {"col", el.col},
-                                                   {"probability", el.probability},
-                                                   {"correct", el.correct},
-                                                   {"wrong", el.wrong}});
+                js["Matrix"].push_back({{"row", el.row},
+                                        {"col", el.col},
+                                        {"probability", el.probability},
+                                        {"correct", el.correct},
+                                        {"wrong", el.wrong},
+                                        {"row_char", el.row_char},
+                                        {"col_char", el.col_char}});
             }
         }
         return js.dump(2);
@@ -88,6 +96,9 @@ public:
 
     // TODO use json to save/read to/from disk
     void read_from_json(const std::string& filename){
+        json js;
+        std::ifstream iss(filename);
+        js.parse(iss);
     }
 
     // TODO BUG updates when some wrong character instead of space is pressed
