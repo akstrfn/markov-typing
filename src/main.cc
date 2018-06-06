@@ -26,6 +26,7 @@ int main()
     std::string numbers = "0123456789";
 
     std::string characters = lowercase + uppercase + symbols + numbers;
+    std::string all_chars = characters;
 
 #if DEBUG
     characters = "asdf";
@@ -36,11 +37,12 @@ int main()
 
 
     ProbabilityMatrix ProbMatrix(characters);
-    std::string sentence = ProbMatrix.generate_sentence(8);
-
+    // TODO: if loading failed add fallback
     std::filesystem::path tmpfile{tmppath};
     if (std::filesystem::exists(tmpfile))
-        ProbMatrix.read_from_json(tmppath); // TODO: if loading failed add fallback
+        ProbMatrix = ProbabilityMatrix::read_from_json(tmppath);
+
+    std::string sentence = ProbMatrix.generate_sentence(8);
 
     initscr();
     raw();
@@ -69,7 +71,7 @@ int main()
         // TODO BUG: this disallows characters that are not on the list
         // entirely which is not desired i.e. if characters = 'a' then only 'a'
         // can be typed!
-        auto res = std::find(std::begin(characters), std::end(characters), ch);
+        auto res = std::find(std::begin(all_chars), std::end(all_chars), ch);
         if (res == std::end(characters) && !is_enter(ch) && !is_backspace(ch) && ch != ' ')
             continue;
 
@@ -146,7 +148,7 @@ int main()
 
         std::ofstream fs;
         fs.open("matrix_console");
-        fs << m.to_string();
+        fs << ProbMatrix.to_string();
 #endif
     }
     // Save progress

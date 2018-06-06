@@ -76,6 +76,8 @@ public:
         return ss.str();
     }
 
+    //TODO write better serialization and deserialization
+    //https://github.com/nlohmann/json#arbitrary-types-conversions
     auto to_json_string(){
         // lot of info is redundant but its not important for now
         json js;
@@ -95,10 +97,12 @@ public:
     }
 
     // TODO use json to save/read to/from disk
-    void read_from_json(const std::string& filename){
-        json js;
+    static auto read_from_json(const std::string& filename){
         std::ifstream iss(filename);
-        js.parse(iss);
+        json js = json::parse(iss);
+        std::string characters = js.at("Characters").get<std::string>();
+        ProbabilityMatrix pm{characters};
+        return pm;
     }
 
     // TODO BUG updates when some wrong character instead of space is pressed
