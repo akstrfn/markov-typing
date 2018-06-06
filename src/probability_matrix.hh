@@ -16,8 +16,8 @@
 using json = nlohmann::json;
 
 struct CharPair {
-    char row;
-    char col;
+    int row;
+    int col;
     double probability;
     size_t correct; //start having one correct typing as an assumption
     size_t wrong;
@@ -36,8 +36,8 @@ void to_json(json& j, const CharPair& p) {
 }
 
 void from_json(const json& j, CharPair& p) {
-    p.row = j.at("row").get<char>();
-    p.col = j.at("col").get<char>();
+    p.row = j.at("row").get<int>();
+    p.col = j.at("col").get<int>();
     p.probability = j.at("probability").get<double>();
     p.correct = j.at("correct").get<size_t>();
     p.wrong = j.at("wrong").get<size_t>();
@@ -65,8 +65,8 @@ public:
             row.reserve(len);
             for(auto j=0ul; j != len; ++j){
                 CharPair chp;
-                chp.row = characters[i];
-                chp.col = characters[j];
+                chp.row = i;
+                chp.col = j;
                 chp.probability = 1.0/std::size(characters);
                 chp.correct = 1;
                 chp.wrong = 0;
@@ -76,6 +76,14 @@ public:
             }
             data.push_back(row);
         }
+    };
+
+    ProbabilityMatrix(const decltype(data) _data,
+                      const std::string& _characters)
+                          : data(_data), characters(_characters){
+        auto len = characters.length();
+        for(auto i=0ul; i != len; ++i)
+            char_map[characters[i]] = i;
     };
 
     auto to_string(){
@@ -100,21 +108,21 @@ public:
         // lot of info is redundant but its not important for now
         json js;
         js["Characters"] = characters;
-        // TODO: Perhaps this can be made even shorter with good use of json
-        // library
         for (auto& row : data)
             for(auto& el : row)
                 js["Matrix"].push_back(el);
         return js.dump(2);
     }
 
-    // TODO use json to save/read to/from disk
+    // TODO test this
     static auto read_from_json(const std::string& filename){
-        std::ifstream iss(filename);
-        json js = json::parse(iss);
+        json js = json::parse(std::ifstream{filename});
         std::string characters = js.at("Characters").get<std::string>();
-        ProbabilityMatrix pm{characters};
-        return pm;
+        auto sz = std::size(characters);
+        std::vector<std::vector<CharPair>> tmpdata(sz, std::vector<CharPair>(sz));
+        for (auto& d: js.at("Matrix").get<std::vector<CharPair>>())
+            tmpdata[d.row][d.col] = d;
+        return ProbabilityMatrix{tmpdata, characters};
     }
 
     // TODO BUG updates when some wrong character instead of space is pressed
@@ -159,6 +167,7 @@ public:
         std::transform(std::begin(weights), std::end(weights), std::begin(weights),
                        [max_el](const auto& el){ return max_el - el; });
 
+        // TODO specialize weighted_choice for std::string
         // get first character
         char ch = '\000';
         while (ch == '\000')
