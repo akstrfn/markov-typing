@@ -22,7 +22,7 @@ int main()
 {
     std::string lowercase = "qwertyuiopasdfghjklzxcvbnm";
     std::string uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
-    std::string symbols = "`~!@#$%^&*()-_=+{[]};:'\"\\|,<.>/?";
+    std::string symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
     std::string numbers = "0123456789";
 
     std::string characters = lowercase + uppercase + symbols + numbers;
