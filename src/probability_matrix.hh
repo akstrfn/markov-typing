@@ -78,14 +78,6 @@ public:
         }
     };
 
-    ProbabilityMatrix(const decltype(data) _data,
-                      const std::string& _characters)
-                          : data(_data), characters(_characters){
-        auto len = characters.length();
-        for(auto i=0ul; i != len; ++i)
-            char_map[characters[i]] = i;
-    };
-
     auto to_string(){
         std::stringstream ss;
         ss << std::fixed << std::setprecision(2) << "    ";
@@ -111,18 +103,22 @@ public:
         for (auto& row : data)
             for(auto& el : row)
                 js["Matrix"].push_back(el);
-        return js.dump(2);
+        return js.dump();
     }
 
     // TODO test this
-    static auto read_from_json(const std::string& filename){
+    auto read_from_json(const std::string& filename){
         json js = json::parse(std::ifstream{filename});
         std::string characters = js.at("Characters").get<std::string>();
+
+        for(auto i=0ul; i != std::size(characters); ++i)
+            char_map[characters[i]] = i;
+
         auto sz = std::size(characters);
         std::vector<std::vector<CharPair>> tmpdata(sz, std::vector<CharPair>(sz));
         for (auto& d: js.at("Matrix").get<std::vector<CharPair>>())
             tmpdata[d.row][d.col] = d;
-        return ProbabilityMatrix{tmpdata, characters};
+        data = tmpdata;
     }
 
     // TODO BUG updates when some wrong character instead of space is pressed

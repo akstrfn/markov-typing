@@ -38,9 +38,11 @@ int main()
 
     ProbabilityMatrix ProbMatrix(characters);
     // TODO: if loading failed add fallback
+    // TODO: BUG: when file is loaded then matrix is not updated correctly i.e.
+    // it is not updated at all many times.
     std::filesystem::path tmpfile{tmppath};
     if (std::filesystem::exists(tmpfile))
-        ProbMatrix = ProbabilityMatrix::read_from_json(tmppath);
+        ProbMatrix.read_from_json(tmppath);
 
     std::string sentence = ProbMatrix.generate_sentence(8);
 
@@ -72,7 +74,7 @@ int main()
         // entirely which is not desired i.e. if characters = 'a' then only 'a'
         // can be typed!
         auto res = std::find(std::begin(all_chars), std::end(all_chars), ch);
-        if (res == std::end(characters) && !is_enter(ch) && !is_backspace(ch) && ch != ' ')
+        if (res == std::end(all_chars) && !is_enter(ch) && !is_backspace(ch) && ch != ' ')
             continue;
 
         if (typed.size() == std::size(sentence)) {
@@ -117,11 +119,14 @@ int main()
                 addch(sentence[typed.length() - 1] | COLOR_PAIR(1));
         }
 
+        // TODO BUG: errors are not counted since errors[len-1] prevents it
+        // because it is updated first. Again some relation with size of typing
+        // should be made.
         // Probability matrix update
         if (auto len=std::size(typed);
                 len > 1  // prevent going past the begining
                 && !is_backspace(ch) // when hitting backspace dont update
-                && !errors[len] // when last character was error dont update it anymore
+                && !errors[len - 1] // when last character was error dont update it anymore
                 && current_errors == 0){ // don't update if all errors are not cleared
             bool correct = last_char_correct(typed, sentence);
             int pos = typed.length() - 1;
