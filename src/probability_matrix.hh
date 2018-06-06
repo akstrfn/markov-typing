@@ -25,6 +25,26 @@ struct CharPair {
     std::string col_char;
 };
 
+void to_json(json& j, const CharPair& p) {
+    j = json{{"row", p.row},
+             {"col", p.col},
+             {"probability", p.probability},
+             {"correct", p.correct},
+             {"wrong", p.wrong},
+             {"row_char", p.row_char},
+             {"col_char", p.col_char}};
+}
+
+void from_json(const json& j, CharPair& p) {
+    p.row = j.at("row").get<char>();
+    p.col = j.at("col").get<char>();
+    p.probability = j.at("probability").get<double>();
+    p.correct = j.at("correct").get<size_t>();
+    p.wrong = j.at("wrong").get<size_t>();
+    p.row_char = j.at("row_char").get<std::string>();
+    p.col_char = j.at("col_char").get<std::string>();
+}
+
 // TODO Some sort of time pressure should be added which should also be
 // accounted for in the function that updates the probabilies.
 
@@ -76,23 +96,15 @@ public:
         return ss.str();
     }
 
-    //TODO write better serialization and deserialization
-    //https://github.com/nlohmann/json#arbitrary-types-conversions
     auto to_json_string(){
         // lot of info is redundant but its not important for now
         json js;
         js["Characters"] = characters;
-        for (auto& row : data){
-            for(auto& el : row){
-                js["Matrix"].push_back({{"row", el.row},
-                                        {"col", el.col},
-                                        {"probability", el.probability},
-                                        {"correct", el.correct},
-                                        {"wrong", el.wrong},
-                                        {"row_char", el.row_char},
-                                        {"col_char", el.col_char}});
-            }
-        }
+        // TODO: Perhaps this can be made even shorter with good use of json
+        // library
+        for (auto& row : data)
+            for(auto& el : row)
+                js["Matrix"].push_back(el);
         return js.dump(2);
     }
 
