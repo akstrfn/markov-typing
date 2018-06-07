@@ -119,24 +119,26 @@ int main()
                 addch(sentence[typed.length() - 1] | COLOR_PAIR(1));
         }
 
-        // TODO BUG: errors are not counted since errors[len-1] prevents it
-        // because it is updated first. Again some relation with size of typing
-        // should be made.
         // Probability matrix update
         if (auto len=std::size(typed);
-                len > 1  // prevent going past the begining
-                && !is_backspace(ch) // when hitting backspace dont update
-                && !errors[len - 1] // when last character was error dont update it anymore
-                && current_errors == 0){ // don't update if all errors are not cleared
+                // prevent checking when typed strings is too small
+                len > 1
+                // when hitting backspace dont update
+                && !is_backspace(ch)
+                // don't update if all errors are not cleared
+                && current_errors == 0){
             bool correct = last_char_correct(typed, sentence);
-            int pos = typed.length() - 1;
-            char current = typed[pos];
-            char last = sentence[pos - 1];
-            // Ignore space entirely for now
-            // TODO (this means that even when mistakes with space are made it
-            // is not counted)
-            if (last != ' ')
+            char current = typed[len - 1];
+            char last = sentence[len - 2];
+            // this convoluted logic is used to catch when we made a mistake in
+            // the past and removed it with backspace
+            if (!correct && last != ' '){
+                // Ignore space entirely? Even don't count mistakes when space
+                // is used?
                 ProbMatrix.update_element(last, current, correct);
+            } else if (!errors[len - 1]){
+                ProbMatrix.update_element(last, current, correct);
+            }
         }
 
         current_errors = missed_characters(typed, sentence);
