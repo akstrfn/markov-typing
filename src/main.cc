@@ -128,7 +128,8 @@ int main()
                 // don't update if all errors are not cleared
                 && current_errors == 0){
             bool correct = last_char_correct(typed, sentence);
-            char current = typed[len - 1];
+
+            char current = sentence[len - 1];
             char last = sentence[len - 2];
             // this convoluted logic is used to catch when we made a mistake in
             // the past and removed it with backspace
