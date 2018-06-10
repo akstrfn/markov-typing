@@ -129,22 +129,25 @@ public:
             auto from_idx = char_map.at(predecessor);
             auto current_idx = char_map.at(current_char);
             CharPair* chp = &data[from_idx][current_idx];
-            if (correct)
+            if (correct) {
                 chp->correct += 1;
-            else
+            }
+            else {
                 chp->wrong += 1;
+                if (chp->correct > 0)
+                    chp->correct -= 1;
+            }
 
-            // TODO total_typed should be separate vector variable for every
-            // row?
             auto row = data[from_idx];
             double total_typed =
                 std::accumulate(std::begin(row), std::end(row), 0.0,
                     [](auto& lhs, auto& rhs){
-                        return lhs + rhs.correct + rhs.wrong;
+                        return lhs + rhs.correct;
                     });
             // update probabilities in a whole row
-            for (auto& el : data[from_idx])
-                el.probability = (el.correct + el.wrong) / total_typed;
+            for (auto& el : data[from_idx]) {
+                el.probability = el.correct / total_typed;
+            }
 
         } catch (std::out_of_range&) {}
     }
