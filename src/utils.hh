@@ -83,9 +83,7 @@ auto zip(const F& lhs, const S& rhs){
 template <typename T, typename E>
 bool is_in(const T& container, const E& el){
     auto result = std::find(std::begin(container), std::end(container), el);
-    if (result == std::end(container))
-        return false;
-    return true;
+    return result != std::end(container);
 }
 
 #endif /* UTILS_H */
