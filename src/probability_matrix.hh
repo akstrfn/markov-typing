@@ -166,11 +166,11 @@ public:
         std::transform(std::begin(weights), std::end(weights), std::begin(weights),
                        [max_el](const auto& el){ return max_el - el; });
 
-        // TODO specialize weighted_choice for std::string
+        // TODO specialize choice for std::string
         // get first character
         char ch = '\000';
         while (ch == '\000')
-            ch = *weighted_choice(characters, weights);
+            ch = *choice(characters, weights);
 
         int ch_idx = char_map.at(ch);
 
@@ -193,7 +193,7 @@ public:
             std::transform(std::begin(row), std::end(row), std::begin(inverse_probs),
                            [](auto& el){ return 1 - el.probability; });
 
-            auto next = weighted_choice(characters, inverse_probs);
+            auto next = choice(characters, inverse_probs);
             ch_idx = std::distance(std::begin(characters), next);
 
             ch = characters[ch_idx];

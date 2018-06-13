@@ -49,7 +49,7 @@ auto choice(Seq& sequence){
 }
 
 template <typename Seq, typename W>
-auto weighted_choice(Seq& sequence, W& weights){
+auto choice(Seq& sequence, W& weights){
     // TODO implement inverting of weights
     double sum = std::accumulate(std::begin(weights), std::end(weights), 0.0);
     if (almost_equal(sum, 0.0, 2))
