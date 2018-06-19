@@ -49,7 +49,8 @@ auto choice(Seq& sequence){
 }
 
 // TODO https://en.cppreference.com/w/cpp/numeric/random/piecewise_constant_distribution
-// reinmplement using this one
+// reinmplement using this one and
+// https://stackoverflow.com/a/5629319/3623468
 template <typename Seq, typename W>
 auto choice(Seq& sequence, W& weights){
     // TODO solve this with asserts in debug?
@@ -93,9 +94,7 @@ auto zip(const F& lhs, const S& rhs){
 template <typename T, typename E>
 bool is_in(const T& container, const E& el){
     auto result = std::find(std::begin(container), std::end(container), el);
-    if (result == std::end(container))
-        return false;
-    return true;
+    return result != std::end(container);
 }
 
 #endif /* UTILS_H */

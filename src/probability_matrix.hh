@@ -193,6 +193,8 @@ public:
 
             // TODO calling choice in the loop like this is inefficient so
             // return function from choice() that can be called repeatedly...
+            // TODO even better implement some sampleing algorithm such as
+            // resorvoir sampleing...
             auto next = choice(characters, inverse_probs);
             ch_idx = std::distance(std::begin(characters), next);
 
