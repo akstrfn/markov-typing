@@ -155,8 +155,7 @@ public:
     std::string generate_word(int word_size){
         // sum cols to determine weights, the highest sum denotes highest
         // chance to end up picking that letter in a chain
-        std::vector<double> weights;
-        weights.reserve(characters.length());
+        std::vector<double> weights(characters.length());
         for (auto& row : data)
             for (auto j=0ul; j != std::size(row); ++j)
                 weights[j] += row[j].probability;
@@ -188,11 +187,12 @@ public:
             auto row = data[ch_idx];
 
             // Trying out to randomize choices a bit
-            std::vector<double> inverse_probs;
-            inverse_probs.reserve(std::size(row));
+            std::vector<double> inverse_probs(std::size(row));
             std::transform(std::begin(row), std::end(row), std::begin(inverse_probs),
                            [](auto& el){ return 1 - el.probability; });
 
+            // TODO calling choice in the loop like this is inefficient so
+            // return function from choice() that can be called repeatedly...
             auto next = choice(characters, inverse_probs);
             ch_idx = std::distance(std::begin(characters), next);
 

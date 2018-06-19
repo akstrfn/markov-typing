@@ -48,12 +48,22 @@ auto choice(Seq& sequence){
     return it;
 }
 
+// TODO https://en.cppreference.com/w/cpp/numeric/random/piecewise_constant_distribution
+// reinmplement using this one
 template <typename Seq, typename W>
 auto choice(Seq& sequence, W& weights){
+    // TODO solve this with asserts in debug?
+    if (std::size(sequence) != std::size(weights)){
+        throw std::range_error("Containers are not the same size.");
+    } else if (std::size(sequence) == 0){
+        throw std::range_error("Container has no elements.");
+    }
     // TODO implement inverting of weights
-    double sum = std::accumulate(std::begin(weights), std::end(weights), 0.0);
-    if (almost_equal(sum, 0.0, 2))
-        return choice(sequence);
+    auto end = std::end(weights);
+    if constexpr (std::is_same_v<std::string, Seq>)
+        --end; //avoid null char \000
+
+    double sum = std::accumulate(std::begin(weights), end, 0.0);
 
     std::mt19937 gen(std::random_device{}());
     auto rnd = std::uniform_real_distribution<>{0, sum}(gen);
