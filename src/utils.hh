@@ -66,6 +66,7 @@ auto choice(Seq& sequence, W& weights){
 
 template <typename F, typename S>
 auto zip(const F& lhs, const S& rhs){
+    // TODO This can be implemented without coping i.e. only over iterators...
     std::vector<std::pair<typename F::value_type, typename S::value_type>> zipped;
     zipped.reserve(std::size(lhs));
 
@@ -79,8 +80,7 @@ auto zip(const F& lhs, const S& rhs){
 
 template <typename T, typename E>
 bool is_in(const T& container, const E& el){
-    auto result = std::find(std::begin(container), std::end(container), el);
-    return result != std::end(container);
+    return std::end(container) != std::find(std::begin(container), std::end(container), el);
 }
 
 #endif /* UTILS_H */
