@@ -66,7 +66,7 @@ auto choice(Seq& sequence, W& weights){
 
 template <typename F, typename S>
 auto zip(const F& lhs, const S& rhs){
-    // TODO This can be implemented without coping i.e. only over iterators...
+    // TODO This should be implemented without coping i.e. only over iterators...
     std::vector<std::pair<typename F::value_type, typename S::value_type>> zipped;
     zipped.reserve(std::size(lhs));
 

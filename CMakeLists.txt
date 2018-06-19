@@ -18,18 +18,21 @@ endif()
 
 add_executable(typing src/main.cc)
 
-target_link_libraries(typing curses stdc++fs)
+target_link_libraries(typing 
+    PRIVATE
+        curses stdc++fs
+)
 
 target_compile_features(typing
     PRIVATE
         cxx_std_17
-    )
+)
 
 target_compile_options(typing
     PRIVATE
         $<$<CXX_COMPILER_ID:GNU>:-Wall>
         $<$<CXX_COMPILER_ID:Clang>:-Weverything>
-    )
+)
 
 target_include_directories(typing PRIVATE third_party)
 
