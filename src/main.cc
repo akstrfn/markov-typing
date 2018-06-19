@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <iterator>
-#include <iostream>
 #include <filesystem>
 #include <sstream>
 #include <curses.h>

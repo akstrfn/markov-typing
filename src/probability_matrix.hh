@@ -165,12 +165,8 @@ public:
         std::transform(std::begin(weights), std::end(weights), std::begin(weights),
                        [max_el](const auto& el){ return max_el - el; });
 
-        // TODO specialize choice for std::string
         // get first character
-        char ch = '\000';
-        while (ch == '\000')
-            ch = *choice(characters, weights);
-
+        char ch = *choice(characters, weights);
         int ch_idx = char_map.at(ch);
 
         // TODO simulate the state of matrix if the chosen charater would be
@@ -185,20 +181,14 @@ public:
             out.push_back(ch);
 
             auto row = data[ch_idx];
+            std::vector<double> inverse_probs;
+            inverse_probs.reserve(std::size(row));
+            for (auto el: row)
+                inverse_probs.push_back(1 - el.probability);
 
-            // Trying out to randomize choices a bit
-            std::vector<double> inverse_probs(std::size(row));
-            std::transform(std::begin(row), std::end(row), std::begin(inverse_probs),
-                           [](auto& el){ return 1 - el.probability; });
 
-            // TODO calling choice in the loop like this is inefficient so
-            // return function from choice() that can be called repeatedly...
-            // TODO even better implement some sampleing algorithm such as
-            // resorvoir sampleing...
-            auto next = choice(characters, inverse_probs);
-            ch_idx = std::distance(std::begin(characters), next);
-
-            ch = characters[ch_idx];
+            ch = *choice(characters, inverse_probs);
+            ch_idx = char_map.at(ch);
         }
         return out;
     }
@@ -206,8 +196,7 @@ public:
     std::string generate_sentence(const int num_words){
         std::string sentence = "";
         for (int i=0; i != num_words; ++i){
-            sentence.append(generate_word(4));
-            sentence.push_back(' ');
+            sentence.append(generate_word(4) + ' ');
         }
         if (sentence.back() == ' ') sentence.pop_back();
         return sentence;
