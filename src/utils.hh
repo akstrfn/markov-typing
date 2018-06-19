@@ -48,33 +48,19 @@ auto choice(Seq& sequence){
     return it;
 }
 
-// TODO https://en.cppreference.com/w/cpp/numeric/random/piecewise_constant_distribution
-// reinmplement using this one and
-// https://stackoverflow.com/a/5629319/3623468
 template <typename Seq, typename W>
 auto choice(Seq& sequence, W& weights){
-    // TODO solve this with asserts in debug?
-    if (std::size(sequence) != std::size(weights)){
-        throw std::range_error("Containers are not the same size.");
-    } else if (std::size(sequence) == 0){
-        throw std::range_error("Container has no elements.");
-    }
+
+    static_assert(std::is_floating_point_v<typename W::value_type>);
+    assert(std::size(sequence) == std::size(weights));
+    assert(std::size(sequence) != 0);
+
     // TODO implement inverting of weights
-    auto end = std::end(weights);
-    if constexpr (std::is_same_v<std::string, Seq>)
-        --end; //avoid null char \000
-
-    double sum = std::accumulate(std::begin(weights), end, 0.0);
-
     std::mt19937 gen(std::random_device{}());
-    auto rnd = std::uniform_real_distribution<>{0, sum}(gen);
-
-    auto it_w = std::begin(weights);
-    for (double rolling_sum = 0; rolling_sum < rnd;)
-        rolling_sum += *it_w++;
+    auto idx = std::discrete_distribution<>{std::begin(weights), std::end(weights)}(gen);
 
     auto it = std::begin(sequence);
-    std::advance(it, std::distance(std::begin(weights), it_w));
+    std::advance(it, idx);
     return it;
 }
 
