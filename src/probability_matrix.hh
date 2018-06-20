@@ -166,9 +166,7 @@ public:
                 weights[j] += row[j].probability;
 
         // invert probabilities
-        auto max_el = *std::max_element(std::begin(weights), std::end(weights));
-        std::transform(std::begin(weights), std::end(weights), std::begin(weights),
-                       [max_el](const auto& el){ return max_el - el; });
+        invert_values(weights, *std::max_element(std::begin(weights), std::end(weights)));
 
         // get first character
         char ch = *choice(characters, weights);
@@ -190,7 +188,6 @@ public:
             inverse_probs.reserve(std::size(row));
             for (auto el: row)
                 inverse_probs.push_back(1 - el.probability);
-
 
             ch = *choice(characters, inverse_probs);
             ch_idx = char_map.at(ch);

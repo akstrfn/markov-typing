@@ -55,7 +55,6 @@ auto choice(Seq& sequence, W& weights){
     assert(std::size(sequence) == std::size(weights));
     assert(std::size(sequence) != 0);
 
-    // TODO implement inverting of weights
     std::mt19937 gen(std::random_device{}());
     auto idx = std::discrete_distribution<>{std::begin(weights), std::end(weights)}(gen);
 
