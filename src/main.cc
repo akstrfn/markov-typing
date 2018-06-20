@@ -4,6 +4,7 @@
 #include <iterator>
 #include <filesystem>
 #include <sstream>
+
 #include <curses.h>
 
 #include "stats.hh"
@@ -21,13 +22,13 @@ int ch;
 //int main(int argc, char *argv[])
 int main()
 {
-    std::string lowercase = "qwertyuiopasdfghjklzxcvbnm";
-    std::string uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
-    std::string symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
-    std::string numbers = "0123456789";
+    const std::string lowercase = "qwertyuiopasdfghjklzxcvbnm";
+    const std::string uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
+    const std::string symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
+    const std::string numbers = "0123456789";
+    const std::string all_chars = lowercase + uppercase + symbols + numbers;
 
-    std::string characters = lowercase + uppercase + symbols + numbers;
-    std::string all_chars = characters;
+    std::string characters = all_chars;
 
 #if DEBUG
     characters = "asdf";
