@@ -10,6 +10,8 @@
 #include "probability_matrix.hh"
 #include "utils.hh"
 
+namespace fs = std::filesystem;
+
 std::string typed = "";
 int row, col;
 int y = -1, x = -1;
@@ -32,15 +34,15 @@ int main()
 #endif
 
     std::string tmppath;
-    tmppath = std::string(std::getenv("HOME")) + "/.local/share/DeliberateTyping/matrix.csv";
+    tmppath = std::string(std::getenv("HOME")) + "/.local/share/DeliberateTyping/matrix.json";
 
 
     ProbabilityMatrix ProbMatrix(characters);
     // TODO: if loading failed add fallback
     // TODO: BUG: when file is loaded then matrix is not updated correctly i.e.
     // it is not updated at all many times.
-    std::filesystem::path tmpfile{tmppath};
-    if (std::filesystem::exists(tmpfile))
+    fs::path tmpfile{tmppath};
+    if (fs::exists(tmpfile))
         ProbMatrix.read_from_json(tmppath);
 
     std::string sentence = ProbMatrix.generate_sentence(8);
@@ -164,11 +166,11 @@ int main()
     std::string fpath;
     auto path = std::getenv("XDG_DATA_HOME");
     if (path)
-        fpath = std::string(path) + "DeliberateTyping/matrix.csv";
+        fpath = std::string(path) + "DeliberateTyping/matrix.json";
     else
         fpath = std::string(std::getenv("HOME")) + "/.local/share/DeliberateTyping";
-    std::filesystem::create_directories(fpath);
-    fpath += "/matrix.csv";
+    fs::create_directories(fpath);
+    fpath += "/matrix.json";
 
     // TODO what if there is not even home defined?
     std::ofstream file{fpath};
