@@ -15,35 +15,40 @@
 
 using json = nlohmann::json;
 
-struct CharPair {
-    int row;
-    int col;
-    double probability;
-    size_t correct; //start having one correct typing as an assumption
-    size_t wrong;
-    std::string row_char;
-    std::string col_char;
-};
+namespace impl
+{
+    struct CharPair {
+        int row;
+        int col;
+        double probability;
+        size_t correct; //start having one correct typing as an assumption
+        size_t wrong;
+        std::string row_char;
+        std::string col_char;
+    };
 
-void to_json(json& j, const CharPair& p) {
-    j = json{{"row", p.row},
-             {"col", p.col},
-             {"probability", p.probability},
-             {"correct", p.correct},
-             {"wrong", p.wrong},
-             {"row_char", p.row_char},
-             {"col_char", p.col_char}};
-}
+    void to_json(json& j, const impl::CharPair& p) {
+        j = json{{"row", p.row},
+                 {"col", p.col},
+                 {"probability", p.probability},
+                 {"correct", p.correct},
+                 {"wrong", p.wrong},
+                 {"row_char", p.row_char},
+                 {"col_char", p.col_char}};
+    }
 
-void from_json(const json& j, CharPair& p) {
-    p.row = j.at("row").get<int>();
-    p.col = j.at("col").get<int>();
-    p.probability = j.at("probability").get<double>();
-    p.correct = j.at("correct").get<size_t>();
-    p.wrong = j.at("wrong").get<size_t>();
-    p.row_char = j.at("row_char").get<std::string>();
-    p.col_char = j.at("col_char").get<std::string>();
-}
+    void from_json(const json& j, impl::CharPair& p) {
+        p.row = j.at("row").get<int>();
+        p.col = j.at("col").get<int>();
+        p.probability = j.at("probability").get<double>();
+        p.correct = j.at("correct").get<size_t>();
+        p.wrong = j.at("wrong").get<size_t>();
+        p.row_char = j.at("row_char").get<std::string>();
+        p.col_char = j.at("col_char").get<std::string>();
+    }
+
+} /* impl */
+
 
 // TODO Some sort of time pressure should be added which should also be
 // accounted for in the function that updates the probabilies.
@@ -51,7 +56,7 @@ void from_json(const json& j, CharPair& p) {
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct based on how frequent they were typed correctly
 class ProbabilityMatrix {
-    std::vector<std::vector<CharPair>> data;
+    std::vector<std::vector<impl::CharPair>> data;
     std::string characters;
     std::map<char, int> char_map;
 public:
@@ -61,10 +66,10 @@ public:
         data.reserve(len);
         for(auto i=0ul; i != len; ++i){
             char_map[characters[i]] = i;
-            std::vector<CharPair> row;
+            std::vector<impl::CharPair> row;
             row.reserve(len);
             for(auto j=0ul; j != len; ++j){
-                CharPair chp;
+                impl::CharPair chp;
                 chp.row = i;
                 chp.col = j;
                 chp.probability = 1.0/std::size(characters);
@@ -115,8 +120,8 @@ public:
             char_map[characters[i]] = i;
 
         auto sz = std::size(characters);
-        std::vector<std::vector<CharPair>> tmpdata(sz, std::vector<CharPair>(sz));
-        for (auto& d: js.at("Matrix").get<std::vector<CharPair>>())
+        std::vector<std::vector<impl::CharPair>> tmpdata(sz, std::vector<impl::CharPair>(sz));
+        for (auto& d: js.at("Matrix").get<std::vector<impl::CharPair>>())
             tmpdata[d.row][d.col] = d;
         data = tmpdata;
     }
@@ -128,7 +133,7 @@ public:
         try {
             auto from_idx = char_map.at(predecessor);
             auto current_idx = char_map.at(current_char);
-            CharPair* chp = &data[from_idx][current_idx];
+            impl::CharPair* chp = &data[from_idx][current_idx];
             if (correct) {
                 chp->correct += 1;
             }
