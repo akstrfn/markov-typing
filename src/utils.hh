@@ -78,6 +78,14 @@ auto zip(const F& lhs, const S& rhs){
     return zipped;
 }
 
+template <typename Seq, typename Number>
+void invert_values(Seq& seq, Number max_value){
+    static_assert(std::is_arithmetic_v<Number>);
+    static_assert(std::is_arithmetic_v<typename Seq::value_type>);
+    for (auto& el: seq)
+        el = max_value - el;
+}
+
 template <typename T, typename E>
 bool is_in(const T& container, const E& el){
     return std::end(container) != std::find(std::begin(container), std::end(container), el);
