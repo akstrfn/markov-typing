@@ -74,9 +74,7 @@ int main()
     while(ch != KEY_F(1)){
         getyx(stdscr, y, x);
         ch = getch();
-        // TODO BUG: this disallows characters that are not on the list
-        // entirely which is not desired i.e. if characters = 'a' then only 'a'
-        // can be typed!
+
         auto res = std::find(std::begin(all_chars), std::end(all_chars), ch);
         if (res == std::end(all_chars) && !is_enter(ch) && !is_backspace(ch) && ch != ' ')
             continue;
