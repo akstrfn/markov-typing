@@ -127,14 +127,14 @@ public:
         try {
             auto const from_idx = char_map.at(predecessor);
             auto const current_idx = char_map.at(current_char);
-            impl::CharPair* chp = &data[from_idx][current_idx];
+            impl::CharPair& chp = data[from_idx][current_idx];
             if (correct)
-                chp->correct += 1;
+                chp.correct += 1;
             else
-                chp->wrong += 1;
+                chp.wrong += 1;
 
-            double const total = std::abs(chp->correct) + chp->wrong;
-            chp->probability = std::abs(chp->correct) / total;
+            double const total = std::abs(chp.correct) + chp.wrong;
+            chp.probability = std::abs(chp.correct) / total;
 
         } catch (std::out_of_range&) {}
     }
