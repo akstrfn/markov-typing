@@ -79,17 +79,18 @@ public:
     auto to_string(){
         std::stringstream ss;
         ss << std::fixed << std::setprecision(2) << "    ";
-        for(auto el=characters.begin(); el != characters.end(); ++el){
-            auto tmp = (el == characters.end() - 1) ? "\n"  : ", ";
-            ss << std::setw(4) << *el << tmp;
-        }
-        for(auto i=0ul; i != std::size(data); ++i){
-            auto row = data[i];
-            ss << characters[i] << " | ";
-            for(auto el=row.begin(); el != row.end(); ++el){
-                auto tmp = (el == row.end() - 1) ? "\n"  : ", ";
-                ss << el->probability << tmp;
+
+        for (auto el=characters.begin(); el != characters.end() - 1; ++el)
+            ss << std::setw(4) << *el << ", ";
+        ss << std::setw(4) << characters.back() << "\n";
+
+        for (auto i=0ul; i != std::size(data); ++i){
+            auto const &row = data[i];
+            ss << characters[i] << "| ";
+            for (auto el=row.begin(); el != row.end() - 1; ++el){
+                ss << el->probability << ", ";
             }
+            ss << row.back().probability << "\n";
         }
         return ss.str();
     }
