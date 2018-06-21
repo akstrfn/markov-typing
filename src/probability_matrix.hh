@@ -20,11 +20,11 @@ namespace impl
     struct CharPair {
         int row;
         int col;
-        double probability;
-        size_t correct; //start having one correct typing as an assumption
-        size_t wrong;
         std::string row_char;
         std::string col_char;
+        double probability{};
+        size_t correct{};
+        size_t wrong{};
     };
 
     void to_json(json& j, const impl::CharPair& p) {
@@ -62,24 +62,17 @@ class ProbabilityMatrix {
 public:
     ProbabilityMatrix(const std::string& _characters) : characters(_characters)
     {
-        auto len = characters.length();
+        int const len = characters.length();
         data.reserve(len);
-        for(auto i=0ul; i != len; ++i){
+        for(int i=0; i != len; ++i){
             char_map[characters[i]] = i;
             std::vector<impl::CharPair> row;
             row.reserve(len);
-            for(auto j=0ul; j != len; ++j){
-                impl::CharPair chp;
-                chp.row = i;
-                chp.col = j;
-                chp.probability = 1.0/std::size(characters);
-                chp.correct = 1;
-                chp.wrong = 0;
-                chp.row_char = characters[i];
-                chp.col_char = characters[j];
+            for(int j=0; j != len; ++j){
+                impl::CharPair chp{i, j, characters.substr(i, 1), characters.substr(j, 1)};
                 row.push_back(std::move(chp));
             }
-            data.push_back(row);
+            data.push_back(std::move(row));
         }
     };
 
@@ -183,7 +176,7 @@ public:
         while (word_size--){
             out.push_back(ch);
 
-            auto row = data[ch_idx];
+            auto const row = data[ch_idx];
             std::vector<double> inverse_probs;
             inverse_probs.reserve(std::size(row));
             for (auto el: row)
