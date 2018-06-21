@@ -23,8 +23,8 @@ namespace impl
         std::string row_char;
         std::string col_char;
         double probability{};
-        size_t correct{};
-        size_t wrong{};
+        long long correct{};
+        unsigned long long wrong{};
     };
 
     void to_json(json& j, const impl::CharPair& p) {
@@ -124,28 +124,16 @@ public:
                         const char& current_char,
                         const bool& correct){
         try {
-            auto from_idx = char_map.at(predecessor);
-            auto current_idx = char_map.at(current_char);
+            auto const from_idx = char_map.at(predecessor);
+            auto const current_idx = char_map.at(current_char);
             impl::CharPair* chp = &data[from_idx][current_idx];
-            if (correct) {
+            if (correct)
                 chp->correct += 1;
-            }
-            else {
+            else
                 chp->wrong += 1;
-                if (chp->correct > 0)
-                    chp->correct -= 1;
-            }
 
-            auto row = data[from_idx];
-            double total_typed =
-                std::accumulate(std::begin(row), std::end(row), 0.0,
-                    [](auto& lhs, auto& rhs){
-                        return lhs + rhs.correct;
-                    });
-            // update probabilities in a whole row
-            for (auto& el : data[from_idx]) {
-                el.probability = el.correct / total_typed;
-            }
+            double const total = std::abs(chp->correct) + chp->wrong;
+            chp->probability = std::abs(chp->correct) / total;
 
         } catch (std::out_of_range&) {}
     }
