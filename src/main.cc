@@ -1,4 +1,6 @@
-#pragma clang diagnostic ignored "-Wc++98-compat"
+#if __clang__
+    #pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
 
 #include <vector>
 #include <iterator>
