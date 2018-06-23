@@ -6,21 +6,19 @@ find_package(Curses REQUIRED)
 
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp)
     file(DOWNLOAD
-        https://github.com/nlohmann/json/releases/download/v3.1.2/json.hpp
-        ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp
+            https://github.com/nlohmann/json/releases/download/v3.1.2/json.hpp
+            ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp
         )
-endif()
-
-
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    add_definitions(-DDEBUG)
 endif()
 
 add_executable(typing src/main.cc)
 
 target_link_libraries(typing 
     PRIVATE
-        curses stdc++fs
+        ${CURSES_LIBRARIES}
+        # TODO it would be better to use boost::filesystem until compilers
+        # stabilize filesystem support
+        stdc++fs
 )
 
 target_compile_features(typing
@@ -32,6 +30,7 @@ target_compile_options(typing
     PRIVATE
         $<$<CXX_COMPILER_ID:GNU>:-Wall>
         $<$<CXX_COMPILER_ID:Clang>:-Weverything>
+        $<$<CONFIG:Debug>:-DDEBUG>
 )
 
 target_include_directories(typing PRIVATE third_party)
@@ -39,7 +38,10 @@ target_include_directories(typing PRIVATE third_party)
 # YouCompleteMe setup
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 add_custom_target(link_for_compile_commands ALL
-                  COMMAND ${CMAKE_COMMAND} -E create_symlink
-                  ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json)
+                  COMMAND
+                      ${CMAKE_COMMAND} -E create_symlink
+                      ${CMAKE_BINARY_DIR}/compile_commands.json
+                      ${CMAKE_SOURCE_DIR}/compile_commands.json
+                 )
 
 install(TARGETS typing DESTINATION "${CMAKE_INSTALL_BINDIR}")
