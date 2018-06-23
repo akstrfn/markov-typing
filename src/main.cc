@@ -6,6 +6,7 @@
 #include <iterator>
 #include <filesystem>
 #include <sstream>
+#include <chrono>
 
 #include <curses.h>
 
@@ -14,6 +15,7 @@
 #include "utils.hh"
 
 namespace fs = std::filesystem;
+namespace cr = std::chrono;
 
 std::string typed = "";
 int row, col;
@@ -68,15 +70,21 @@ int main()
     move(mid_y, mid_x);
 
     std::vector<short> errors; // really just 0 or 1 is necessary here
-    errors.reserve(50);
+    errors.reserve(std::size(characters));
     int current_errors{};
 
     while(ch != KEY_F(1)){
         getyx(stdscr, y, x);
+
+        auto const start = cr::high_resolution_clock::now();
         ch = getch();
+        auto const end = cr::high_resolution_clock::now();
+        // are nanoseconds better choice here?
+        auto const duration = cr::duration_cast<cr::milliseconds>(end - start).count();
 
         auto res = std::find(std::begin(all_chars), std::end(all_chars), ch);
-        if (res == std::end(all_chars) && !is_enter(ch) && !is_backspace(ch) && ch != ' ')
+        if (res == std::end(all_chars) && !is_enter(ch) && !is_backspace(ch)
+                && ch != ' ')
             continue;
 
         if (typed.size() == std::size(sentence)) {
@@ -138,9 +146,9 @@ int main()
             if (!correct && last != ' '){
                 // Ignore space entirely? Even don't count mistakes when space
                 // is used?
-                ProbMatrix.update_element(last, current, correct);
+                ProbMatrix.update_element(last, current, duration, correct);
             } else if (!errors[len - 1]){
-                ProbMatrix.update_element(last, current, correct);
+                ProbMatrix.update_element(last, current, duration, correct);
             }
         }
 
@@ -153,6 +161,8 @@ int main()
         for (auto& el : errors)
             ss << el;
 
+        printnm(LINES - 7, 2, "Proficiency: " + std::to_string(ProbMatrix.proficiency()));
+        printnm(LINES - 6, 2, "Typing speed: " + std::to_string(duration));
         printnm(LINES - 4, 2, "Error: " + ss.str());
         printnm(LINES - 3, 2, "Typed: " + typed);
 
@@ -169,7 +179,8 @@ int main()
     if (path)
         fpath = std::string(path) + "DeliberateTyping/matrix.json";
     else
-        fpath = std::string(std::getenv("HOME")) + "/.local/share/DeliberateTyping";
+        fpath = std::string(std::getenv("HOME"))
+                + "/.local/share/DeliberateTyping";
     fs::create_directories(fpath);
     fpath += "/matrix.json";
 

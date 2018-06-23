@@ -25,26 +25,30 @@ namespace impl
         double probability{};
         size_t correct{};
         size_t wrong{};
+        long typing_time{}; // TODO should I make all time units unsigned long?
     };
 
     void to_json(json& j, const impl::CharPair& p) {
         j = json{{"row", p.row},
                  {"col", p.col},
+                 {"row_char", p.row_char},
+                 {"col_char", p.col_char},
                  {"probability", p.probability},
                  {"correct", p.correct},
                  {"wrong", p.wrong},
-                 {"row_char", p.row_char},
-                 {"col_char", p.col_char}};
+                 {"typing_time", p.typing_time},
+                };
     }
 
     void from_json(const json& j, impl::CharPair& p) {
         p.row = j.at("row").get<int>();
         p.col = j.at("col").get<int>();
+        p.row_char = j.at("row_char").get<std::string>();
+        p.col_char = j.at("col_char").get<std::string>();
         p.probability = j.at("probability").get<double>();
         p.correct = j.at("correct").get<size_t>();
         p.wrong = j.at("wrong").get<size_t>();
-        p.row_char = j.at("row_char").get<std::string>();
-        p.col_char = j.at("col_char").get<std::string>();
+        p.typing_time = j.at("typing_time").get<long>();
     }
 
 } /* impl */
@@ -59,6 +63,7 @@ class ProbabilityMatrix {
     std::vector<std::vector<impl::CharPair>> data;
     std::string characters;
     std::map<char, int> char_map;
+    long average_typing_time{};
 public:
     ProbabilityMatrix(const std::string& _characters) : characters(_characters)
     {
@@ -69,7 +74,8 @@ public:
             std::vector<impl::CharPair> row;
             row.reserve(len);
             for(int j=0; j != len; ++j){
-                impl::CharPair chp{i, j, characters.substr(i, 1), characters.substr(j, 1)};
+                impl::CharPair chp{i, j, characters.substr(i, 1),
+                                         characters.substr(j, 1)};
                 row.push_back(std::move(chp));
             }
             data.push_back(std::move(row));
@@ -121,14 +127,31 @@ public:
     }
 
     // TODO BUG updates when some wrong character instead of space is pressed
-    void update_element(const char& predecessor,
-                        const char& current_char,
-                        const bool& correct){
+    void update_element(char const predecessor,
+                        char const current_char,
+                        long const typing_time,
+                        bool const correct){
         try {
             auto const from_idx = char_map.at(predecessor);
             auto const current_idx = char_map.at(current_char);
             impl::CharPair& chp = data[from_idx][current_idx];
-            if (correct)
+
+            // Using exponential moving average update average typing time.
+            // Using different aplpha's for CharPair and global average can be
+            // useful to adjust the level of dificulty i.e. one is updated more
+            // agresivelly than the other.
+            double alpha = 0.7;
+            double diff = typing_time - average_typing_time;
+            // truncation will happen long/double but it does not matter
+            average_typing_time = average_typing_time + alpha * diff;
+
+            // also update the CharPair
+            diff = typing_time - chp.typing_time;
+            chp.typing_time = chp.typing_time + alpha * diff;
+
+            // if the CharPair average is below global average count as wrong
+            // even if it was correct
+            if (correct && (average_typing_time < chp.typing_time))
                 chp.correct += 1;
             else
                 chp.wrong += 1;
@@ -136,7 +159,7 @@ public:
             double const total = chp.correct + chp.wrong;
             chp.probability = chp.correct / total;
 
-        } catch (std::out_of_range&) {}
+        } catch (std::out_of_range&) {/*TODO log this */}
     }
 
     std::string generate_word(int word_size){
@@ -149,6 +172,9 @@ public:
 
         // invert probabilities
         invert_values(weights, *std::max_element(std::begin(weights), std::end(weights)));
+
+        // TODO BUG after inversion max el becomes zero making it impossible to
+        // be chosen.
 
         // get first character
         char ch = *choice(characters, weights);
@@ -171,6 +197,9 @@ public:
             for (auto el: row)
                 inverse_probs.push_back(1 - el.probability);
 
+            // TODO BUG: same as above bug for choice. Here we can have
+            // elements being perfect i.e. probability is 1 hence they will
+            // never be chosen.
             ch = *choice(characters, inverse_probs);
             ch_idx = char_map.at(ch);
         }
