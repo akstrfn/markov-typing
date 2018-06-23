@@ -179,11 +179,21 @@ public:
 
     std::string generate_sentence(const int num_words){
         std::string sentence = "";
-        for (int i=0; i != num_words; ++i){
+        for (int i=0; i != num_words; ++i)
             sentence.append(generate_word(4) + ' ');
-        }
-        if (sentence.back() == ' ') sentence.pop_back();
+
+        sentence.pop_back(); // remove last space
         return sentence;
+    }
+
+    // how close are we to 1 i.e. whole matrix is perfect? albeit this is
+    // impossible wih time pressure
+    auto proficiency(){
+        double sum = 0;
+        for (auto&& row: data)
+            for (auto&& el: row)
+                sum += el.probability;
+        return sum/std::pow(data.size(), 2);
     }
 };
 
