@@ -113,8 +113,8 @@ public:
         for(auto i=0ul; i != std::size(characters); ++i)
             char_map[characters[i]] = i;
 
-        auto sz = std::size(characters);
-        std::vector<std::vector<impl::CharPair>> tmpdata(sz, std::vector<impl::CharPair>(sz));
+        auto const sz = std::size(characters);
+        std::vector tmpdata(sz, std::vector<impl::CharPair>(sz));
         for (auto& d: js.at("Matrix").get<std::vector<impl::CharPair>>())
             tmpdata[d.row][d.col] = d;
         data = tmpdata;
