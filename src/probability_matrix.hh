@@ -23,8 +23,8 @@ namespace impl
         std::string row_char;
         std::string col_char;
         double probability{};
-        long long correct{};
-        unsigned long long wrong{};
+        size_t correct{};
+        size_t wrong{};
     };
 
     void to_json(json& j, const impl::CharPair& p) {
@@ -133,8 +133,8 @@ public:
             else
                 chp.wrong += 1;
 
-            double const total = std::abs(chp.correct) + chp.wrong;
-            chp.probability = std::abs(chp.correct) / total;
+            double const total = chp.correct + chp.wrong;
+            chp.probability = chp.correct / total;
 
         } catch (std::out_of_range&) {}
     }
