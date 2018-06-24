@@ -65,6 +65,7 @@ class ProbabilityMatrix {
     std::map<char, int> char_map;
     long average_typing_time{};
 public:
+    ProbabilityMatrix() = default;
     ProbabilityMatrix(const std::string& _characters) : characters(_characters)
     {
         int const len = characters.length();

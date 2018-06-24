@@ -1,5 +1,5 @@
 #if __clang__
-    #pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
 
 #include <vector>
@@ -8,14 +8,14 @@
 #include <sstream>
 #include <chrono>
 
-#include <curses.h>
-
 #include "stats.hh"
 #include "probability_matrix.hh"
 #include "utils.hh"
+#include "curses_wrap.hh"
 
 namespace fs = std::filesystem;
 namespace cr = std::chrono;
+using curses::Colors;
 
 std::string typed = "";
 int row, col;
@@ -52,22 +52,13 @@ int main()
 
     std::string sentence = ProbMatrix.generate_sentence(8);
 
-    initscr();
-    raw();
-    // cbreak(); // use to enable ctrl-c
-    noecho();
-    keypad(stdscr, 1);
-    start_color();
-    init_pair(1, COLOR_RED, COLOR_BLACK);
-    init_pair(2, COLOR_GREEN, COLOR_BLACK);
-    init_pair(3, COLOR_RED, COLOR_RED);
+    curses::initialize();
 
     getmaxyx(stdscr, row, col);
     mid_x = (col - std::size(sentence))/2;
     mid_y = row/2;
 
-    mvprintw(mid_y, mid_x, "%s", sentence.c_str());
-    move(mid_y, mid_x);
+    curses::print_begin(mid_y, mid_x, sentence.c_str());
 
     std::vector<short> errors; // really just 0 or 1 is necessary here
     errors.reserve(std::size(characters));
@@ -83,19 +74,18 @@ int main()
         auto const duration = cr::duration_cast<cr::milliseconds>(end - start).count();
 
         auto res = std::find(std::begin(all_chars), std::end(all_chars), ch);
-        if (res == std::end(all_chars) && !is_enter(ch) && !is_backspace(ch)
+        if (res == std::end(all_chars) && !curses::is_enter(ch) && !curses::is_backspace(ch)
                 && ch != ' ')
             continue;
 
         if (typed.size() == std::size(sentence)) {
-            if (is_enter(ch)) {
+            if (curses::is_enter(ch)) {
                 typed.clear();
                 errors.clear();
                 // sentence = generate(characters, 40);
                 sentence = ProbMatrix.generate_sentence(8);
-                printnm(mid_y, mid_x, sentence.c_str());
-                move(mid_y, mid_x);
-            } else if (current_errors != 0 && is_backspace(ch)) { 
+                curses::print_begin(mid_y, mid_x, sentence.c_str());
+            } else if (current_errors != 0 && curses::is_backspace(ch)) { 
                 // allow backspace
             } else {
                 // block any new entry of characters since we are at the end
@@ -103,12 +93,13 @@ int main()
             }
         }
 
-        if (is_enter(ch)) continue;
+        if (curses::is_enter(ch)) continue;
 
-        if (is_backspace(ch)) {
+        if (curses::is_backspace(ch)) {
             // disable backspace if everything is correct
             if (current_errors == 0) continue;
             if (!typed.empty()){
+                // TODO here I just want to remove color not change character
                 move(y, --x);
                 addch(sentence[typed.length() - 1]);
                 move(y, x);
@@ -118,15 +109,15 @@ int main()
             typed.push_back(ch);
             if (std::size(typed) > std::size(errors))
                 errors.push_back(0);
-            addch(ch | COLOR_PAIR(2));
+            addch(ch | Colors::GreenBlack);
         } else { // wrong one
             typed.push_back(ch);
             if (std::size(typed) > std::size(errors))
                 errors.push_back(1);
             if (sentence[typed.length() - 1] == ' ') //space
-                addch(sentence[typed.length() - 1] | COLOR_PAIR(3));
+                addch(sentence[typed.length() - 1] | Colors::RedRed);
             else //all others
-                addch(sentence[typed.length() - 1] | COLOR_PAIR(1));
+                addch(sentence[typed.length() - 1] | Colors::RedBlack);
         }
 
         // Probability matrix update
@@ -134,7 +125,7 @@ int main()
                 // prevent checking when typed strings is too small
                 len > 1
                 // when hitting backspace dont update
-                && !is_backspace(ch)
+                && !curses::is_backspace(ch)
                 // don't update if all errors are not cleared
                 && current_errors == 0){
             bool correct = last_char_correct(typed, sentence);
@@ -155,16 +146,16 @@ int main()
         current_errors = missed_characters(typed, sentence);
 
 #ifdef DEBUG
-        printnm(LINES - 5, 2, "Errors: " + std::to_string(current_errors));
+        curses::printnm(LINES - 5, 2, "Errors: " + std::to_string(current_errors));
 
         std::stringstream ss;
         for (auto& el : errors)
             ss << el;
 
-        printnm(LINES - 7, 2, "Proficiency: " + std::to_string(ProbMatrix.proficiency()));
-        printnm(LINES - 6, 2, "Typing speed: " + std::to_string(duration));
-        printnm(LINES - 4, 2, "Error: " + ss.str());
-        printnm(LINES - 3, 2, "Typed: " + typed);
+        curses::printnm(LINES - 7, 2, "Proficiency: " + std::to_string(ProbMatrix.proficiency()));
+        curses::printnm(LINES - 6, 2, "Typing speed: " + std::to_string(duration));
+        curses::printnm(LINES - 4, 2, "Error: " + ss.str());
+        curses::printnm(LINES - 3, 2, "Typed: " + typed);
 
         std::ofstream fs;
         fs.open("matrix_console");

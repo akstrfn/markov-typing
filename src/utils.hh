@@ -7,25 +7,6 @@
 #include <stdexcept>
 #include <curses.h>
 
-bool is_backspace(const int ch){
-    return  ch == KEY_BACKSPACE || ch == '\b' || ch == 127;
-}
-
-bool is_enter(const int ch){
-    return ch == KEY_ENTER || ch == '\n' || ch == 10;
-}
-
-// print somewhere in the screen and return the cursor to original position
-// print_no_move
-void printnm(const int y, const int x, const std::string& str){
-    int old_y, old_x;
-    getyx(stdscr, old_y, old_x);
-    move(y, x);
-    clrtoeol();
-    printw(str.c_str());
-    move(old_y, old_x);
-}
-
 // from: http://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
 template<class T>
 typename std::enable_if_t<!std::numeric_limits<T>::is_integer, bool>
