@@ -26,11 +26,11 @@ int ch;
 //int main(int argc, char *argv[])
 int main()
 {
-    const std::string lowercase = "qwertyuiopasdfghjklzxcvbnm";
-    const std::string uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
-    const std::string symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
-    const std::string numbers = "0123456789";
-    const std::string all_chars = lowercase + uppercase + symbols + numbers;
+    constexpr auto lowercase = "qwertyuiopasdfghjklzxcvbnm";
+    constexpr auto uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
+    constexpr auto symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
+    constexpr auto numbers = "0123456789";
+    const auto all_chars = std::string(lowercase) + uppercase + symbols + numbers;
 
     std::string characters = all_chars;
 

@@ -87,8 +87,8 @@ public:
         ss << std::fixed << std::setprecision(2) << "    ";
 
         for (auto el=characters.begin(); el != characters.end() - 1; ++el)
-            ss << std::setw(4) << *el << ", ";
-        ss << std::setw(4) << characters.back() << "\n";
+            ss << std::setw(3) << *el << ", ";
+        ss << std::setw(3) << characters.back() << "\n";
 
         for (auto i=0ul; i != std::size(data); ++i){
             auto const &row = data[i];
