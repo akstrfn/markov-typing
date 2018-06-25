@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
 project(deliberate_typing)
 
-include(GNUInstallDirs)
 find_package(Curses REQUIRED)
 
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp)
@@ -11,7 +10,10 @@ if(NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp)
         )
 endif()
 
-add_executable(typing src/main.cc)
+add_executable(typing
+    src/main.cc
+    src/curses_wrap.cc
+)
 
 target_link_libraries(typing 
     PRIVATE
@@ -47,4 +49,5 @@ if(UNIX)
     )
 endif()
 
+include(GNUInstallDirs)
 install(TARGETS typing DESTINATION "${CMAKE_INSTALL_BINDIR}")

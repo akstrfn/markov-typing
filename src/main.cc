@@ -53,7 +53,7 @@ int main()
     std::string sentence = ProbMatrix.generate_sentence(8);
 
     curses::initialize();
-    auto [mid_y, mid_x] = curses::get_mid(stdscr, 0, std::size(sentence) / 2);
+    auto [mid_y, mid_x] = curses::get_mid(0, std::size(sentence) / 2);
 
     curses::print_begin(mid_y, mid_x, sentence);
 
