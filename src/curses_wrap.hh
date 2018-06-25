@@ -1,8 +1,9 @@
 #include <string>
 #include <array>
 
-namespace curses {
 #include <curses.h>
+
+namespace curses {
     
 void initialize() {
     initscr();
@@ -29,6 +30,12 @@ bool is_backspace(const int ch){
 
 bool is_enter(const int ch){
     return ch == KEY_ENTER || ch == '\n' || ch == 10;
+}
+
+auto get_mid(WINDOW* src, int y_offset=0, int x_offset=0){
+    int y, x;
+    getmaxyx(src, y, x);
+    return std::pair{(y / 2) - y_offset, (x / 2) - x_offset};
 }
 
 // print somewhere in the screen and return the cursor to the original position

@@ -53,12 +53,9 @@ int main()
     std::string sentence = ProbMatrix.generate_sentence(8);
 
     curses::initialize();
+    auto [mid_y, mid_x] = curses::get_mid(stdscr, 0, std::size(sentence) / 2);
 
-    getmaxyx(stdscr, row, col);
-    mid_x = (col - std::size(sentence))/2;
-    mid_y = row/2;
-
-    curses::print_begin(mid_y, mid_x, sentence.c_str());
+    curses::print_begin(mid_y, mid_x, sentence);
 
     std::vector<short> errors; // really just 0 or 1 is necessary here
     errors.reserve(std::size(characters));

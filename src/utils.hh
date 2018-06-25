@@ -68,7 +68,8 @@ void invert_values(Seq& seq, Number max_value){
 
 template <typename T, typename E>
 bool is_in(const T& container, const E& el){
-    return std::end(container) != std::find(std::begin(container), std::end(container), el);
+    return std::end(container) != std::find(std::begin(container),
+                                            std::end(container), el);
 }
 
 #endif /* UTILS_H */
