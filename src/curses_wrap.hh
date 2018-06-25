@@ -33,20 +33,20 @@ bool is_enter(const int ch){
 
 // print somewhere in the screen and return the cursor to the original position
 // print_no_move
-void printnm(const int y, const int x, const std::string& str){
+void printnm(const int y, const int x, const std::string_view& str){
     int old_y, old_x;
     getyx(stdscr, old_y, old_x);
     move(y, x);
     clrtoeol();
-    printw(str.c_str());
+    printw(str.data());
     move(old_y, old_x);
 }
 
 // print and go to position from which you started printing
-void print_begin(const int y, const int x, const std::string& str){
+void print_begin(const int y, const int x, const std::string_view& str){
     move(y, x);
     clrtoeol();
-    printw(str.c_str());
+    printw(str.data());
     move(y, x);
 }
 
