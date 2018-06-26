@@ -1,9 +1,7 @@
-#include <utility>
 #include "curses_wrap.hh"
 #include <curses.h>
 
 namespace curses {
-
 
     void initialize() {
         initscr();
@@ -13,6 +11,7 @@ namespace curses {
         keypad(stdscr, 1);
         start_color();
 
+        // separate into new function?
         init_pair(1, COLOR_RED, COLOR_BLACK);
         init_pair(2, COLOR_GREEN, COLOR_BLACK);
         init_pair(3, COLOR_RED, COLOR_RED);
