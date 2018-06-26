@@ -3,6 +3,7 @@
 
 #include <string>
 
+// TODO I should wrap WINDOW into its own class... and char...
 namespace curses {
         
 
@@ -21,8 +22,11 @@ namespace curses {
 
     bool is_backspace(const int ch);
     bool is_enter(const int ch);
+    bool is_f1(const int ch);
 
     std::pair<int, int> get_mid(int y_offset, int x_offset);
+    int get_char();
+    std::pair<int, int> get_pos();
 
     // print somewhere in the screen and return the cursor to the original
     // position print_no_move
@@ -30,6 +34,13 @@ namespace curses {
 
     // print and go to position from which you started printing
     void print_begin(const int y, const int x, const std::string_view& str);
+
+    void move_to(int y, int x);
+
+    void add_char(int ch);
+    int get_lines();
+
+    void end_win();
 
 } /* curses */ 
 

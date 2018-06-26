@@ -61,11 +61,11 @@ int main()
     errors.reserve(std::size(characters));
     int current_errors{};
 
-    while(ch != KEY_F(1)){
-        getyx(stdscr, y, x);
+    while(!curses::is_f1(ch)){
+        auto [y, x] = curses::get_pos();
 
         auto const start = cr::high_resolution_clock::now();
-        ch = getch();
+        ch = curses::get_char();
         auto const end = cr::high_resolution_clock::now();
         // are nanoseconds better choice here?
         auto const duration = cr::duration_cast<cr::milliseconds>(end - start).count();
@@ -97,24 +97,24 @@ int main()
             if (current_errors == 0) continue;
             if (!typed.empty()){
                 // TODO here I just want to remove color not change character
-                move(y, --x);
-                addch(sentence[typed.length() - 1]);
-                move(y, x);
+                curses::move_to(y, --x);
+                curses::add_char(sentence[typed.length() - 1]);
+                curses::move_to(y, x);
                 typed.pop_back();
             }
         } else if (sentence[x - mid_x] == ch) { // correct one
             typed.push_back(ch);
             if (std::size(typed) > std::size(errors))
                 errors.push_back(0);
-            addch(ch | Colors::GreenBlack);
+            curses::add_char(ch | Colors::GreenBlack);
         } else { // wrong one
             typed.push_back(ch);
             if (std::size(typed) > std::size(errors))
                 errors.push_back(1);
             if (sentence[typed.length() - 1] == ' ') //space
-                addch(sentence[typed.length() - 1] | Colors::RedRed);
+                curses::add_char(sentence[typed.length() - 1] | Colors::RedRed);
             else //all others
-                addch(sentence[typed.length() - 1] | Colors::RedBlack);
+                curses::add_char(sentence[typed.length() - 1] | Colors::RedBlack);
         }
 
         // Probability matrix update
@@ -143,16 +143,18 @@ int main()
         current_errors = missed_characters(typed, sentence);
 
 #ifdef DEBUG
-        curses::printnm(LINES - 5, 2, "Errors: " + std::to_string(current_errors));
+        auto lines = curses::get_lines();
+        curses::printnm(lines - 5, 2, "Errors: " + std::to_string(current_errors));
 
         std::stringstream ss;
         for (auto& el : errors)
             ss << el;
 
-        curses::printnm(LINES - 7, 2, "Proficiency: " + std::to_string(ProbMatrix.proficiency()));
-        curses::printnm(LINES - 6, 2, "Typing speed: " + std::to_string(duration));
-        curses::printnm(LINES - 4, 2, "Error: " + ss.str());
-        curses::printnm(LINES - 3, 2, "Typed: " + typed);
+        curses::printnm(lines - 7, 2, "Proficiency: "
+                                      + std::to_string(ProbMatrix.proficiency()));
+        curses::printnm(lines - 6, 2, "Typing speed: " + std::to_string(duration));
+        curses::printnm(lines - 4, 2, "Error: " + ss.str());
+        curses::printnm(lines - 3, 2, "Typed: " + typed);
 
         std::ofstream fs;
         fs.open("matrix_console");
@@ -176,6 +178,6 @@ int main()
     std::ofstream file{fpath};
     file << ProbMatrix.to_json_string();
 
-    endwin();
+    curses::end_win();
     return 0;
 }

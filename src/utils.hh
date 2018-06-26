@@ -5,7 +5,6 @@
 #include <random>
 #include <algorithm>
 #include <stdexcept>
-#include <curses.h>
 
 // from: http://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
 template<class T>
