@@ -1,20 +1,22 @@
 #ifndef STATS_H
 #define STATS_H
 
-#include <string>
 #include <numeric>
+#include <string>
 
 // TODO check for null characters
-int missed_characters(const std::string& buffer,
-                      const std::string& full_sentence){
-    if (buffer.length() == 0) return 0;
+int missed_characters(const std::string &buffer,
+                      const std::string &full_sentence) {
+    if (buffer.length() == 0)
+        return 0;
     return buffer.length() - std::inner_product(buffer.begin(), buffer.end(),
                                                 full_sentence.begin(), 0,
-                                                std::plus<>(), std::equal_to<>());
+                                                std::plus<>(),
+                                                std::equal_to<>());
 }
 
-bool last_char_correct(const std::string& buffer,
-                      const std::string& full_sentence){
+bool last_char_correct(const std::string &buffer,
+                       const std::string &full_sentence) {
     if (buffer.length() == 0)
         throw;
 

@@ -2,16 +2,16 @@
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
 
-#include <vector>
-#include <iterator>
-#include <filesystem>
-#include <sstream>
 #include <chrono>
+#include <filesystem>
+#include <iterator>
+#include <sstream>
+#include <vector>
 
-#include "stats.hh"
-#include "probability_matrix.hh"
-#include "utils.hh"
 #include "curses_wrap.hh"
+#include "probability_matrix.hh"
+#include "stats.hh"
+#include "utils.hh"
 
 namespace fs = std::filesystem;
 namespace cr = std::chrono;
@@ -23,14 +23,14 @@ int y = -1, x = -1;
 int mid_y, mid_x;
 int ch;
 
-//int main(int argc, char *argv[])
-int main()
-{
+// int main(int argc, char *argv[])
+int main() {
     constexpr auto lowercase = "qwertyuiopasdfghjklzxcvbnm";
     constexpr auto uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
     constexpr auto symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
     constexpr auto numbers = "0123456789";
-    const auto all_chars = std::string(lowercase) + uppercase + symbols + numbers;
+    const auto all_chars =
+            std::string(lowercase) + uppercase + symbols + numbers;
 
     std::string characters = all_chars;
 
@@ -39,8 +39,8 @@ int main()
 #endif
 
     std::string tmppath;
-    tmppath = std::string(std::getenv("HOME")) + "/.local/share/DeliberateTyping/matrix.json";
-
+    tmppath = std::string(std::getenv("HOME")) +
+              "/.local/share/DeliberateTyping/matrix.json";
 
     ProbabilityMatrix ProbMatrix(characters);
     // TODO: if loading failed add fallback
@@ -61,18 +61,19 @@ int main()
     errors.reserve(std::size(characters));
     int current_errors{};
 
-    while(!curses::is_f1(ch)){
+    while (!curses::is_f1(ch)) {
         auto [y, x] = curses::get_pos();
 
         auto const start = cr::high_resolution_clock::now();
         ch = curses::get_char();
         auto const end = cr::high_resolution_clock::now();
         // are nanoseconds better choice here?
-        auto const duration = cr::duration_cast<cr::milliseconds>(end - start).count();
+        auto const duration =
+                cr::duration_cast<cr::milliseconds>(end - start).count();
 
         auto res = std::find(std::begin(all_chars), std::end(all_chars), ch);
-        if (res == std::end(all_chars) && !curses::is_enter(ch) && !curses::is_backspace(ch)
-                && ch != ' ')
+        if (res == std::end(all_chars) && !curses::is_enter(ch) &&
+            !curses::is_backspace(ch) && ch != ' ')
             continue;
 
         if (typed.size() == std::size(sentence)) {
@@ -82,7 +83,7 @@ int main()
                 // sentence = generate(characters, 40);
                 sentence = ProbMatrix.generate_sentence(8);
                 curses::print_begin(mid_y, mid_x, sentence.c_str());
-            } else if (current_errors != 0 && curses::is_backspace(ch)) { 
+            } else if (current_errors != 0 && curses::is_backspace(ch)) {
                 // allow backspace
             } else {
                 // block any new entry of characters since we are at the end
@@ -90,12 +91,14 @@ int main()
             }
         }
 
-        if (curses::is_enter(ch)) continue;
+        if (curses::is_enter(ch))
+            continue;
 
         if (curses::is_backspace(ch)) {
             // disable backspace if everything is correct
-            if (current_errors == 0) continue;
-            if (!typed.empty()){
+            if (current_errors == 0)
+                continue;
+            if (!typed.empty()) {
                 // TODO here I just want to remove color not change character
                 curses::move_to(y, --x);
                 curses::add_char(sentence[typed.length() - 1]);
@@ -111,31 +114,32 @@ int main()
             typed.push_back(ch);
             if (std::size(typed) > std::size(errors))
                 errors.push_back(1);
-            if (sentence[typed.length() - 1] == ' ') //space
+            if (sentence[typed.length() - 1] == ' ') // space
                 curses::add_char(sentence[typed.length() - 1] | Colors::RedRed);
-            else //all others
-                curses::add_char(sentence[typed.length() - 1] | Colors::RedBlack);
+            else // all others
+                curses::add_char(sentence[typed.length() - 1] |
+                                 Colors::RedBlack);
         }
 
         // Probability matrix update
-        if (auto len=std::size(typed);
-                // prevent checking when typed strings is too small
-                len > 1
-                // when hitting backspace dont update
-                && !curses::is_backspace(ch)
-                // don't update if all errors are not cleared
-                && current_errors == 0){
+        if (auto len = std::size(typed);
+            // prevent checking when typed strings is too small
+            len > 1
+            // when hitting backspace dont update
+            && !curses::is_backspace(ch)
+            // don't update if all errors are not cleared
+            && current_errors == 0) {
             bool correct = last_char_correct(typed, sentence);
 
             char current = sentence[len - 1];
             char last = sentence[len - 2];
             // this convoluted logic is used to catch when we made a mistake in
             // the past and removed it with backspace
-            if (!correct && last != ' '){
+            if (!correct && last != ' ') {
                 // Ignore space entirely? Even don't count mistakes when space
                 // is used?
                 ProbMatrix.update_element(last, current, duration, correct);
-            } else if (!errors[len - 1]){
+            } else if (!errors[len - 1]) {
                 ProbMatrix.update_element(last, current, duration, correct);
             }
         }
@@ -144,15 +148,18 @@ int main()
 
 #ifdef DEBUG
         auto lines = curses::get_lines();
-        curses::printnm(lines - 5, 2, "Errors: " + std::to_string(current_errors));
+        curses::printnm(lines - 5, 2,
+                        "Errors: " + std::to_string(current_errors));
 
         std::stringstream ss;
-        for (auto& el : errors)
+        for (auto &el : errors)
             ss << el;
 
-        curses::printnm(lines - 7, 2, "Proficiency: "
-                                      + std::to_string(ProbMatrix.proficiency()));
-        curses::printnm(lines - 6, 2, "Typing speed: " + std::to_string(duration));
+        curses::printnm(lines - 7, 2,
+                        "Proficiency: " +
+                                std::to_string(ProbMatrix.proficiency()));
+        curses::printnm(lines - 6, 2,
+                        "Typing speed: " + std::to_string(duration));
         curses::printnm(lines - 4, 2, "Error: " + ss.str());
         curses::printnm(lines - 3, 2, "Typed: " + typed);
 
@@ -169,8 +176,8 @@ int main()
     if (path)
         fpath = std::string(path) + "DeliberateTyping/matrix.json";
     else
-        fpath = std::string(std::getenv("HOME"))
-                + "/.local/share/DeliberateTyping";
+        fpath = std::string(std::getenv("HOME")) +
+                "/.local/share/DeliberateTyping";
     fs::create_directories(fpath);
     fpath += "/matrix.json";
 

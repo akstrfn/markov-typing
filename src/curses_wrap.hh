@@ -1,48 +1,48 @@
 #ifndef CURSES_WRAP_HH
 #define CURSES_WRAP_HH
 
-#include <string>
 #include <array>
+#include <string>
 
 // TODO I should wrap WINDOW into its own class... and char...
 namespace curses {
-        
 
-    // TODO Colors could be more generalized like this but I'm not sure if its
-    // worth it.
-    enum Colors {
-        // COLOR_PAIR from ncurses source translates to this:
-        // COLOR_PAIR(color_number) == static_cast<unsigned>(color_number) << 8 & A_COLOR
-        // where A_COLOR == static_cast<unsigned>(((1U << 8) - 1U)) << 8
-        RedBlack =   1u << 8 & 0b1111111100000000,
-        GreenBlack = 2u << 8 & 0b1111111100000000,
-        RedRed =     3u << 8 & 0b1111111100000000,
-    };
+// TODO Colors could be more generalized like this but I'm not sure if its
+// worth it.
+enum Colors {
+    // COLOR_PAIR from ncurses source translates to this:
+    // COLOR_PAIR(color_number) == static_cast<unsigned>(color_number) << 8 &
+    // A_COLOR
+    // where A_COLOR == static_cast<unsigned>(((1U << 8) - 1U)) << 8
+    RedBlack = 1u << 8 & 0b1111111100000000,
+    GreenBlack = 2u << 8 & 0b1111111100000000,
+    RedRed = 3u << 8 & 0b1111111100000000,
+};
 
-    void initialize();
+void initialize();
 
-    bool is_backspace(const int ch);
-    bool is_enter(const int ch);
-    bool is_f1(const int ch);
+bool is_backspace(const int ch);
+bool is_enter(const int ch);
+bool is_f1(const int ch);
 
-    std::array<int, 2> get_mid(int y_offset, int x_offset);
-    std::array<int, 2> get_pos();
-    int get_char();
+std::array<int, 2> get_mid(int y_offset, int x_offset);
+std::array<int, 2> get_pos();
+int get_char();
 
-    // print somewhere in the screen and return the cursor to the original
-    // position print_no_move
-    void printnm(const int y, const int x, const std::string_view& str);
+// print somewhere in the screen and return the cursor to the original
+// position print_no_move
+void printnm(const int y, const int x, const std::string_view &str);
 
-    // print and go to position from which you started printing
-    void print_begin(const int y, const int x, const std::string_view& str);
+// print and go to position from which you started printing
+void print_begin(const int y, const int x, const std::string_view &str);
 
-    void move_to(int y, int x);
+void move_to(int y, int x);
 
-    void add_char(int ch);
-    int get_lines();
+void add_char(int ch);
+int get_lines();
 
-    void end_win();
+void end_win();
 
-} /* curses */ 
+} // namespace curses
 
 #endif /* ifndef CURSES_WRAP_HH */
