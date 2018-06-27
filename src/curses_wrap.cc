@@ -3,6 +3,26 @@
 
 namespace curses {
 
+NChar::NChar(int ch_) : ch{ch_} {};
+
+bool NChar::is_backspace() {
+    return ch == KEY_BACKSPACE || ch == '\b' || ch == 127;
+}
+
+bool NChar::is_enter() { return ch == KEY_ENTER || ch == '\n' || ch == 10; }
+
+bool NChar::is_f1() { return ch == KEY_F(1); }
+
+NChar &NChar::operator=(NChar other) {
+    ch = other.ch;
+    return *this;
+}
+
+NChar &NChar::operator=(int other) {
+    ch = other;
+    return *this;
+}
+
 void initialize() {
     initscr();
     raw();
@@ -19,16 +39,6 @@ void initialize() {
     init_pair(30, COLOR_WHITE, COLOR_BLACK);
     bkgd(COLOR_PAIR(30));
 }
-
-bool is_backspace(const int ch) {
-    return ch == KEY_BACKSPACE || ch == '\b' || ch == 127;
-}
-
-bool is_enter(const int ch) {
-    return ch == KEY_ENTER || ch == '\n' || ch == 10;
-}
-
-bool is_f1(const int ch) { return ch == KEY_F(1); }
 
 std::array<int, 2> get_mid(int y_offset, int x_offset) {
     int y, x;

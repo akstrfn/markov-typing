@@ -21,7 +21,8 @@ std::string typed = "";
 int row, col;
 int y = -1, x = -1;
 int mid_y, mid_x;
-int ch;
+
+curses::NChar ch{0};
 
 // int main(int argc, char *argv[])
 int main() {
@@ -61,7 +62,7 @@ int main() {
     errors.reserve(std::size(characters));
     int current_errors{};
 
-    while (!curses::is_f1(ch)) {
+    while (!ch.is_f1()) {
         auto [y, x] = curses::get_pos();
 
         auto const start = cr::high_resolution_clock::now();
@@ -71,19 +72,19 @@ int main() {
         auto const duration =
                 cr::duration_cast<cr::milliseconds>(end - start).count();
 
-        auto res = std::find(std::begin(all_chars), std::end(all_chars), ch);
-        if (res == std::end(all_chars) && !curses::is_enter(ch) &&
-            !curses::is_backspace(ch) && ch != ' ')
+        auto res = std::find(std::begin(all_chars), std::end(all_chars), ch.ch);
+        if (res == std::end(all_chars) && !ch.is_enter() &&
+            !ch.is_backspace() && ch.ch != ' ')
             continue;
 
         if (typed.size() == std::size(sentence)) {
-            if (curses::is_enter(ch)) {
+            if (ch.is_enter()) {
                 typed.clear();
                 errors.clear();
                 // sentence = generate(characters, 40);
                 sentence = ProbMatrix.generate_sentence(8);
                 curses::print_begin(mid_y, mid_x, sentence.c_str());
-            } else if (current_errors != 0 && curses::is_backspace(ch)) {
+            } else if (current_errors != 0 && ch.is_backspace()) {
                 // allow backspace
             } else {
                 // block any new entry of characters since we are at the end
@@ -91,10 +92,10 @@ int main() {
             }
         }
 
-        if (curses::is_enter(ch))
+        if (ch.is_enter())
             continue;
 
-        if (curses::is_backspace(ch)) {
+        if (ch.is_backspace()) {
             // disable backspace if everything is correct
             if (current_errors == 0)
                 continue;
@@ -105,13 +106,13 @@ int main() {
                 curses::move_to(y, x);
                 typed.pop_back();
             }
-        } else if (sentence[x - mid_x] == ch) { // correct one
-            typed.push_back(ch);
+        } else if (sentence[x - mid_x] == ch.ch) { // correct one
+            typed.push_back(ch.ch);
             if (std::size(typed) > std::size(errors))
                 errors.push_back(0);
-            curses::add_char(ch | Colors::GreenBlack);
+            curses::add_char(ch.ch | Colors::GreenBlack);
         } else { // wrong one
-            typed.push_back(ch);
+            typed.push_back(ch.ch);
             if (std::size(typed) > std::size(errors))
                 errors.push_back(1);
             if (sentence[typed.length() - 1] == ' ') // space
@@ -126,7 +127,7 @@ int main() {
             // prevent checking when typed strings is too small
             len > 1
             // when hitting backspace dont update
-            && !curses::is_backspace(ch)
+            && !ch.is_backspace()
             // don't update if all errors are not cleared
             && current_errors == 0) {
             bool correct = last_char_correct(typed, sentence);

@@ -7,6 +7,16 @@
 // TODO I should wrap WINDOW into its own class... and char...
 namespace curses {
 
+struct NChar {
+    int ch;
+    NChar(int);
+    bool is_backspace();
+    bool is_enter();
+    bool is_f1();
+    NChar &operator=(NChar);
+    NChar &operator=(int);
+};
+
 // TODO Colors could be more generalized like this but I'm not sure if its
 // worth it.
 enum Colors {
@@ -20,10 +30,6 @@ enum Colors {
 };
 
 void initialize();
-
-bool is_backspace(const int ch);
-bool is_enter(const int ch);
-bool is_f1(const int ch);
 
 std::array<int, 2> get_mid(int y_offset, int x_offset);
 std::array<int, 2> get_pos();
