@@ -32,13 +32,13 @@ namespace curses {
         return ch == KEY_F(1);
     }
 
-    std::pair<int, int> get_mid(int y_offset, int x_offset){
+    std::array<int, 2> get_mid(int y_offset, int x_offset){
         int y, x;
         getmaxyx(stdscr, y, x);
         return {(y / 2) - y_offset, (x / 2) - x_offset};
     }
 
-    std::pair<int, int> get_pos(){
+    std::array<int, 2> get_pos(){
         int y, x;
         getyx(stdscr, y, x);
         return {y, x};

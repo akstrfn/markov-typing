@@ -2,6 +2,7 @@
 #define CURSES_WRAP_HH
 
 #include <string>
+#include <array>
 
 // TODO I should wrap WINDOW into its own class... and char...
 namespace curses {
@@ -24,9 +25,9 @@ namespace curses {
     bool is_enter(const int ch);
     bool is_f1(const int ch);
 
-    std::pair<int, int> get_mid(int y_offset, int x_offset);
+    std::array<int, 2> get_mid(int y_offset, int x_offset);
+    std::array<int, 2> get_pos();
     int get_char();
-    std::pair<int, int> get_pos();
 
     // print somewhere in the screen and return the cursor to the original
     // position print_no_move
