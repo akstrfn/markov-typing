@@ -131,14 +131,9 @@ int main() {
             char current = sentence[len - 1];
             char last = sentence[len - 2];
             // this convoluted logic is used to catch when we made a mistake in
-            // the past and removed it with backspace
-            if (!correct && last != ' ') {
-                // Ignore space entirely? Even don't count mistakes when space
-                // is used?
+            // the past and removed it with backspace. Also don't count space.
+            if (!errors[len - 1] || (!correct && last != ' '))
                 ProbMatrix.update_element(last, current, duration, correct);
-            } else if (!errors[len - 1]) {
-                ProbMatrix.update_element(last, current, duration, correct);
-            }
         }
 
         error_exist = !all_correct(typed, sentence);
