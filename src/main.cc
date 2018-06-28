@@ -18,10 +18,6 @@ namespace cr = std::chrono;
 using curses::Colors;
 
 std::string typed = "";
-int row, col;
-int y = -1, x = -1;
-int mid_y, mid_x;
-
 curses::NChar ch{0};
 
 // int main(int argc, char *argv[])
@@ -63,7 +59,6 @@ int main() {
     bool error_exist{false};
 
     while (!ch.is_f1()) {
-        auto [y, x] = curses::get_pos();
 
         auto const start = cr::high_resolution_clock::now();
         ch = curses::get_char();
@@ -102,7 +97,9 @@ int main() {
                 curses::backspace(sentence[typed.length() - 1]);
                 typed.pop_back();
             }
-        } else if (sentence[x - mid_x] == ch.ch) { // correct one
+        // here its not typed.length() - 1 because cursor is one position in
+        // front of typed sentence
+        } else if (sentence[typed.length()] == ch.ch) { // correct one
             typed.push_back(ch.ch);
             if (std::size(typed) > std::size(errors))
                 errors.push_back(0);
