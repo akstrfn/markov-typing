@@ -59,6 +59,7 @@ int main() {
     bool error_exist{false};
 
     while (!ch.is_f1()) {
+        error_exist = !all_correct(typed, sentence);
 
         auto const start = cr::high_resolution_clock::now();
         ch = curses::get_char();
@@ -122,23 +123,29 @@ int main() {
 
         // Probability matrix update
         if (auto len = std::size(typed);
-            // prevent checking when typed strings is too small
-            len > 1
-            // when hitting backspace dont update
-            && !ch.is_backspace()
-            // don't update if all errors are not cleared
-            && !error_exist) {
-            bool correct = last_char_correct(typed, sentence);
-
+            len > 1 // Prevent checking when typed strings is too small
+            && !ch.is_backspace() // When hitting backspace dont update
+            // Don't update if there is an error in the text. This works
+            // because errors dont update if more errors follow uncorected
+            // error. This is too complicated...
+            && (errors.size() == len))
+        {
+            // If there was error in the past don't count as correct
+            bool correct = errors[len - 1];
             char current = sentence[len - 1];
             char last = sentence[len - 2];
-            // this convoluted logic is used to catch when we made a mistake in
-            // the past and removed it with backspace. Also don't count space.
-            if (!errors[len - 1] || (!correct && last != ' '))
-                ProbMatrix.update_element(last, current, duration, correct);
+            // Don't count space.
+            if (last != ' ')
+                p_matrix.update_element(last, current, duration, correct);
+#ifdef DEBUG
+            auto lines = curses::get_lines();
+            std::stringstream sdbg;
+            sdbg << "last: " << last
+                 << " current: " << current
+                 << " correct: " << correct;
+            curses::printnm(lines - 8, 2, sdbg.str());
+#endif
         }
-
-        error_exist = !all_correct(typed, sentence);
 
 #ifdef DEBUG
         auto lines = curses::get_lines();
