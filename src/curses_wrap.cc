@@ -3,6 +3,7 @@
 
 namespace curses {
 
+NChar::NChar() = default;
 NChar::NChar(int ch_) : ch{ch_} {};
 
 bool NChar::is_backspace() {
@@ -23,8 +24,10 @@ NChar &NChar::operator=(int other) {
     return *this;
 }
 
-void backspace(int replacement_char){
-    // TODO KEY_BACKSPACE is inconsistent so now do it manually...  check
+int NChar::data() { return ch; }
+
+void backspace(int replacement_char) {
+    // TODO KEY_BACKSPACE is inconsistent so for now do it manually...  check
     // terminfo and terminal configuration since something is wrong there
     int y, x;
     getyx(stdscr, y, x);
@@ -69,7 +72,7 @@ void printnm(const int y, const int x, const std::string_view &str) {
     move(y, x);
     clrtoeol();
     printw(str.data());
-    //return to old position
+    // return to old position
     move(old_y, old_x);
 }
 

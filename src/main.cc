@@ -18,7 +18,7 @@ namespace cr = std::chrono;
 using curses::Colors;
 
 std::string typed = "";
-curses::NChar ch{0};
+curses::NChar ch;
 
 // int main(int argc, char *argv[])
 int main() {
@@ -67,9 +67,10 @@ int main() {
         auto const duration =
                 cr::duration_cast<cr::milliseconds>(end - start).count();
 
-        auto res = std::find(std::begin(all_chars), std::end(all_chars), ch.ch);
+        auto res = std::find(std::begin(all_chars), std::end(all_chars),
+                             ch.data());
         if (res == std::end(all_chars) && !ch.is_enter() && !ch.is_backspace()
-            && ch.ch != ' ')
+            && ch.data() != ' ')
             continue;
 
         if (typed.size() == std::size(sentence)) {
@@ -99,14 +100,14 @@ int main() {
             }
         // here its not typed.length() - 1 because cursor is one position in
         // front of typed sentence
-        } else if (sentence[typed.length()] == ch.ch) { // correct one
-            typed.push_back(ch.ch);
-            if (std::size(typed) > std::size(errors))
+        if (sentence[typed.length()] == ch.data()) { // correct one
+            typed.push_back(ch.data());
+            if (!error_exist && (std::size(typed) > std::size(errors)))
                 errors.push_back(0);
-            curses::add_char(ch.ch | Colors::GreenBlack);
+            curses::add_char(ch.data() | Colors::GreenBlack);
         } else { // wrong one
-            typed.push_back(ch.ch);
-            if (std::size(typed) > std::size(errors))
+            typed.push_back(ch.data());
+            if (!error_exist && (std::size(typed) > std::size(errors)))
                 errors.push_back(1);
             if (sentence[typed.length() - 1] == ' ') // space
                 curses::add_char(sentence[typed.length() - 1] | Colors::RedRed);

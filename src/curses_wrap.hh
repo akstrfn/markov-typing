@@ -7,14 +7,18 @@
 // TODO I should wrap WINDOW into its own class... and char...
 namespace curses {
 
-struct NChar {
+class NChar {
     int ch;
+
+public:
+    NChar();
     NChar(int);
     bool is_backspace();
     bool is_enter();
     bool is_f1();
     NChar &operator=(NChar);
     NChar &operator=(int);
+    int data();
 };
 
 // TODO Colors could be more generalized like this but I'm not sure if its
