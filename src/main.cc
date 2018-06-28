@@ -39,15 +39,15 @@ int main() {
     tmppath = std::string(std::getenv("HOME"))
               + "/.local/share/DeliberateTyping/matrix.json";
 
-    ProbabilityMatrix ProbMatrix(characters);
+    ProbabilityMatrix p_matrix(characters);
     // TODO: if loading failed add fallback
     // TODO: BUG: when file is loaded then matrix is not updated correctly i.e.
     // it is not updated at all many times.
     fs::path tmpfile{tmppath};
     if (fs::exists(tmpfile))
-        ProbMatrix.read_from_json(tmppath);
+        p_matrix.read_from_json(tmppath);
 
-    std::string sentence = ProbMatrix.generate_sentence(8);
+    std::string sentence = p_matrix.generate_sentence(8);
 
     curses::initialize();
     auto [mid_y, mid_x] = curses::get_mid(0, std::size(sentence) / 2);
@@ -77,8 +77,9 @@ int main() {
             if (ch.is_enter()) {
                 typed.clear();
                 errors.clear();
-                sentence = ProbMatrix.generate_sentence(8);
+                sentence = p_matrix.generate_sentence(8);
                 curses::print_begin(mid_y, mid_x, sentence.c_str());
+                continue;
             } else if (error_exist && ch.is_backspace()) {
                 // allow backspace
             } else {
@@ -97,7 +98,10 @@ int main() {
             if (!typed.empty()) {
                 curses::backspace(sentence[typed.length() - 1]);
                 typed.pop_back();
+                continue;
             }
+        }
+
         // here its not typed.length() - 1 because cursor is one position in
         // front of typed sentence
         if (sentence[typed.length()] == ch.data()) { // correct one
@@ -145,7 +149,7 @@ int main() {
 
         curses::printnm(lines - 6, 2,
                         "Proficiency: "
-                                + std::to_string(ProbMatrix.proficiency()));
+                                + std::to_string(p_matrix.proficiency()));
         curses::printnm(lines - 5, 2,
                         "Typing speed: " + std::to_string(duration));
         curses::printnm(lines - 4, 2, "Error: " + ss.str());
@@ -153,7 +157,7 @@ int main() {
 
         std::ofstream fs;
         fs.open("matrix_console");
-        fs << ProbMatrix.to_string();
+        fs << p_matrix.to_string();
 #endif
     }
     // Save progress
@@ -171,7 +175,7 @@ int main() {
 
     // TODO what if there is not even home defined?
     std::ofstream file{fpath};
-    file << ProbMatrix.to_json_string();
+    file << p_matrix.to_json_string();
 
     curses::end_win();
     return 0;
