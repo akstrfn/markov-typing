@@ -40,8 +40,8 @@ int main() {
 #endif
 
     std::string tmppath;
-    tmppath = std::string(std::getenv("HOME")) +
-              "/.local/share/DeliberateTyping/matrix.json";
+    tmppath = std::string(std::getenv("HOME"))
+              + "/.local/share/DeliberateTyping/matrix.json";
 
     ProbabilityMatrix ProbMatrix(characters);
     // TODO: if loading failed add fallback
@@ -73,8 +73,8 @@ int main() {
                 cr::duration_cast<cr::milliseconds>(end - start).count();
 
         auto res = std::find(std::begin(all_chars), std::end(all_chars), ch.ch);
-        if (res == std::end(all_chars) && !ch.is_enter() &&
-            !ch.is_backspace() && ch.ch != ' ')
+        if (res == std::end(all_chars) && !ch.is_enter() && !ch.is_backspace()
+            && ch.ch != ' ')
             continue;
 
         if (typed.size() == std::size(sentence)) {
@@ -118,8 +118,8 @@ int main() {
             if (sentence[typed.length() - 1] == ' ') // space
                 curses::add_char(sentence[typed.length() - 1] | Colors::RedRed);
             else // all others
-                curses::add_char(sentence[typed.length() - 1] |
-                                 Colors::RedBlack);
+                curses::add_char(sentence[typed.length() - 1]
+                                 | Colors::RedBlack);
         }
 
         // Probability matrix update
@@ -157,8 +157,8 @@ int main() {
             ss << el;
 
         curses::printnm(lines - 7, 2,
-                        "Proficiency: " +
-                                std::to_string(ProbMatrix.proficiency()));
+                        "Proficiency: "
+                                + std::to_string(ProbMatrix.proficiency()));
         curses::printnm(lines - 6, 2,
                         "Typing speed: " + std::to_string(duration));
         curses::printnm(lines - 4, 2, "Error: " + ss.str());
@@ -177,8 +177,8 @@ int main() {
     if (path)
         fpath = std::string(path) + "DeliberateTyping/matrix.json";
     else
-        fpath = std::string(std::getenv("HOME")) +
-                "/.local/share/DeliberateTyping";
+        fpath = std::string(std::getenv("HOME"))
+                + "/.local/share/DeliberateTyping";
     fs::create_directories(fpath);
     fpath += "/matrix.json";
 
