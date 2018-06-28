@@ -4,19 +4,13 @@
 #include <numeric>
 #include <string>
 
-// TODO check for null characters
-int missed_characters(const std::string &buffer,
-                      const std::string &full_sentence) {
-    if (buffer.length() == 0)
-        return 0;
-    return buffer.length()
-           - std::inner_product(buffer.begin(), buffer.end(),
-                                full_sentence.begin(), 0, std::plus<>(),
-                                std::equal_to<>());
+bool all_correct(std::string_view buffer,
+                 std::string_view full_sentence) {
+    return buffer == full_sentence.substr(0, buffer.length());
 }
 
-bool last_char_correct(const std::string &buffer,
-                       const std::string &full_sentence) {
+bool last_char_correct(std::string_view buffer,
+                       std::string_view full_sentence) {
     if (buffer.length() == 0)
         throw;
 

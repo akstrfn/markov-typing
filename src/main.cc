@@ -60,7 +60,7 @@ int main() {
 
     std::vector<short> errors; // really just 0 or 1 is necessary here
     errors.reserve(std::size(characters));
-    int current_errors{};
+    bool error_exist{false};
 
     while (!ch.is_f1()) {
         auto [y, x] = curses::get_pos();
@@ -83,7 +83,7 @@ int main() {
                 errors.clear();
                 sentence = ProbMatrix.generate_sentence(8);
                 curses::print_begin(mid_y, mid_x, sentence.c_str());
-            } else if (current_errors != 0 && ch.is_backspace()) {
+            } else if (error_exist && ch.is_backspace()) {
                 // allow backspace
             } else {
                 // block any new entry of characters since we are at the end
@@ -96,7 +96,7 @@ int main() {
 
         if (ch.is_backspace()) {
             // disable backspace if everything is correct
-            if (current_errors == 0)
+            if (!error_exist)
                 continue;
             if (!typed.empty()) {
                 curses::backspace(sentence[typed.length() - 1]);
@@ -125,7 +125,7 @@ int main() {
             // when hitting backspace dont update
             && !ch.is_backspace()
             // don't update if all errors are not cleared
-            && current_errors == 0) {
+            && !error_exist) {
             bool correct = last_char_correct(typed, sentence);
 
             char current = sentence[len - 1];
@@ -141,21 +141,19 @@ int main() {
             }
         }
 
-        current_errors = missed_characters(typed, sentence);
+        error_exist = !all_correct(typed, sentence);
 
 #ifdef DEBUG
         auto lines = curses::get_lines();
-        curses::printnm(lines - 5, 2,
-                        "Errors: " + std::to_string(current_errors));
 
         std::stringstream ss;
         for (auto &el : errors)
             ss << el;
 
-        curses::printnm(lines - 7, 2,
+        curses::printnm(lines - 6, 2,
                         "Proficiency: "
                                 + std::to_string(ProbMatrix.proficiency()));
-        curses::printnm(lines - 6, 2,
+        curses::printnm(lines - 5, 2,
                         "Typing speed: " + std::to_string(duration));
         curses::printnm(lines - 4, 2, "Error: " + ss.str());
         curses::printnm(lines - 3, 2, "Typed: " + typed);
