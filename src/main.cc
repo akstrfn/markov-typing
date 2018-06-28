@@ -81,7 +81,6 @@ int main() {
             if (ch.is_enter()) {
                 typed.clear();
                 errors.clear();
-                // sentence = generate(characters, 40);
                 sentence = ProbMatrix.generate_sentence(8);
                 curses::print_begin(mid_y, mid_x, sentence.c_str());
             } else if (current_errors != 0 && ch.is_backspace()) {
@@ -100,10 +99,7 @@ int main() {
             if (current_errors == 0)
                 continue;
             if (!typed.empty()) {
-                // TODO here I just want to remove color not change character
-                curses::move_to(y, --x);
-                curses::add_char(sentence[typed.length() - 1]);
-                curses::move_to(y, x);
+                curses::backspace(sentence[typed.length() - 1]);
                 typed.pop_back();
             }
         } else if (sentence[x - mid_x] == ch.ch) { // correct one

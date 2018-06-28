@@ -29,8 +29,8 @@ enum Colors {
     RedRed = 3u << 8 & 0b1111111100000000,
 };
 
+void backspace(int);
 void initialize();
-
 std::array<int, 2> get_mid(int y_offset, int x_offset);
 std::array<int, 2> get_pos();
 int get_char();

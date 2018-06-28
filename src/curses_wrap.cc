@@ -23,6 +23,15 @@ NChar &NChar::operator=(int other) {
     return *this;
 }
 
+void backspace(int replacement_char){
+    // TODO KEY_BACKSPACE is inconsistent so now do it manually...  check
+    // terminfo and terminal configuration since something is wrong there
+    int y, x;
+    getyx(stdscr, y, x);
+    mvaddch(y, --x, replacement_char);
+    move(y, x);
+}
+
 void initialize() {
     initscr();
     raw();
@@ -53,11 +62,14 @@ std::array<int, 2> get_pos() {
 }
 
 void printnm(const int y, const int x, const std::string_view &str) {
+    // sve old position
     int old_y, old_x;
     getyx(stdscr, old_y, old_x);
+    // clear the line and print on it
     move(y, x);
     clrtoeol();
     printw(str.data());
+    //return to old position
     move(old_y, old_x);
 }
 
