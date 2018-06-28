@@ -4,8 +4,7 @@
 #include <numeric>
 #include <string>
 
-bool all_correct(std::string_view buffer,
-                 std::string_view full_sentence) {
+bool all_correct(std::string_view buffer, std::string_view full_sentence) {
     return buffer == full_sentence.substr(0, buffer.length());
 }
 
