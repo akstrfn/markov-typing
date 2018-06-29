@@ -3,8 +3,10 @@
 
 #include <numeric>
 #include <string>
+#include <cassert>
 
 bool all_correct(std::string_view buffer, std::string_view full_sentence) {
+    assert(buffer.size() <= full_sentence.size());
     return buffer == full_sentence.substr(0, buffer.length());
 }
 
