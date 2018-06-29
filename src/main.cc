@@ -12,12 +12,12 @@
 #include "probability_matrix.hh"
 #include "stats.hh"
 #include "utils.hh"
+#include "sentence.hh"
 
 namespace fs = std::filesystem;
 namespace cr = std::chrono;
 using curses::Colors;
 
-std::string typed = "";
 curses::NChar ch;
 
 // int main(int argc, char *argv[])
@@ -47,19 +47,19 @@ int main() {
     if (fs::exists(tmpfile))
         p_matrix.read_from_json(tmppath);
 
-    std::string sentence = p_matrix.generate_sentence(8);
+    PracticeSentence psec{p_matrix.generate_sentence(8)};
 
     curses::initialize();
-    auto const [mid_y, mid_x] = curses::get_mid(0, std::size(sentence) / 2);
+    auto const [mid_y, mid_x] = curses::get_mid(0, std::size(psec.get_sentence()) / 2);
 
-    curses::print_begin(mid_y, mid_x, sentence);
+    curses::print_begin(mid_y, mid_x, psec.get_sentence());
 
     std::vector<short> errors; // really just 0 or 1 is necessary here
     errors.reserve(std::size(characters));
     bool error_exist{false};
 
     while (!ch.is_f1()) {
-        error_exist = !all_correct(typed, sentence);
+        error_exist = !all_correct(psec.get_typed(), psec.get_sentence());
 
         auto const start = cr::high_resolution_clock::now();
         ch = curses::get_char();
@@ -72,12 +72,10 @@ int main() {
             && !ch.is_backspace() && ch.data() != ' ')
             continue;
 
-        if (typed.size() == std::size(sentence)) {
+        if (psec.get_typed().size() == std::size(psec.get_sentence())) {
             if (ch.is_enter()) {
-                typed.clear();
-                errors.clear();
-                sentence = p_matrix.generate_sentence(8);
-                curses::print_begin(mid_y, mid_x, sentence.c_str());
+                psec.refresh_sentence(p_matrix.generate_sentence(8));
+                curses::print_begin(mid_y, mid_x, psec.get_sentence().c_str());
                 continue;
             } else if (ch.is_backspace()) {
                 // allow backspace
@@ -94,43 +92,43 @@ int main() {
             // disable backspace if everything is correct
             if (!error_exist)
                 continue;
-            if (!typed.empty()) {
-                curses::backspace(sentence[typed.length() - 1]);
-                typed.pop_back();
+            if (psec.total_typed()) {
+                auto pos = psec.total_typed() - 1;
+                auto tmp_ch = psec.get_sentence()[pos];
+                curses::backspace(tmp_ch);
+                psec.backspace();
                 continue;
             }
         }
 
-        // here its not typed.length() - 1 because cursor is one position in
-        // front of typed sentence
-        if (sentence[typed.length()] == ch.data()) { // correct one
-            typed.push_back(ch.data());
-            if (!error_exist && (std::size(typed) > std::size(errors)))
-                errors.push_back(0);
+        auto ch_correct = psec.update_typed(ch.data());
+        if (ch_correct) {
             curses::add_char(ch.data() | Colors::GreenBlack);
-        } else { // wrong one
-            typed.push_back(ch.data());
-            if (!error_exist && (std::size(typed) > std::size(errors)))
-                errors.push_back(1);
-            if (sentence[typed.length() - 1] == ' ') // space
-                curses::add_char(sentence[typed.length() - 1] | Colors::RedRed);
-            else // all others
-                curses::add_char(sentence[typed.length() - 1]
-                                 | Colors::RedBlack);
+        } else {
+            auto pos = psec.total_typed() - 1;
+            auto tmp_ch = psec.get_sentence()[pos];
+            curses::add_char(tmp_ch | Colors::BlackRed);
         }
 
+#ifdef DEBUG
+            auto lns = curses::get_lines();
+            std::stringstream sdbg;
+            sdbg << "first: " <<  std::size(psec.get_typed()) << " second: " << psec.get_errors().size();
+            curses::printnm(lns - 10, 2, sdbg.str());
+#endif
+
         // Probability matrix update
-        if (auto len = std::size(typed);
+        if (auto len = std::size(psec.get_typed());
             len > 1 // Prevent checking when typed strings is too small
             && !ch.is_backspace() // When hitting backspace dont update
             // Don't update if there is an error in the text. This works
             // because errors dont update if more errors follow uncorected
             // error. This is too complicated...
-            && (errors.size() == len)) {
+            && (psec.get_errors().size() == len)) {
             // If there was error in the past don't count as correct
-            bool correct = !errors[len - 1];
-            char current = sentence[len - 1];
-            char last = sentence[len - 2];
+            bool correct = !psec.get_errors()[len - 1];
+            char current = psec.get_sentence()[len - 1];
+            char last = psec.get_sentence()[len - 2];
             // Don't count space.
             if (last != ' ')
                 p_matrix.update_element(last, current, duration, correct);
@@ -156,7 +154,7 @@ int main() {
         curses::printnm(lines - 5, 2,
                         "Typing speed: " + std::to_string(duration));
         curses::printnm(lines - 4, 2, "Error: " + ss.str());
-        curses::printnm(lines - 3, 2, "Typed: " + typed);
+        curses::printnm(lines - 3, 2, "Typed: " + psec.get_typed());
 
         std::ofstream fs;
         fs.open("matrix_console");

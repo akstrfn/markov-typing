@@ -31,6 +31,7 @@ enum Colors {
     RedBlack = 1u << 8 & 0b1111111100000000,
     GreenBlack = 2u << 8 & 0b1111111100000000,
     RedRed = 3u << 8 & 0b1111111100000000,
+    BlackRed = 4u << 8 & 0b1111111100000000,
 };
 
 void backspace(int);
