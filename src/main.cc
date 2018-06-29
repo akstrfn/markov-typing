@@ -131,7 +131,7 @@ int main() {
             && (errors.size() == len))
         {
             // If there was error in the past don't count as correct
-            bool correct = errors[len - 1];
+            bool correct = !errors[len - 1];
             char current = sentence[len - 1];
             char last = sentence[len - 2];
             // Don't count space.
