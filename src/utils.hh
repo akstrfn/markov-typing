@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <random>
-#include <stdexcept>
 #include <string>
 
 // from: http://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
