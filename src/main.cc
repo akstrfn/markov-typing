@@ -50,7 +50,7 @@ int main() {
     std::string sentence = p_matrix.generate_sentence(8);
 
     curses::initialize();
-    auto [mid_y, mid_x] = curses::get_mid(0, std::size(sentence) / 2);
+    auto const [mid_y, mid_x] = curses::get_mid(0, std::size(sentence) / 2);
 
     curses::print_begin(mid_y, mid_x, sentence);
 
@@ -81,7 +81,7 @@ int main() {
                 sentence = p_matrix.generate_sentence(8);
                 curses::print_begin(mid_y, mid_x, sentence.c_str());
                 continue;
-            } else if (error_exist && ch.is_backspace()) {
+            } else if (ch.is_backspace()) {
                 // allow backspace
             } else {
                 // block any new entry of characters since we are at the end
