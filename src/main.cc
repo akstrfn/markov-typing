@@ -68,10 +68,8 @@ int main() {
         auto const duration =
                 cr::duration_cast<cr::milliseconds>(end - start).count();
 
-        auto res = std::find(std::begin(all_chars), std::end(all_chars),
-                             ch.data());
-        if (res == std::end(all_chars) && !ch.is_enter() && !ch.is_backspace()
-            && ch.data() != ' ')
+        if (all_chars.find(ch.data()) == std::string::npos && !ch.is_enter()
+            && !ch.is_backspace() && ch.data() != ' ')
             continue;
 
         if (typed.size() == std::size(sentence)) {
@@ -128,8 +126,7 @@ int main() {
             // Don't update if there is an error in the text. This works
             // because errors dont update if more errors follow uncorected
             // error. This is too complicated...
-            && (errors.size() == len))
-        {
+            && (errors.size() == len)) {
             // If there was error in the past don't count as correct
             bool correct = !errors[len - 1];
             char current = sentence[len - 1];
@@ -140,8 +137,7 @@ int main() {
 #ifdef DEBUG
             auto lines = curses::get_lines();
             std::stringstream sdbg;
-            sdbg << "last: " << last
-                 << " current: " << current
+            sdbg << "last: " << last << " current: " << current
                  << " correct: " << correct;
             curses::printnm(lines - 8, 2, sdbg.str());
 #endif
