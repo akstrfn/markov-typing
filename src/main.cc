@@ -2,7 +2,6 @@
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
 
-#include <chrono>
 #include <filesystem>
 #include <iterator>
 #include <sstream>
@@ -15,7 +14,6 @@
 #include "utils.hh"
 
 namespace fs = std::filesystem;
-namespace cr = std::chrono;
 using curses::Colors;
 
 // int main(int argc, char *argv[])
@@ -53,15 +51,14 @@ int main() {
 
     curses::print_begin(mid_y, mid_x, psec.get_sentence());
 
+    // timer is in milliseconds, are nanoseconds better choice?
+    Timer timer;
     curses::NChar ch;
     while (!ch.is_f1()) {
 
-        auto const start = cr::high_resolution_clock::now();
+        timer.start();
         ch = curses::get_char();
-        auto const end = cr::high_resolution_clock::now();
-        // are nanoseconds better choice here?
-        auto const duration =
-                cr::duration_cast<cr::milliseconds>(end - start).count();
+        auto const duration = timer.duration();
 
         // only predefined characters are allowed
         if (!is_in(all_chars, ch.data()) && !ch.is_enter() && !ch.is_backspace()
@@ -122,7 +119,7 @@ int main() {
 
         std::stringstream ss;
         ss << "last: " << last << " current: " << current
-             << " correct: " << correct;
+           << " correct: " << correct;
         curses::printnm(lines - 8, 2, ss.str());
 
         ss.str("");

@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <algorithm>
+#include <chrono>
 #include <random>
 #include <string>
 
@@ -68,5 +69,20 @@ template <typename T, typename E> bool is_in(const T &container, const E &el) {
     return std::end(container)
            != std::find(std::begin(container), std::end(container), el);
 }
+
+// possibly use this to define different resolution but it is unneeded atm
+// template <class Units>
+class Timer {
+    using resolution_t = std::chrono::milliseconds;
+    using clock = std::chrono::high_resolution_clock;
+    clock::time_point t;
+
+public:
+    auto start() { t = clock::now(); }
+    auto duration() {
+        auto end = clock::now();
+        return std::chrono::duration_cast<resolution_t>(end - t).count();
+    }
+};
 
 #endif /* UTILS_H */
