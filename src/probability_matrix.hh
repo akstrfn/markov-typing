@@ -130,6 +130,7 @@ public:
     // TODO BUG updates when some wrong character instead of space is pressed
     void update_element(char const predecessor, char const current_char,
                         long const typing_time, bool const correct) {
+        // Doesn't count space.
         try {
             auto const from_idx = char_map.at(predecessor);
             auto const current_idx = char_map.at(current_char);

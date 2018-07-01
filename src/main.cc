@@ -115,14 +115,12 @@ int main() {
         bool correct = !psec.full_error_check();
         char current = psec.get_sentence()[len - 1];
         char last = psec.get_sentence()[len - 2];
-        // Don't count space.
-        if (last != ' ')
-            p_matrix.update_element(last, current, duration, correct);
+        p_matrix.update_element(last, current, duration, correct);
 
 #ifdef DEBUG
         std::stringstream sdbg;
         sdbg << "last: " << last << " current: " << current
-            << " correct: " << correct;
+             << " correct: " << correct;
         curses::printnm(curses::get_lines() - 8, 2, sdbg.str());
 
         auto lines = curses::get_lines();
