@@ -18,8 +18,6 @@ namespace fs = std::filesystem;
 namespace cr = std::chrono;
 using curses::Colors;
 
-curses::NChar ch;
-
 // int main(int argc, char *argv[])
 int main() {
     constexpr auto lowercase = "qwertyuiopasdfghjklzxcvbnm";
@@ -54,12 +52,8 @@ int main() {
 
     curses::print_begin(mid_y, mid_x, psec.get_sentence());
 
-    std::vector<short> errors; // really just 0 or 1 is necessary here
-    errors.reserve(std::size(characters));
-    bool error_exist{false};
-
+    curses::NChar ch;
     while (!ch.is_f1()) {
-        error_exist = !all_correct(psec.get_typed(), psec.get_sentence());
 
         auto const start = cr::high_resolution_clock::now();
         ch = curses::get_char();
@@ -72,34 +66,34 @@ int main() {
             && !ch.is_backspace() && ch.data() != ' ')
             continue;
 
-        if (psec.get_typed().size() == std::size(psec.get_sentence())) {
-            if (ch.is_enter()) {
-                psec.refresh_sentence(p_matrix.generate_sentence(8));
-                curses::print_begin(mid_y, mid_x, psec.get_sentence().c_str());
-                continue;
-            } else if (ch.is_backspace()) {
-                // allow backspace
-            } else {
-                // block any new entry of characters since we are at the end
-                continue;
-            }
+        bool at_the_end = psec.total_typed() == std::size(psec.get_sentence());
+        // disable enter if we are not at the end
+        if (ch.is_enter() && at_the_end) {
+            psec.refresh_sentence(p_matrix.generate_sentence(8));
+            curses::print_begin(mid_y, mid_x, psec.get_sentence().c_str());
+            continue;
         }
 
-        if (ch.is_enter())
-            continue;
-
+        // handle backspace
         if (ch.is_backspace()) {
             // disable backspace if everything is correct
-            if (!error_exist)
+            if (!psec.get_error_exists())
                 continue;
-            if (psec.total_typed()) {
+            if (psec.total_typed() > 0) {
                 auto pos = psec.total_typed() - 1;
                 auto tmp_ch = psec.get_sentence()[pos];
                 curses::backspace(tmp_ch);
                 psec.backspace();
                 continue;
             }
+            if (psec.total_typed() == 0)
+                continue;
         }
+
+        // we are at the end but backspace and enter were not pressed so loop
+        // over
+        if (at_the_end)
+            continue;
 
         auto ch_correct = psec.update_typed(ch.data());
         if (ch_correct) {
@@ -113,7 +107,8 @@ int main() {
 #ifdef DEBUG
             auto lns = curses::get_lines();
             std::stringstream sdbg;
-            sdbg << "first: " <<  std::size(psec.get_typed()) << " second: " << psec.get_errors().size();
+            sdbg << "first: " <<  std::size(psec.get_typed())
+                 << " second: " << psec.get_errors().size();
             curses::printnm(lns - 10, 2, sdbg.str());
 #endif
 
@@ -121,12 +116,9 @@ int main() {
         if (auto len = std::size(psec.get_typed());
             len > 1 // Prevent checking when typed strings is too small
             && !ch.is_backspace() // When hitting backspace dont update
-            // Don't update if there is an error in the text. This works
-            // because errors dont update if more errors follow uncorected
-            // error. This is too complicated...
-            && (psec.get_errors().size() == len)) {
+            ) {
             // If there was error in the past don't count as correct
-            bool correct = !psec.get_errors()[len - 1];
+            bool correct = !psec.full_error_check();
             char current = psec.get_sentence()[len - 1];
             char last = psec.get_sentence()[len - 2];
             // Don't count space.
@@ -145,7 +137,7 @@ int main() {
         auto lines = curses::get_lines();
 
         std::stringstream ss;
-        for (auto &el : errors)
+        for (auto el : psec.get_errors())
             ss << el;
 
         curses::printnm(lines - 6, 2,
