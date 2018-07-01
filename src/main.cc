@@ -47,7 +47,7 @@ int main() {
 
     curses::initialize();
     auto const [mid_y, mid_x] =
-            curses::get_mid(0, std::size(psec.get_sentence()) / 2);
+            curses::get_mid(0, psec.get_sentence().size() / 2);
 
     curses::print_begin(mid_y, mid_x, psec.get_sentence());
 
@@ -65,7 +65,7 @@ int main() {
             && ch.data() != ' ')
             continue;
 
-        bool at_the_end = psec.total_typed() == std::size(psec.get_sentence());
+        bool at_the_end = psec.total_typed() == psec.get_sentence().size();
 
         // handle disable enter if we are not at the end
         if (ch.is_enter()) {
@@ -88,8 +88,7 @@ int main() {
             continue;
         }
 
-        // we are at the end but backspace and enter were not pressed so loop
-        // over
+        // we are at the end but backspace and enter were not pressed
         if (at_the_end)
             continue;
 
@@ -115,10 +114,12 @@ int main() {
         p_matrix.update_element(last, current, duration, correct);
 
 #ifdef DEBUG
+        // clang-format off
         auto lines = curses::get_lines();
 
         std::stringstream ss;
-        ss << "last: " << last << " current: " << current
+        ss << "last: " << last
+           << " current: " << current
            << " correct: " << correct;
         curses::printnm(lines - 8, 2, ss.str());
 
@@ -126,17 +127,15 @@ int main() {
         for (auto el : psec.get_errors())
             ss << el;
 
-        curses::printnm(lines - 6, 2,
-                        "Proficiency: "
-                                + std::to_string(p_matrix.proficiency()));
-        curses::printnm(lines - 5, 2,
-                        "Typing speed: " + std::to_string(duration));
+        curses::printnm(lines - 6, 2, "Proficiency: " + std::to_string(p_matrix.proficiency()));
+        curses::printnm(lines - 5, 2, "Typing speed: " + std::to_string(duration));
         curses::printnm(lines - 4, 2, "Error: " + ss.str());
         curses::printnm(lines - 3, 2, "Typed: " + psec.get_typed());
 
         std::ofstream fs;
         fs.open("matrix_console");
         fs << p_matrix.to_string();
+        // clang-format on
 #endif
     }
     // Save progress
