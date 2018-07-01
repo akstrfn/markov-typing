@@ -57,7 +57,17 @@ public:
     auto get_error_exists() { return error_exist; }
     auto& get_typed() { return typed; }
     auto& get_sentence() { return sentence; }
-    auto& get_errors() { return errors; }
+
+    // convert pointers to vector of 0 and 1 to have better overview of errors
+    auto get_errors() {
+        std::vector<short> v(typed.size(), 0);
+        
+        char* begin = &sentence[0];
+        for(auto ptr : errors)
+            v[ptr - begin] = 1;
+        
+        return v;
+    }
 };
 
 #endif /* ifndef SENTENCE_HH */
