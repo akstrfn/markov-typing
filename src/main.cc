@@ -118,14 +118,14 @@ int main() {
         p_matrix.update_element(last, current, duration, correct);
 
 #ifdef DEBUG
-        std::stringstream sdbg;
-        sdbg << "last: " << last << " current: " << current
-             << " correct: " << correct;
-        curses::printnm(curses::get_lines() - 8, 2, sdbg.str());
-
         auto lines = curses::get_lines();
 
         std::stringstream ss;
+        ss << "last: " << last << " current: " << current
+             << " correct: " << correct;
+        curses::printnm(lines - 8, 2, ss.str());
+
+        ss.str("");
         for (auto el : psec.get_errors())
             ss << el;
 
