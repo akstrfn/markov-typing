@@ -3,6 +3,8 @@ project(deliberate_typing)
 
 find_package(Curses REQUIRED)
 
+set(CLANG_FORMAT true CACHE BOOL "format the code with clang format")
+
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp)
     file(DOWNLOAD
             https://github.com/nlohmann/json/releases/download/v3.1.2/json.hpp
@@ -10,10 +12,17 @@ if(NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp)
         )
 endif()
 
-add_executable(typing
-    src/main.cc
-    src/curses_wrap.cc
+set(TYPING_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/curses_wrap.cc
+    ${CMAKE_SOURCE_DIR}/src/curses_wrap.hh
+    ${CMAKE_SOURCE_DIR}/src/main.cc
+    ${CMAKE_SOURCE_DIR}/src/probability_matrix.hh
+    ${CMAKE_SOURCE_DIR}/src/sentence.hh
+    ${CMAKE_SOURCE_DIR}/src/stats.hh
+    ${CMAKE_SOURCE_DIR}/src/utils.hh
 )
+
+add_executable(typing ${TYPING_SOURCES})
 
 target_link_libraries(typing 
     PRIVATE
@@ -40,12 +49,18 @@ target_include_directories(typing PRIVATE third_party)
 if(UNIX)
     # YouCompleteMe setup
     set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
-    add_custom_target(link_for_compile_commands
-        ALL
+    add_custom_target(link_for_compile_commands ALL
         COMMAND
             ${CMAKE_COMMAND} -E create_symlink
                 ${CMAKE_BINARY_DIR}/compile_commands.json
                 ${CMAKE_SOURCE_DIR}/compile_commands.json
+    )
+
+endif()
+
+if(UNIX AND ${CLANG_FORMAT})
+    add_custom_target(clang-format ALL
+        clang-format -i ${TYPING_SOURCES}
     )
 endif()
 
