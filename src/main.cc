@@ -63,15 +63,19 @@ int main() {
         auto const duration =
                 cr::duration_cast<cr::milliseconds>(end - start).count();
 
+        // only predefined characters are allowed
         if (!is_in(all_chars, ch.data()) && !ch.is_enter() && !ch.is_backspace()
             && ch.data() != ' ')
             continue;
 
         bool at_the_end = psec.total_typed() == std::size(psec.get_sentence());
-        // disable enter if we are not at the end
-        if (ch.is_enter() && at_the_end) {
-            psec.refresh_sentence(p_matrix.generate_sentence(8));
-            curses::print_begin(mid_y, mid_x, psec.get_sentence().c_str());
+
+        // handle disable enter if we are not at the end
+        if (ch.is_enter()) {
+            if (at_the_end) {
+                psec.refresh_sentence(p_matrix.generate_sentence(8));
+                curses::print_begin(mid_y, mid_x, psec.get_sentence().c_str());
+            }
             continue;
         }
 
@@ -103,28 +107,24 @@ int main() {
 
         // handle Probability matrix update
         // Prevent checking when typed strings is too small
-        if (auto len = psec.total_typed(); len > 1) {
-            assert(!ch.is_backspace()); // for debug
+        assert(!ch.is_backspace());
+        assert(!ch.is_enter());
 
-            // If there was error in the past don't count as correct
-            // TODO this would count error on the same char twice? possibly a
-            // good thing
-            bool correct = !psec.full_error_check();
-            char current = psec.get_sentence()[len - 1];
-            char last = psec.get_sentence()[len - 2];
-            // Don't count space.
-            if (last != ' ')
-                p_matrix.update_element(last, current, duration, correct);
-#ifdef DEBUG
-            auto lines = curses::get_lines();
-            std::stringstream sdbg;
-            sdbg << "last: " << last << " current: " << current
-                 << " correct: " << correct;
-            curses::printnm(lines - 8, 2, sdbg.str());
-#endif
-        }
+        auto len = psec.total_typed();
+        // If there was error in the past don't count as correct
+        bool correct = !psec.full_error_check();
+        char current = psec.get_sentence()[len - 1];
+        char last = psec.get_sentence()[len - 2];
+        // Don't count space.
+        if (last != ' ')
+            p_matrix.update_element(last, current, duration, correct);
 
 #ifdef DEBUG
+        std::stringstream sdbg;
+        sdbg << "last: " << last << " current: " << current
+            << " correct: " << correct;
+        curses::printnm(curses::get_lines() - 8, 2, sdbg.str());
+
         auto lines = curses::get_lines();
 
         std::stringstream ss;
