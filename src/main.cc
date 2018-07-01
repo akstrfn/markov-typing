@@ -76,18 +76,14 @@ int main() {
 
         // handle backspace
         if (ch.is_backspace()) {
-            // disable backspace if everything is correct
-            if (!psec.get_error_exists())
-                continue;
-            if (psec.total_typed() > 0) {
+            // there are errors and typed is bigger than 0
+            if (psec.get_error_exists() && psec.total_typed() > 0) {
                 auto pos = psec.total_typed() - 1;
                 auto tmp_ch = psec.get_sentence()[pos];
                 curses::backspace(tmp_ch);
                 psec.backspace();
-                continue;
             }
-            if (psec.total_typed() == 0)
-                continue;
+            continue;
         }
 
         // we are at the end but backspace and enter were not pressed so loop
@@ -113,11 +109,13 @@ int main() {
 #endif
 
         // Probability matrix update
-        if (auto len = std::size(psec.get_typed());
-            len > 1 // Prevent checking when typed strings is too small
-            && !ch.is_backspace() // When hitting backspace dont update
-            ) {
+        // Prevent checking when typed strings is too small
+        if (auto len = std::size(psec.get_typed()); len > 1) {
+            assert(!ch.is_backspace()); // for debug
+
             // If there was error in the past don't count as correct
+            // TODO this would count error on the same char twice? possibly a
+            // good thing
             bool correct = !psec.full_error_check();
             char current = psec.get_sentence()[len - 1];
             char last = psec.get_sentence()[len - 2];
