@@ -6,11 +6,12 @@
 #include <vector>
 
 #include "stats.hh"
+#include "utils.hh"
 
 class PracticeSentence {
     std::string sentence;
     std::string typed;
-    std::vector<short> errors; // to keep track of past errors
+    std::vector<char*> errors; // to keep track of past errors
     bool error_exist{false};
 
 public:
@@ -23,19 +24,13 @@ public:
         // Caller must handle if characters are not suitable. Perhaps add all
         // allowed characters and then check when adding?
         typed.push_back(ch);
-        bool const last_correct = sentence[typed.size() - 1] == ch;
+        auto* const s_char = &sentence[typed.size() - 1];
+        bool const last_correct = *s_char == ch;
 
-        if (last_correct) {
-            // update error vector only if there are no errors
-            // TODO BUG: when backspace clears text it sets errors exist to 0
-            // but in the past there was an error on that character so don't
-            // change the size of the errors vector
-            if (!error_exist)
-                errors.push_back(0);
-        } else { // last was wrong
-            // update error vector only if there are no errors
-            if (!error_exist)
-                errors.push_back(1);
+        // update error vector only if there are no previous errors
+        if (!last_correct) {
+            if (!error_exist && !is_in(errors, s_char))
+                errors.push_back(s_char);
             error_exist = true;
         }
         return last_correct;
@@ -44,7 +39,6 @@ public:
     auto backspace() {
         if (error_exist && !typed.empty())
             typed.pop_back();
-
         error_exist = !all_correct(typed, sentence);
     }
 
@@ -54,10 +48,12 @@ public:
         errors.clear();
     }
 
-    auto total_typed() {
-        return typed.size();
+    // check if error was there in the past as well as now
+    auto full_error_check() {
+        return error_exist || is_in(errors, &sentence[typed.size() - 1]);
     }
 
+    auto total_typed() { return typed.size(); }
     auto get_error_exists() { return error_exist; }
     auto& get_typed() { return typed; }
     auto& get_sentence() { return sentence; }
