@@ -101,17 +101,9 @@ int main() {
             curses::add_char(tmp_ch | Colors::BlackRed);
         }
 
-#ifdef DEBUG
-        auto lns = curses::get_lines();
-        std::stringstream sdbg;
-        sdbg << "first: " << std::size(psec.get_typed())
-             << " second: " << psec.get_errors().size();
-        curses::printnm(lns - 10, 2, sdbg.str());
-#endif
-
-        // Probability matrix update
+        // handle Probability matrix update
         // Prevent checking when typed strings is too small
-        if (auto len = std::size(psec.get_typed()); len > 1) {
+        if (auto len = psec.total_typed(); len > 1) {
             assert(!ch.is_backspace()); // for debug
 
             // If there was error in the past don't count as correct
