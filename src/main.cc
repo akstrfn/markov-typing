@@ -10,9 +10,9 @@
 
 #include "curses_wrap.hh"
 #include "probability_matrix.hh"
+#include "sentence.hh"
 #include "stats.hh"
 #include "utils.hh"
-#include "sentence.hh"
 
 namespace fs = std::filesystem;
 namespace cr = std::chrono;
@@ -48,7 +48,8 @@ int main() {
     PracticeSentence psec{p_matrix.generate_sentence(8)};
 
     curses::initialize();
-    auto const [mid_y, mid_x] = curses::get_mid(0, std::size(psec.get_sentence()) / 2);
+    auto const [mid_y, mid_x] =
+            curses::get_mid(0, std::size(psec.get_sentence()) / 2);
 
     curses::print_begin(mid_y, mid_x, psec.get_sentence());
 
@@ -62,8 +63,8 @@ int main() {
         auto const duration =
                 cr::duration_cast<cr::milliseconds>(end - start).count();
 
-        if (all_chars.find(ch.data()) == std::string::npos && !ch.is_enter()
-            && !ch.is_backspace() && ch.data() != ' ')
+        if (!is_in(all_chars, ch.data()) && !ch.is_enter() && !ch.is_backspace()
+            && ch.data() != ' ')
             continue;
 
         bool at_the_end = psec.total_typed() == std::size(psec.get_sentence());
@@ -101,11 +102,11 @@ int main() {
         }
 
 #ifdef DEBUG
-            auto lns = curses::get_lines();
-            std::stringstream sdbg;
-            sdbg << "first: " <<  std::size(psec.get_typed())
-                 << " second: " << psec.get_errors().size();
-            curses::printnm(lns - 10, 2, sdbg.str());
+        auto lns = curses::get_lines();
+        std::stringstream sdbg;
+        sdbg << "first: " << std::size(psec.get_typed())
+             << " second: " << psec.get_errors().size();
+        curses::printnm(lns - 10, 2, sdbg.str());
 #endif
 
         // Probability matrix update

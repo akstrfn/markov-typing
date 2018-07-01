@@ -1,9 +1,9 @@
 #ifndef STATS_H
 #define STATS_H
 
+#include <cassert>
 #include <numeric>
 #include <string>
-#include <cassert>
 
 bool all_correct(std::string_view buffer, std::string_view full_sentence) {
     assert(buffer.size() <= full_sentence.size());

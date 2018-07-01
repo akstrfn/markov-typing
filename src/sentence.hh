@@ -11,7 +11,7 @@
 class PracticeSentence {
     std::string sentence;
     std::string typed;
-    std::vector<char*> errors; // to keep track of past errors
+    std::vector<char *> errors; // to keep track of past errors
     bool error_exist{false};
 
 public:
@@ -24,7 +24,7 @@ public:
         // Caller must handle if characters are not suitable. Perhaps add all
         // allowed characters and then check when adding?
         typed.push_back(ch);
-        auto* const s_char = &sentence[typed.size() - 1];
+        auto *const s_char = &sentence[typed.size() - 1];
         bool const last_correct = *s_char == ch;
 
         // update error vector only if there are no previous errors
@@ -55,17 +55,17 @@ public:
 
     auto total_typed() { return typed.size(); }
     auto get_error_exists() { return error_exist; }
-    auto& get_typed() { return typed; }
-    auto& get_sentence() { return sentence; }
+    auto &get_typed() { return typed; }
+    auto &get_sentence() { return sentence; }
 
     // convert pointers to vector of 0 and 1 to have better overview of errors
     auto get_errors() {
         std::vector<short> v(typed.size(), 0);
-        
-        char* begin = &sentence[0];
-        for(auto ptr : errors)
+
+        char *begin = &sentence[0];
+        for (auto ptr : errors)
             v[ptr - begin] = 1;
-        
+
         return v;
     }
 };
