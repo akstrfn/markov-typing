@@ -27,7 +27,7 @@ struct CharPair {
     long typing_time{}; // TODO should I make all time units unsigned long?
 };
 
-void to_json(json &j, const impl::CharPair &p) {
+inline void to_json(json &j, const CharPair &p) {
     j = json{
             {"row", p.row},
             {"col", p.col},
@@ -40,7 +40,7 @@ void to_json(json &j, const impl::CharPair &p) {
     };
 }
 
-void from_json(const json &j, impl::CharPair &p) {
+inline void from_json(const json &j, CharPair &p) {
     p.row = j.at("row").get<int>();
     p.col = j.at("col").get<int>();
     p.row_char = j.at("row_char").get<std::string>();

@@ -1,8 +1,8 @@
 #ifndef IO_HH
 #define IO_HH
 
-#include <string_view>
 #include "probability_matrix.hh"
+#include <string_view>
 
 void write_json(std::string_view, ProbabilityMatrix const &);
 void read_json(std::string_view, ProbabilityMatrix &);
