@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "curses_wrap.hh"
+#include "io.hh"
 #include "probability_matrix.hh"
 #include "sentence.hh"
 #include "stats.hh"
@@ -31,17 +32,8 @@ int main() {
     characters = "asdf";
 #endif
 
-    std::string tmppath;
-    tmppath = std::string(std::getenv("HOME"))
-              + "/.local/share/DeliberateTyping/matrix.json";
-
     ProbabilityMatrix p_matrix(characters);
-    // TODO: if loading failed add fallback
-    // TODO: BUG: when file is loaded then matrix is not updated correctly i.e.
-    // it is not updated at all many times.
-    fs::path tmpfile{tmppath};
-    if (fs::exists(tmpfile))
-        p_matrix.read_from_json(tmppath);
+    read_json("matrix.json", p_matrix); // modifis p_matrix
 
     PracticeSentence psec{p_matrix.generate_sentence(8)};
 
@@ -138,22 +130,8 @@ int main() {
         // clang-format on
 #endif
     }
-    // Save progress
-    // TODO check these paths before starting to avoid exercising and then not
-    // being able to save
-    std::string fpath;
-    auto path = std::getenv("XDG_DATA_HOME");
-    if (path)
-        fpath = std::string(path) + "DeliberateTyping/matrix.json";
-    else
-        fpath = std::string(std::getenv("HOME"))
-                + "/.local/share/DeliberateTyping";
-    fs::create_directories(fpath);
-    fpath += "/matrix.json";
 
-    // TODO what if there is not even home defined?
-    std::ofstream file{fpath};
-    file << p_matrix.to_json_string();
+    write_json("matrix.json", p_matrix);
 
     curses::end_win();
     return 0;

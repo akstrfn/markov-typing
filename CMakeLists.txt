@@ -20,6 +20,8 @@ set(TYPING_SOURCES
     ${CMAKE_SOURCE_DIR}/src/sentence.hh
     ${CMAKE_SOURCE_DIR}/src/stats.hh
     ${CMAKE_SOURCE_DIR}/src/utils.hh
+    ${CMAKE_SOURCE_DIR}/src/io.hh
+    ${CMAKE_SOURCE_DIR}/src/io.cc
 )
 
 add_executable(typing ${TYPING_SOURCES})
