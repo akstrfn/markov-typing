@@ -102,7 +102,8 @@ public:
         return ss.str();
     }
 
-    auto to_json_string() {
+    // TODO test this
+    auto to_json_string() const {
         // lot of info is redundant but its not important for now
         json js;
         js["Characters"] = characters;
