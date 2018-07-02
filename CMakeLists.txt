@@ -17,6 +17,7 @@ set(TYPING_SOURCES
     ${CMAKE_SOURCE_DIR}/src/curses_wrap.hh
     ${CMAKE_SOURCE_DIR}/src/main.cc
     ${CMAKE_SOURCE_DIR}/src/probability_matrix.hh
+    ${CMAKE_SOURCE_DIR}/src/probability_matrix.cc
     ${CMAKE_SOURCE_DIR}/src/sentence.hh
     ${CMAKE_SOURCE_DIR}/src/stats.hh
     ${CMAKE_SOURCE_DIR}/src/utils.hh

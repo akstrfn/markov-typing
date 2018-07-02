@@ -3,6 +3,7 @@
 #endif
 
 #include <filesystem>
+#include <fstream>
 #include <iterator>
 #include <sstream>
 #include <vector>
