@@ -6,7 +6,7 @@
 namespace fs = std::filesystem;
 
 // TODO add tests
-void write_json(std::string_view file_name, ProbabilityMatrix const &mat) {
+void write_string(std::string_view file_name, ProbabilityMatrix const &mat) {
 
     // Save progress
     // TODO check these paths before starting to avoid exercising and then not
@@ -33,7 +33,7 @@ void write_json(std::string_view file_name, ProbabilityMatrix const &mat) {
 }
 
 // TODO add tests
-void read_json(std::string_view file_name, ProbabilityMatrix &mat) {
+void read_string(std::string_view file_name, ProbabilityMatrix &mat) {
     // TODO: if loading failed add fallback
     // TODO check on both spaces and prefer xdg?
     using namespace std::literals::string_literals;

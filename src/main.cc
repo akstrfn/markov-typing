@@ -34,7 +34,7 @@ int main() {
 #endif
 
     ProbabilityMatrix p_matrix(characters);
-    read_json("matrix.json", p_matrix); // modifis p_matrix
+    read_string("matrix.json", p_matrix); // modifis p_matrix
 
     PracticeSentence psec{p_matrix.generate_sentence(8)};
 
@@ -132,7 +132,7 @@ int main() {
 #endif
     }
 
-    write_json("matrix.json", p_matrix);
+    write_string("matrix.json", p_matrix);
 
     curses::end_win();
     return 0;
