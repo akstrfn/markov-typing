@@ -42,8 +42,8 @@ public:
         error_exist = !all_correct(typed, sentence);
     }
 
-    auto refresh_sentence(std::string_view sentence) {
-        sentence = sentence;
+    auto refresh_sentence(std::string_view new_sentence) {
+        sentence = new_sentence;
         typed.clear(); // most string implementations do not change capacity
         errors.clear();
     }
