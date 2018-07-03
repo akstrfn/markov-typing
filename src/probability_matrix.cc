@@ -42,9 +42,6 @@ void from_json(const json &j, CharPair &p) {
 
 } // namespace impl
 
-// TODO Some sort of time pressure should be added which should also be
-// accounted for in the function that updates the probabilies.
-
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct based on how frequent they were typed correctly
 ProbabilityMatrix::ProbabilityMatrix() = default;
@@ -84,30 +81,31 @@ std::string ProbabilityMatrix::to_string() {
     return ss.str();
 }
 
-// TODO test this
 std::string ProbabilityMatrix::to_json_string() const {
-    // lot of info is redundant but its not important for now
     json js;
     js["Characters"] = characters;
+    js["typing_time"] = average_typing_time;
     for (auto &row : data)
         for (auto &el : row)
             js["Matrix"].push_back(el);
     return js.dump();
 }
 
-// TODO test this
 void ProbabilityMatrix::read_from_json(const std::string &filename) {
     json js = json::parse(std::ifstream{filename});
-    std::string characters = js.at("Characters").get<std::string>();
 
+    characters = js.at("Characters").get<std::string>();
+    average_typing_time = js.at("typing_time").get<long>();
+
+    char_map.clear();
     for (auto i = 0ul; i != std::size(characters); ++i)
         char_map[characters[i]] = i;
 
     auto const sz = std::size(characters);
-    std::vector tmpdata(sz, std::vector<impl::CharPair>(sz));
+    data.clear();
+    data.resize(sz, std::vector<impl::CharPair>(sz));
     for (auto &d : js.at("Matrix").get<std::vector<impl::CharPair>>())
-        tmpdata[d.row][d.col] = d;
-    data = tmpdata;
+        data[d.row][d.col] = d;
 }
 
 // TODO BUG updates when some wrong character instead of space is pressed
