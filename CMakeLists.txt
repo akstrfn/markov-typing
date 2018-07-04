@@ -15,11 +15,11 @@ if(NOT nlohmann_json_FOUND AND NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohma
         )
 endif()
 
-if(NOT CLI11_FOUND AND NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/CLI/CLI.hpp)
+if(NOT CLI11_FOUND AND NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/CLI11.hpp)
     message("Downloading CLI11")
     file(DOWNLOAD
             https://github.com/CLIUtils/CLI11/releases/download/v1.6.0/CLI11.hpp
-            ${CMAKE_SOURCE_DIR}/third_party/CLI/CLI.hpp
+            ${CMAKE_SOURCE_DIR}/third_party/CLI11.hpp
         )
 endif()
 
