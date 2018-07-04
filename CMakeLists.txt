@@ -2,13 +2,24 @@ cmake_minimum_required(VERSION 3.11)
 project(deliberate_typing)
 
 find_package(Curses REQUIRED)
+find_package(nlohmann_json)
+find_package(CLI11) #QUIET)
 
 set(CLANG_FORMAT true CACHE BOOL "format the code with clang format")
 
-if(NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp)
+if(NOT nlohmann_json_FOUND)
+    message("Downloading nlohmann/json")
     file(DOWNLOAD
             https://github.com/nlohmann/json/releases/download/v3.1.2/json.hpp
             ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp
+        )
+endif()
+
+if(NOT CLI11_FOUND)
+    message("Downloading CLI11")
+    file(DOWNLOAD
+            https://github.com/CLIUtils/CLI11/releases/download/v1.6.0/CLI11.hpp
+            ${CMAKE_SOURCE_DIR}/third_party/CLI/CLI.hpp
         )
 endif()
 
