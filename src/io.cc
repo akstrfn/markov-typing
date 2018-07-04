@@ -3,9 +3,18 @@
 
 #include "io.hh"
 
+#if BOOST_FILESYSTEM
+
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
+#else
+
+#include <filesystem>
 namespace fs = std::filesystem;
 
-// TODO add tests
+#endif
+
 void write_string(std::string_view file_name, ProbabilityMatrix const &mat) {
 
     // Save progress
@@ -23,7 +32,7 @@ void write_string(std::string_view file_name, ProbabilityMatrix const &mat) {
     }
 
     fs::create_directories(fpath);
-    fpath /= file_name;
+    fpath /= std::string(file_name); // boost cant handle string_view atm
 
     // TODO for now just break everything if you cant save
     std::ofstream file{fpath};
@@ -32,8 +41,7 @@ void write_string(std::string_view file_name, ProbabilityMatrix const &mat) {
     file << mat.to_json_string();
 }
 
-// TODO add tests
-void read_string(std::string_view file_name, ProbabilityMatrix &mat) {
+bool read_string(std::string_view file_name, ProbabilityMatrix &mat) {
     // TODO: if loading failed add fallback
     // TODO check on both spaces and prefer xdg?
     using namespace std::literals::string_literals;
@@ -47,6 +55,10 @@ void read_string(std::string_view file_name, ProbabilityMatrix &mat) {
         fpath /= ".local/share/DeliberateTyping/"s + file_name.data();
     }
 
-    if (fs::exists(fpath))
-        mat.read_from_json(fpath);
+    if (fs::exists(fpath)) {
+        // TODO if json cant load file it will throw should this be handled?
+        mat.read_from_json(fpath.c_str()); // c_str because of boost
+        return true;
+    }
+    return false;
 }

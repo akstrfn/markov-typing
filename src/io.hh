@@ -5,6 +5,6 @@
 #include <string_view>
 
 void write_string(std::string_view, ProbabilityMatrix const &);
-void read_string(std::string_view, ProbabilityMatrix &);
+bool read_string(std::string_view, ProbabilityMatrix &);
 
 #endif /* ifndef IO_HH */

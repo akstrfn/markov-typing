@@ -1,11 +1,21 @@
 cmake_minimum_required(VERSION 3.11)
-project(deliberate_typing)
+project(markov_typing)
 
 find_package(Curses REQUIRED)
 find_package(nlohmann_json)
 find_package(CLI11) #QUIET)
 
 set(CLANG_FORMAT true CACHE BOOL "format the code with clang format")
+set(USE_BOOST_FS false CACHE BOOL "use boost filesystem. does not work atm")
+
+if(USE_BOOST_FS)
+    find_package(Boost REQUIRED COMPONENTS filesystem)
+    set(FS_LINK Boost::filesystem)
+    add_compile_options(-DBOOST_FILESYSTEM)
+else()
+    set(FS_LINK stdc++fs)
+endif()
+message(${FS_LINK})
 
 if(NOT nlohmann_json_FOUND AND NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp)
     message("Downloading nlohmann/json")
@@ -43,7 +53,7 @@ target_link_libraries(typing
         ${CURSES_LIBRARIES}
         # TODO it would be better to use boost::filesystem until compilers
         # stabilize filesystem support
-        stdc++fs
+        ${FS_LINK}
 )
 
 target_compile_features(typing
