@@ -8,7 +8,7 @@
 #include <sstream>
 #include <vector>
 
-#include <CLI/CLI.hpp>
+#include <CLI11.hpp>
 
 #include "curses_wrap.hh"
 #include "io.hh"
@@ -35,16 +35,29 @@ int main(int argc, char *argv[]) {
     CLI::Option *sy = app.add_flag("--symbols", "Use symbols.");
     CLI::Option *num = app.add_flag("--num", "Use numbers.");
 
+    std::string custom;
+    app.add_option("--custom", custom, "Provide custom set of letters");
+
     CLI11_PARSE(app, argc, argv);
 
     std::string characters{};
-    if (*lc) characters += lowercase;
-    if (*uc) characters += uppercase;
-    if (*sy) characters += symbols;
-    if (*num) characters += numbers;
+    if (custom.empty()) {
 
-    if (characters.size() == 0)
-        characters = all_chars;
+        if (*lc)
+            characters += lowercase;
+        if (*uc)
+            characters += uppercase;
+        if (*sy)
+            characters += symbols;
+        if (*num)
+            characters += numbers;
+
+        if (characters.empty())
+            characters = all_chars;
+    } else {
+        // TODO only latin chars will work
+        characters = custom;
+    }
 
 #if DEBUG
     characters = "asdf";
@@ -54,8 +67,9 @@ int main(int argc, char *argv[]) {
     // only specific elements of it i.e. if only numbers are practiced then
     // only numbers are updated, so some sort of mutable view of full matrix
     // should be made...
-    ProbabilityMatrix p_matrix(characters);
-    // read_string("matrix.json", p_matrix); // modifies p_matrix
+    ProbabilityMatrix p_matrix;
+    if (!read_string("matrix.json", p_matrix))
+        p_matrix = ProbabilityMatrix{characters};
 
     PracticeSentence psec{p_matrix.generate_sentence(8)};
 
