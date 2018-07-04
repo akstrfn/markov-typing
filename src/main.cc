@@ -8,6 +8,8 @@
 #include <sstream>
 #include <vector>
 
+#include <CLI/CLI.hpp>
+
 #include "curses_wrap.hh"
 #include "io.hh"
 #include "probability_matrix.hh"
@@ -18,23 +20,42 @@
 namespace fs = std::filesystem;
 using curses::Colors;
 
-// int main(int argc, char *argv[])
-int main() {
-    constexpr auto lowercase = "qwertyuiopasdfghjklzxcvbnm";
-    constexpr auto uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
-    constexpr auto symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
-    constexpr auto numbers = "0123456789";
-    const auto all_chars =
-            std::string(lowercase) + uppercase + symbols + numbers;
+constexpr auto lowercase = "qwertyuiopasdfghjklzxcvbnm";
+constexpr auto uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
+constexpr auto symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
+constexpr auto numbers = "0123456789";
+const auto all_chars = std::string(lowercase) + uppercase + symbols + numbers;
 
-    std::string characters = all_chars;
+int main(int argc, char *argv[]) {
+
+    CLI::App app("Markov typing tutor");
+
+    CLI::Option *lc = app.add_flag("--lowercase", "Use lowercase.");
+    CLI::Option *uc = app.add_flag("--uppercase", "Use uppercase.");
+    CLI::Option *sy = app.add_flag("--symbols", "Use symbols.");
+    CLI::Option *num = app.add_flag("--num", "Use numbers.");
+
+    CLI11_PARSE(app, argc, argv);
+
+    std::string characters{};
+    if (*lc) characters += lowercase;
+    if (*uc) characters += uppercase;
+    if (*sy) characters += symbols;
+    if (*num) characters += numbers;
+
+    if (characters.size() == 0)
+        characters = all_chars;
 
 #if DEBUG
     characters = "asdf";
 #endif
 
+    // TODO based on input one should be able to slice the matrix and update
+    // only specific elements of it i.e. if only numbers are practiced then
+    // only numbers are updated, so some sort of mutable view of full matrix
+    // should be made...
     ProbabilityMatrix p_matrix(characters);
-    read_string("matrix.json", p_matrix); // modifis p_matrix
+    // read_string("matrix.json", p_matrix); // modifies p_matrix
 
     PracticeSentence psec{p_matrix.generate_sentence(8)};
 
