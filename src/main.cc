@@ -2,7 +2,6 @@
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
 
-#include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <sstream>
@@ -17,7 +16,6 @@
 #include "stats.hh"
 #include "utils.hh"
 
-namespace fs = std::filesystem;
 using curses::Colors;
 
 constexpr auto lowercase = "qwertyuiopasdfghjklzxcvbnm";
@@ -67,11 +65,11 @@ int main(int argc, char *argv[]) {
     // only specific elements of it i.e. if only numbers are practiced then
     // only numbers are updated, so some sort of mutable view of full matrix
     // should be made...
-    ProbabilityMatrix p_matrix;
-    if (!read_string("matrix.json", p_matrix))
-        p_matrix = ProbabilityMatrix{characters};
+    ProbabilityMatrix matrix;
+    if (!read_string("matrix.json", matrix))
+        matrix = ProbabilityMatrix{characters};
 
-    PracticeSentence psec{p_matrix.generate_sentence(8)};
+    PracticeSentence psec{matrix.generate_sentence(8)};
 
     curses::initialize();
     auto const [mid_y, mid_x] =
@@ -98,7 +96,7 @@ int main(int argc, char *argv[]) {
         // handle disable enter if we are not at the end
         if (ch.is_enter()) {
             if (at_the_end) {
-                psec.refresh_sentence(p_matrix.generate_sentence(8));
+                psec.refresh_sentence(matrix.generate_sentence(8));
                 curses::print_begin(mid_y, mid_x, psec.get_sentence().c_str());
             }
             continue;
@@ -139,7 +137,7 @@ int main(int argc, char *argv[]) {
         bool correct = !psec.full_error_check();
         char current = psec.get_sentence()[len - 1];
         char last = psec.get_sentence()[len - 2];
-        p_matrix.update_element(last, current, duration, correct);
+        matrix.update_element(last, current, duration, correct);
 
 #ifdef DEBUG
         // clang-format off
@@ -155,19 +153,19 @@ int main(int argc, char *argv[]) {
         for (auto el : psec.get_errors())
             ss << el;
 
-        curses::printnm(lines - 6, 2, "Proficiency: " + std::to_string(p_matrix.proficiency()));
+        curses::printnm(lines - 6, 2, "Proficiency: " + std::to_string(matrix.proficiency()));
         curses::printnm(lines - 5, 2, "Typing speed: " + std::to_string(duration));
         curses::printnm(lines - 4, 2, "Error: " + ss.str());
         curses::printnm(lines - 3, 2, "Typed: " + psec.get_typed());
 
         std::ofstream fs;
         fs.open("matrix_console");
-        fs << p_matrix.to_string();
+        fs << matrix.to_string();
         // clang-format on
 #endif
     }
 
-    write_string("matrix.json", p_matrix);
+    write_string("matrix.json", matrix);
 
     curses::end_win();
     return 0;
