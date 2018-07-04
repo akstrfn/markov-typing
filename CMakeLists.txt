@@ -7,7 +7,7 @@ find_package(CLI11) #QUIET)
 
 set(CLANG_FORMAT true CACHE BOOL "format the code with clang format")
 
-if(NOT nlohmann_json_FOUND)
+if(NOT nlohmann_json_FOUND AND NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp)
     message("Downloading nlohmann/json")
     file(DOWNLOAD
             https://github.com/nlohmann/json/releases/download/v3.1.2/json.hpp
@@ -15,7 +15,7 @@ if(NOT nlohmann_json_FOUND)
         )
 endif()
 
-if(NOT CLI11_FOUND)
+if(NOT CLI11_FOUND AND NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/CLI/CLI.hpp)
     message("Downloading CLI11")
     file(DOWNLOAD
             https://github.com/CLIUtils/CLI11/releases/download/v1.6.0/CLI11.hpp
