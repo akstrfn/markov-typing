@@ -6,6 +6,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -45,7 +46,14 @@ void from_json(const json &j, CharPair &p) {
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct based on how frequent they were typed correctly
 ProbabilityMatrix::ProbabilityMatrix() = default;
-ProbabilityMatrix::ProbabilityMatrix(const std::string &_characters)
+
+ProbabilityMatrix::ProbabilityMatrix(std::string_view sen,
+                                     const decltype(data) &data_,
+                                     decltype(char_map) &char_map_, long avg)
+        : characters(sen), data(data_), char_map(char_map_),
+          average_typing_time(avg){};
+
+ProbabilityMatrix::ProbabilityMatrix(std::string_view _characters)
         : characters(_characters) {
     int const len = characters.length();
     data.reserve(len);
