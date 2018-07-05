@@ -99,8 +99,7 @@ std::string ProbabilityMatrix::to_json_string() const {
     return js.dump();
 }
 
-ProbabilityMatrix
-ProbabilityMatrix::read_from_json(std::string_view filename) {
+ProbabilityMatrix ProbabilityMatrix::read_from_json(std::string_view filename) {
     json js = json::parse(std::ifstream{filename.data()});
 
     auto characters = js.at("Characters").get<std::string>();

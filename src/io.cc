@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <fstream>
+#include <optional>
 
 #include "io.hh"
 
@@ -41,7 +42,7 @@ void write_string(std::string_view file_name, ProbabilityMatrix const &mat) {
     file << mat.to_json_string();
 }
 
-bool read_string(std::string_view file_name, ProbabilityMatrix &mat) {
+std::optional<ProbabilityMatrix> read_string(std::string_view file_name) {
     // TODO: if loading failed add fallback
     // TODO check on both spaces and prefer xdg?
     using namespace std::literals::string_literals;
@@ -55,9 +56,9 @@ bool read_string(std::string_view file_name, ProbabilityMatrix &mat) {
         fpath /= ".local/share/DeliberateTyping/"s + file_name.data();
     }
 
-    if (fs::exists(fpath)) {
+    if (fs::exists(fpath))
         // TODO if json cant load file it will throw should this be handled?
-    return false;
         return ProbabilityMatrix::read_from_json(
                 fpath.c_str()); // c_str because of boost
+    return std::nullopt;
 }

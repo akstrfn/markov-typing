@@ -65,9 +65,8 @@ int main(int argc, char *argv[]) {
     // only specific elements of it i.e. if only numbers are practiced then
     // only numbers are updated, so some sort of mutable view of full matrix
     // should be made...
-    ProbabilityMatrix matrix;
-    if (!read_string("matrix.json", matrix))
-        matrix = ProbabilityMatrix{characters};
+    ProbabilityMatrix matrix =
+            read_string("matrix.json").value_or(ProbabilityMatrix{characters});
 
     PracticeSentence psec{matrix.generate_sentence(8)};
 
