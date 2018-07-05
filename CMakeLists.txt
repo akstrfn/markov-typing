@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.11)
 project(markov_typing)
 
 find_package(Curses REQUIRED)
-find_package(nlohmann_json)
-find_package(CLI11) #QUIET)
+find_package(nlohmann_json QUIET)
+find_package(CLI11 QUIET)
 
 set(CLANG_FORMAT true CACHE BOOL "format the code with clang format")
 set(USE_BOOST_FS false CACHE BOOL "use boost filesystem. does not work atm")
@@ -15,7 +15,6 @@ if(USE_BOOST_FS)
 else()
     set(FS_LINK stdc++fs)
 endif()
-message(${FS_LINK})
 
 if(NOT nlohmann_json_FOUND AND NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp)
     message("Downloading nlohmann/json")
