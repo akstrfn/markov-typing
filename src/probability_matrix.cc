@@ -99,21 +99,23 @@ std::string ProbabilityMatrix::to_json_string() const {
     return js.dump();
 }
 
-void ProbabilityMatrix::read_from_json(const std::string &filename) {
-    json js = json::parse(std::ifstream{filename});
+ProbabilityMatrix
+ProbabilityMatrix::read_from_json(std::string_view filename) {
+    json js = json::parse(std::ifstream{filename.data()});
 
-    characters = js.at("Characters").get<std::string>();
-    average_typing_time = js.at("typing_time").get<long>();
+    auto characters = js.at("Characters").get<std::string>();
+    auto average_typing_time = js.at("typing_time").get<long>();
 
-    char_map.clear();
+    std::map<char, int> char_map;
     for (auto i = 0ul; i != std::size(characters); ++i)
         char_map[characters[i]] = i;
 
     auto const sz = std::size(characters);
-    data.clear();
-    data.resize(sz, std::vector<impl::CharPair>(sz));
+    decltype(data) data(sz, std::vector<impl::CharPair>(sz));
     for (auto &d : js.at("Matrix").get<std::vector<impl::CharPair>>())
         data[d.row][d.col] = d;
+
+    return ProbabilityMatrix{characters, data, char_map, average_typing_time};
 }
 
 // TODO BUG updates when some wrong character instead of space is pressed

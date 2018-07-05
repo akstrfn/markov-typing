@@ -57,8 +57,7 @@ bool read_string(std::string_view file_name, ProbabilityMatrix &mat) {
 
     if (fs::exists(fpath)) {
         // TODO if json cant load file it will throw should this be handled?
-        mat.read_from_json(fpath.c_str()); // c_str because of boost
-        return true;
-    }
     return false;
+        return ProbabilityMatrix::read_from_json(
+                fpath.c_str()); // c_str because of boost
 }
