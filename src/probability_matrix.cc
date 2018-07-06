@@ -95,17 +95,17 @@ std::string ProbabilityMatrix::to_string() {
     return ss.str();
 }
 
-std::string ProbabilityMatrix::to_json_string() const {
+json ProbabilityMatrix::to_json() const {
     json js;
     js["Characters"] = characters;
     js["typing_time"] = average_typing_time;
     for (auto &row : data)
         for (auto &el : row)
             js["Matrix"].push_back(el);
-    return js.dump();
+    return js;
 }
 
-ProbabilityMatrix ProbabilityMatrix::read_from_json(std::string_view filename) {
+ProbabilityMatrix ProbabilityMatrix::read_json(std::string_view filename) {
     json js = json::parse(std::ifstream{filename.data()});
 
     auto characters = js.at("Characters").get<std::string>();

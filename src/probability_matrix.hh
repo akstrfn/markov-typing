@@ -2,6 +2,7 @@
 #define SIMPLE_MATRIX_H
 
 #include <map>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -33,8 +34,8 @@ public:
                       decltype(char_map) &, long);
 
     std::string to_string();
-    std::string to_json_string() const;
-    static ProbabilityMatrix read_from_json(std::string_view);
+    nlohmann::json to_json() const;
+    static ProbabilityMatrix read_json(std::string_view);
     void update_element(char const, char const, long const, bool const);
     std::string generate_word(int);
     std::string generate_sentence(const int);

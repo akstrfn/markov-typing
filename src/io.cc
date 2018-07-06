@@ -39,7 +39,7 @@ void write_string(std::string_view file_name, ProbabilityMatrix const &mat) {
     std::ofstream file{fpath};
     if (!file.is_open())
         throw;
-    file << mat.to_json_string();
+    file << mat.to_json();
 }
 
 std::optional<ProbabilityMatrix> read_string(std::string_view file_name) {
@@ -58,7 +58,7 @@ std::optional<ProbabilityMatrix> read_string(std::string_view file_name) {
 
     if (fs::exists(fpath))
         // TODO if json cant load file it will throw should this be handled?
-        return ProbabilityMatrix::read_from_json(
-                fpath.c_str()); // c_str because of boost
+        // c_str because of boost
+        return ProbabilityMatrix::read_json(fpath.c_str());
     return std::nullopt;
 }
