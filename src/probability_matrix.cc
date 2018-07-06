@@ -51,10 +51,16 @@ ProbabilityMatrix::ProbabilityMatrix(std::string_view sen,
                                      const decltype(data) &data_,
                                      decltype(char_map) &char_map_, long avg)
         : characters(sen), data(data_), char_map(char_map_),
-          average_typing_time(avg){};
+          average_typing_time(avg) {
+
+    assert(std::unique(characters.begin(), characters.end())
+           == characters.end());
+};
 
 ProbabilityMatrix::ProbabilityMatrix(std::string_view _characters)
         : characters(_characters) {
+    assert(std::unique(characters.begin(), characters.end())
+           == characters.end());
     int const len = characters.length();
     data.reserve(len);
     for (int i = 0; i != len; ++i) {
