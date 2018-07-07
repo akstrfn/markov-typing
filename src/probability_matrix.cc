@@ -57,6 +57,10 @@ void to_json(json &j, ProbabilityMatrix &pm) {
 void from_json(const json &js, ProbabilityMatrix &pm) {
 
     pm.characters = js.at("Characters").get<std::string>();
+
+    assert(std::unique(characters.begin(), characters.end())
+           == characters.end());
+
     pm.average_typing_time = js.at("average_typing_time").get<long>();
 
     auto const sz = std::size(pm.characters);
@@ -74,16 +78,6 @@ void from_json(const json &js, ProbabilityMatrix &pm) {
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct based on how frequent they were typed correctly
 ProbabilityMatrix::ProbabilityMatrix() = default;
-
-ProbabilityMatrix::ProbabilityMatrix(std::string_view sen,
-                                     const decltype(data) &data_,
-                                     decltype(char_map) &char_map_, long avg)
-        : characters(sen), data(data_), char_map(char_map_),
-          average_typing_time(avg) {
-
-    assert(std::unique(characters.begin(), characters.end())
-           == characters.end());
-};
 
 ProbabilityMatrix::ProbabilityMatrix(std::string_view _characters)
         : characters(_characters) {
