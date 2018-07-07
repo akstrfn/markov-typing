@@ -63,11 +63,6 @@ int main(int argc, char *argv[]) {
         characters = custom;
     }
 
-#if DEBUG
-    if (characters == all_chars)
-        characters = "asdf";
-#endif
-
     // TODO based on input one should be able to slice the matrix and update
     // only specific elements of it i.e. if only numbers are practiced then
     // only numbers are updated, so some sort of mutable view of full matrix
@@ -151,9 +146,14 @@ int main(int argc, char *argv[]) {
         char last = psec.get_sentence()[len - 2];
         matrix.update_element(last, current, duration, correct);
 
+        auto lines = curses::get_lines();
+        curses::printnm(lines - 6, 2,
+                        "Proficiency: " + std::to_string(matrix.proficiency()));
+        curses::printnm(lines - 5, 2,
+                        "Typing speed: " + std::to_string(duration));
 #ifdef DEBUG
         // clang-format off
-        auto lines = curses::get_lines();
+        curses::printnm(0, 2, "DEBUG MODE");
 
         std::stringstream ss;
         ss << "last: " << last
@@ -165,8 +165,6 @@ int main(int argc, char *argv[]) {
         for (auto el : psec.get_errors())
             ss << el;
 
-        curses::printnm(lines - 6, 2, "Proficiency: " + std::to_string(matrix.proficiency()));
-        curses::printnm(lines - 5, 2, "Typing speed: " + std::to_string(duration));
         curses::printnm(lines - 4, 2, "Error: " + ss.str());
         curses::printnm(lines - 3, 2, "Typed: " + psec.get_typed());
 
