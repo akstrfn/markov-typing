@@ -64,15 +64,22 @@ int main(int argc, char *argv[]) {
     }
 
 #if DEBUG
-    characters = "asdf";
+    if (characters == all_chars)
+        characters = "asdf";
 #endif
 
     // TODO based on input one should be able to slice the matrix and update
     // only specific elements of it i.e. if only numbers are practiced then
     // only numbers are updated, so some sort of mutable view of full matrix
     // should be made...
-    ProbabilityMatrix matrix =
-            read_string("matrix.json").value_or(ProbabilityMatrix{characters});
+    ProbabilityMatrix matrix;
+    if (*lc || *uc || *sy || *num || !custom.empty()) {
+        matrix = ProbabilityMatrix{characters};
+    } else {
+        auto matrix = read_string("matrix.json", characters);
+        if (!matrix)
+            matrix = ProbabilityMatrix{characters};
+    }
 
     PracticeSentence psec{matrix.generate_sentence(8)};
 
@@ -163,8 +170,7 @@ int main(int argc, char *argv[]) {
         curses::printnm(lines - 4, 2, "Error: " + ss.str());
         curses::printnm(lines - 3, 2, "Typed: " + psec.get_typed());
 
-        std::ofstream fs;
-        fs.open("matrix_console");
+        std::ofstream fs("matrix_console");
         fs << matrix.to_string();
         // clang-format on
 #endif

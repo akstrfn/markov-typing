@@ -19,52 +19,87 @@ namespace fs = std::filesystem;
 
 #endif
 
+using namespace std;
 using json = nlohmann::json;
 
-void write_string(std::string_view file_name, ProbabilityMatrix &mat) {
+void write_string(string_view file_name, ProbabilityMatrix &mat) {
 
     // Save progress
     // TODO check these paths before starting to avoid exercising and then not
     // being able to save
     fs::path fpath;
-    auto home = std::getenv("XDG_DATA_HOME");
+    auto home = getenv("XDG_DATA_HOME");
     if (home) {
         fpath /= home;
         fpath /= "DeliberateTyping";
     } else {
-        home = std::getenv("HOME");
+        home = getenv("HOME");
         fpath /= home; // this will throw is home is not found
         fpath /= ".local/share/DeliberateTyping";
     }
 
     fs::create_directories(fpath);
-    fpath /= std::string(file_name); // boost cant handle string_view atm
+    fpath /= string(file_name); // boost cant handle string_view atm
 
-    // TODO for now just break everything if you cant save
-    std::ofstream file{fpath};
-    if (!file.is_open())
-        throw;
-    json j = mat;
-    file << j;
+    if (fs::exists(fpath)) {
+        auto istr = ifstream(fpath.c_str());
+        vector<ProbabilityMatrix> matrices = json::parse(istr);
+
+        string chars = mat.get_characters();
+        auto comp = [&chars](auto &val) {
+            return chars == val.get_characters();
+        };
+
+        auto res = find_if(matrices.begin(), matrices.end(), comp);
+        if (res != matrices.end())
+            *res = mat;
+        else
+            matrices.push_back(mat);
+
+        ofstream file{fpath};
+        if (!file.is_open())
+            throw ios_base::failure("Failed to open a file.");
+
+        json j;
+        for (auto &el : matrices)
+            j.push_back(el);
+
+        file << j;
+
+    } else {
+        // TODO for now just break everything if you cant save
+        ofstream file{fpath};
+        if (!file.is_open())
+            throw ios_base::failure("Failed to open a file.");
+        file << json{mat}; // write as array, strange constructor trick
+    }
 }
 
-std::optional<ProbabilityMatrix> read_string(std::string_view file_name) {
+optional<ProbabilityMatrix> read_string(string_view file_name,
+                                        string_view chars) {
     // TODO: if loading failed add fallback
     // TODO check on both spaces and prefer xdg?
-    using namespace std::literals::string_literals;
+    using namespace literals::string_literals;
     fs::path fpath;
-    auto home = std::getenv("XDG_DATA_HOME");
+    auto home = getenv("XDG_DATA_HOME");
     if (home) {
-        fpath /= std::string(home) + "/DeliberateTyping/" + file_name.data();
+        fpath /= string(home) + "/DeliberateTyping/" + file_name.data();
     } else {
-        home = std::getenv("HOME");
+        home = getenv("HOME");
         fpath /= home; // this will throw is home is not found
         fpath /= ".local/share/DeliberateTyping/"s + file_name.data();
     }
 
-    if (fs::exists(fpath))
+    if (fs::exists(fpath)) {
         // TODO if json cant load file it will throw should this be handled?
         // c_str because of boost
-        return ProbabilityMatrix{json::parse(std::ifstream{fpath.c_str()})};
-    return std::nullopt;
+        // TODO copy constructor works but vector<matr>(json::parse) does not?
+        vector<ProbabilityMatrix> mats = json::parse(ifstream{fpath.c_str()});
+        auto res = find_if(mats.begin(), mats.end(), [&chars](auto &val) {
+            return val.get_characters() == chars;
+        });
+        if (res != mats.end())
+            return *res;
+    }
+    return nullopt;
 }

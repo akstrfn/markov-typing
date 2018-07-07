@@ -22,6 +22,7 @@ struct CharPair {
 } // namespace impl
 
 class ProbabilityMatrix {
+    // TODO use set for characters to get uniqueness
     std::string characters;
     std::vector<std::vector<impl::CharPair>> data;
     std::map<char, int> char_map;
@@ -38,6 +39,7 @@ public:
     ProbabilityMatrix(std::string_view, const decltype(data) &,
                       decltype(char_map) &, long);
 
+    std::string get_characters();
     std::string to_string();
     void update_element(char const, char const, long const, bool const);
     std::string generate_sentence(const int);
