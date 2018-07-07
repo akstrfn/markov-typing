@@ -27,6 +27,11 @@ class ProbabilityMatrix {
     std::map<char, int> char_map;
     long average_typing_time{};
 
+    friend void to_json(nlohmann::json &, ProbabilityMatrix &);
+    friend void from_json(const nlohmann::json &, ProbabilityMatrix &);
+
+    std::string generate_word(int);
+
 public:
     ProbabilityMatrix();
     ProbabilityMatrix(std::string_view);
@@ -34,10 +39,7 @@ public:
                       decltype(char_map) &, long);
 
     std::string to_string();
-    nlohmann::json to_json() const;
-    static ProbabilityMatrix read_json(std::string_view);
     void update_element(char const, char const, long const, bool const);
-    std::string generate_word(int);
     std::string generate_sentence(const int);
     double proficiency();
 };

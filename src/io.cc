@@ -2,7 +2,10 @@
 #include <fstream>
 #include <optional>
 
+#include <nlohmann/json.hpp>
+
 #include "io.hh"
+#include "probability_matrix.hh"
 
 #if BOOST_FILESYSTEM
 
@@ -16,7 +19,9 @@ namespace fs = std::filesystem;
 
 #endif
 
-void write_string(std::string_view file_name, ProbabilityMatrix const &mat) {
+using json = nlohmann::json;
+
+void write_string(std::string_view file_name, ProbabilityMatrix &mat) {
 
     // Save progress
     // TODO check these paths before starting to avoid exercising and then not
@@ -39,7 +44,8 @@ void write_string(std::string_view file_name, ProbabilityMatrix const &mat) {
     std::ofstream file{fpath};
     if (!file.is_open())
         throw;
-    file << mat.to_json();
+    json j = mat;
+    file << j;
 }
 
 std::optional<ProbabilityMatrix> read_string(std::string_view file_name) {
@@ -59,6 +65,6 @@ std::optional<ProbabilityMatrix> read_string(std::string_view file_name) {
     if (fs::exists(fpath))
         // TODO if json cant load file it will throw should this be handled?
         // c_str because of boost
-        return ProbabilityMatrix::read_json(fpath.c_str());
+        return ProbabilityMatrix{json::parse(std::ifstream{fpath.c_str()})};
     return std::nullopt;
 }

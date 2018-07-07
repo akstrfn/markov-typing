@@ -24,6 +24,12 @@ constexpr auto symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
 constexpr auto numbers = "0123456789";
 const auto all_chars = std::string(lowercase) + uppercase + symbols + numbers;
 
+// TODO add timer to see how fast was typing for current sentence and save
+// each sentence typing time for statistics (char/min or char/sec)
+// TODO some weights for character appearances should exist. This would allow
+// analysing some texts and then having relative frequencies which would be
+// combined in the markov generator. It would also solve the problem that
+// symbols appear far to often.
 int main(int argc, char *argv[]) {
 
     CLI::App app("Markov typing tutor");

@@ -43,6 +43,34 @@ void from_json(const json &j, CharPair &p) {
 
 } // namespace impl
 
+void to_json(json &j, ProbabilityMatrix &pm) {
+    // TODO can I use j directly?
+    json js;
+    js["Characters"] = pm.characters;
+    js["average_typing_time"] = pm.average_typing_time;
+    for (auto &row : pm.data)
+        for (auto &el : row)
+            js["Matrix"].push_back(el);
+    j = std::move(js);
+}
+
+void from_json(const json &js, ProbabilityMatrix &pm) {
+
+    pm.characters = js.at("Characters").get<std::string>();
+    pm.average_typing_time = js.at("average_typing_time").get<long>();
+
+    auto const sz = std::size(pm.characters);
+    std::map<char, int> char_map;
+    for (auto i = 0ul; i != sz; ++i)
+        char_map[pm.characters[i]] = i;
+
+    pm.char_map = std::move(char_map);
+
+    decltype(pm.data) data(sz, std::vector<impl::CharPair>(sz));
+    for (auto &d : js.at("Matrix").get<std::vector<impl::CharPair>>())
+        data[d.row][d.col] = d;
+    pm.data = std::move(data);
+}
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct based on how frequent they were typed correctly
 ProbabilityMatrix::ProbabilityMatrix() = default;
@@ -93,34 +121,6 @@ std::string ProbabilityMatrix::to_string() {
         ss << row.back().probability << "\n";
     }
     return ss.str();
-}
-
-json ProbabilityMatrix::to_json() const {
-    json js;
-    js["Characters"] = characters;
-    js["typing_time"] = average_typing_time;
-    for (auto &row : data)
-        for (auto &el : row)
-            js["Matrix"].push_back(el);
-    return js;
-}
-
-ProbabilityMatrix ProbabilityMatrix::read_json(std::string_view filename) {
-    json js = json::parse(std::ifstream{filename.data()});
-
-    auto characters = js.at("Characters").get<std::string>();
-    auto average_typing_time = js.at("typing_time").get<long>();
-
-    std::map<char, int> char_map;
-    for (auto i = 0ul; i != std::size(characters); ++i)
-        char_map[characters[i]] = i;
-
-    auto const sz = std::size(characters);
-    decltype(data) data(sz, std::vector<impl::CharPair>(sz));
-    for (auto &d : js.at("Matrix").get<std::vector<impl::CharPair>>())
-        data[d.row][d.col] = d;
-
-    return ProbabilityMatrix{characters, data, char_map, average_typing_time};
 }
 
 // TODO BUG updates when some wrong character instead of space is pressed
