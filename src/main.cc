@@ -20,6 +20,10 @@ using curses::Colors;
 
 constexpr auto lowercase = "qwertyuiopasdfghjklzxcvbnm";
 constexpr auto uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
+
+// TODO BUG some combinations of symbols form escape sequences so crazy stuff
+// gets printed on the screen like numbers or memory address etc. At least I
+// guess thats the reason.
 constexpr auto symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
 constexpr auto numbers = "0123456789";
 const auto all_chars = std::string(lowercase) + uppercase + symbols + numbers;

@@ -151,21 +151,11 @@ void ProbabilityMatrix::update_element(char const predecessor,
 }
 
 string ProbabilityMatrix::generate_sentence(int word_size) {
-    // sum cols to determine weights, the highest sum denotes highest
-    // chance to end up picking that letter in a chain
-    vector<double> weights(characters.length());
-    for (auto &row : data)
-        for (auto j = 0ul; j != size(row); ++j)
-            weights[j] += row[j].probability;
-
-    // invert probabilities
-    invert_values(weights, *max_element(begin(weights), end(weights)));
-
     // TODO BUG after inversion max el becomes zero making it impossible to
     // be chosen.
 
     // get first character
-    char ch = *choice(characters, weights);
+    char ch = *choice(characters);
     int ch_idx = char_map.at(ch);
 
     // TODO simulate the state of matrix if the chosen charater would be
