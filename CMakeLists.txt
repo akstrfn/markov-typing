@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.11)
 project(markov_typing)
 
-set(CURSES_NEED_WIDE TRUE)
+#set(CURSES_NEED_WIDE TRUE)
 find_package(Curses REQUIRED)
 find_package(nlohmann_json QUIET)
 find_package(CLI11 QUIET)
 
-set(CLANG_FORMAT true CACHE BOOL "format the code with clang format")
-set(USE_BOOST_FS false CACHE BOOL "use boost filesystem. does not work atm")
+set(CLANG_FORMAT FALSE CACHE BOOL "Format the code with clang format.")
+set(USE_BOOST_FS FALSE CACHE BOOL "Use boost filesystem. Does not work atm.")
 
 if(USE_BOOST_FS)
     find_package(Boost REQUIRED COMPONENTS filesystem)
