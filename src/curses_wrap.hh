@@ -49,7 +49,7 @@ void print_begin(const int y, const int x, const std::string_view &str);
 
 void move_to(int y, int x);
 
-void add_char(int ch);
+void add_char(int ch, int attribute);
 
 int lines();
 int cols();

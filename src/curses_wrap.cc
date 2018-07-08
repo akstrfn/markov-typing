@@ -87,7 +87,11 @@ int get_char() { return getch(); }
 
 void move_to(int y, int x) { move(y, x); }
 
-void add_char(int ch) { addch(ch); }
+void add_char(int ch, int attr) {
+    attron(attr);
+    addch(ch);
+    attroff(attr);
+}
 
 int lines() { return LINES; }
 

@@ -89,6 +89,8 @@ int main(int argc, char *argv[]) {
     Timer timer;
     curses::NChar ch;
     while (!ch.is_f4()) {
+        // TODO add attributes to NChar and then always repaint the whole
+        // sentence at the beginning of this loop
         auto [mid_y, mid_x] =
                 curses::get_mid(0, psec.get_sentence().size() / 2);
 
@@ -130,11 +132,11 @@ int main(int argc, char *argv[]) {
 
         auto ch_correct = psec.update_typed(ch.data());
         if (ch_correct) {
-            curses::add_char(ch.data() | Colors::GreenBlack);
+            curses::add_char(ch.data(), Colors::GreenBlack);
         } else {
             auto pos = psec.total_typed() - 1;
             auto tmp_ch = psec.get_sentence()[pos];
-            curses::add_char(tmp_ch | Colors::BlackRed);
+            curses::add_char(tmp_ch, Colors::BlackRed);
         }
 
         // handle Probability matrix update
