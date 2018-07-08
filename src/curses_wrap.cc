@@ -12,7 +12,7 @@ bool NChar::is_backspace() {
 
 bool NChar::is_enter() { return ch == KEY_ENTER || ch == '\n' || ch == 10; }
 
-bool NChar::is_f1() { return ch == KEY_F(1); }
+bool NChar::is_f4() { return ch == KEY_F(4); }
 
 NChar &NChar::operator=(NChar other) {
     ch = other.ch;
@@ -55,9 +55,7 @@ void initialize() {
 }
 
 std::array<int, 2> get_mid(int y_offset, int x_offset) {
-    int y, x;
-    getmaxyx(stdscr, y, x);
-    return {(y / 2) - y_offset, (x / 2) - x_offset};
+    return {(LINES / 2) - y_offset, (COLS / 2) - x_offset};
 }
 
 std::array<int, 2> get_pos() {
@@ -91,7 +89,9 @@ void move_to(int y, int x) { move(y, x); }
 
 void add_char(int ch) { addch(ch); }
 
-int get_lines() { return LINES; }
+int lines() { return LINES; }
+
+int cols() { return COLS; }
 
 void end_win() { endwin(); }
 

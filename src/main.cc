@@ -81,15 +81,16 @@ int main(int argc, char *argv[]) {
     PracticeSentence psec{matrix.generate_sentence(40)};
 
     curses::initialize();
-    auto const [mid_y, mid_x] =
-            curses::get_mid(0, psec.get_sentence().size() / 2);
+    auto [mid_y, mid_x] = curses::get_mid(0, psec.get_sentence().size() / 2);
 
     curses::print_begin(mid_y, mid_x, psec.get_sentence());
 
     // timer is in milliseconds, are nanoseconds better choice?
     Timer timer;
     curses::NChar ch;
-    while (!ch.is_f1()) {
+    while (!ch.is_f4()) {
+        auto [mid_y, mid_x] =
+                curses::get_mid(0, psec.get_sentence().size() / 2);
 
         timer.start();
         ch = curses::get_char();
@@ -148,11 +149,16 @@ int main(int argc, char *argv[]) {
         char last = psec.get_sentence()[len - 2];
         matrix.update_element(last, current, duration, correct);
 
-        auto lines = curses::get_lines();
-        curses::printnm(lines - 6, 2,
-                        "Proficiency: " + std::to_string(matrix.proficiency()));
-        curses::printnm(lines - 5, 2,
-                        "Typing speed: " + std::to_string(duration));
+        auto lines = curses::lines();
+        auto cols = curses::cols();
+        curses::printnm(lines - 2, 2,
+                        "Proficiency:            "
+                                + std::to_string(matrix.proficiency()));
+        curses::printnm(lines - 1, 2,
+                        "Typing speed (milisec): " + std::to_string(duration));
+
+        constexpr char exit_msg[] = "Press F4 to exit.";
+        curses::printnm(lines - 1, cols - std::size(exit_msg) - 2, exit_msg);
 #ifdef DEBUG
         // clang-format off
         curses::printnm(0, 2, "DEBUG MODE");

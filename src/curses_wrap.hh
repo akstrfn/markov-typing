@@ -15,7 +15,7 @@ public:
     NChar(int);
     bool is_backspace();
     bool is_enter();
-    bool is_f1();
+    bool is_f4();
     NChar &operator=(NChar);
     NChar &operator=(int);
     int data();
@@ -50,7 +50,9 @@ void print_begin(const int y, const int x, const std::string_view &str);
 void move_to(int y, int x);
 
 void add_char(int ch);
-int get_lines();
+
+int lines();
+int cols();
 
 void end_win();
 
