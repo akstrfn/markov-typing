@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.11)
 project(markov_typing)
 
+set(CURSES_NEED_WIDE TRUE)
 find_package(Curses REQUIRED)
 find_package(nlohmann_json QUIET)
 find_package(CLI11 QUIET)

@@ -36,6 +36,7 @@ void backspace(int replacement_char) {
 }
 
 void initialize() {
+    setlocale(LC_ALL, "");
     initscr();
     raw();
     // cbreak(); // use to enable ctrl-c
