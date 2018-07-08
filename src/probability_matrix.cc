@@ -14,6 +14,7 @@
 #include "utils.hh"
 
 using json = nlohmann::json;
+using namespace std;
 
 namespace impl {
 
@@ -31,8 +32,8 @@ void to_json(json &j, const CharPair &p) {
 void from_json(const json &j, CharPair &p) {
     p.row = j.at("row").get<int>();
     p.col = j.at("col").get<int>();
-    p.row_char = j.at("row_char").get<std::string>();
-    p.col_char = j.at("col_char").get<std::string>();
+    p.row_char = j.at("row_char").get<string>();
+    p.col_char = j.at("col_char").get<string>();
     p.probability = j.at("probability").get<double>();
     p.correct = j.at("correct").get<size_t>();
     p.wrong = j.at("wrong").get<size_t>();
@@ -51,57 +52,56 @@ void to_json(json &js, ProbabilityMatrix &pm) {
 
 void from_json(const json &js, ProbabilityMatrix &pm) {
 
-    pm.characters = js.at("Characters").get<std::string>();
+    pm.characters = js.at("Characters").get<string>();
 
-    assert(std::unique(pm.characters.begin(), pm.characters.end())
+    assert(unique(pm.characters.begin(), pm.characters.end())
            == pm.characters.end());
 
     pm.average_typing_time = js.at("average_typing_time").get<long>();
 
-    auto const sz = std::size(pm.characters);
-    std::map<char, int> char_map;
+    auto const sz = size(pm.characters);
+    map<char, int> char_map;
     for (auto i = 0ul; i != sz; ++i)
         char_map[pm.characters[i]] = i;
 
-    pm.char_map = std::move(char_map);
+    pm.char_map = move(char_map);
 
-    decltype(pm.data) data(sz, std::vector<impl::CharPair>(sz));
-    for (auto &d : js.at("Matrix").get<std::vector<impl::CharPair>>())
+    decltype(pm.data) data(sz, vector<impl::CharPair>(sz));
+    for (auto &d : js.at("Matrix").get<vector<impl::CharPair>>())
         data[d.row][d.col] = d;
-    pm.data = std::move(data);
+    pm.data = move(data);
 }
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct based on how frequent they were typed correctly
 ProbabilityMatrix::ProbabilityMatrix() = default;
 
-ProbabilityMatrix::ProbabilityMatrix(std::string_view _characters)
+ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
         : characters(_characters) {
-    assert(std::unique(characters.begin(), characters.end())
-           == characters.end());
+    assert(unique(characters.begin(), characters.end()) == characters.end());
     int const len = characters.length();
     data.reserve(len);
     for (int i = 0; i != len; ++i) {
         char_map[characters[i]] = i;
-        std::vector<impl::CharPair> row;
+        vector<impl::CharPair> row;
         row.reserve(len);
         for (int j = 0; j != len; ++j) {
             impl::CharPair chp{i, j, characters.substr(i, 1),
                                characters.substr(j, 1)};
-            row.push_back(std::move(chp));
+            row.push_back(move(chp));
         }
-        data.push_back(std::move(row));
+        data.push_back(move(row));
     }
 };
 
-std::string ProbabilityMatrix::to_string() {
-    std::stringstream ss;
-    ss << std::fixed << std::setprecision(2) << "    ";
+string ProbabilityMatrix::to_string() {
+    stringstream ss;
+    ss << fixed << setprecision(2) << "    ";
 
     for (auto el = characters.begin(); el != characters.end() - 1; ++el)
-        ss << std::setw(3) << *el << ", ";
-    ss << std::setw(3) << characters.back() << "\n";
+        ss << setw(3) << *el << ", ";
+    ss << setw(3) << characters.back() << "\n";
 
-    for (auto i = 0ul; i != std::size(data); ++i) {
+    for (auto i = 0ul; i != size(data); ++i) {
         auto const &row = data[i];
         ss << characters[i] << "| ";
         for (auto el = row.begin(); el != row.end() - 1; ++el) {
@@ -146,21 +146,20 @@ void ProbabilityMatrix::update_element(char const predecessor,
         double const total = chp.correct + chp.wrong;
         chp.probability = chp.correct / total;
 
-    } catch (std::out_of_range &) { /*TODO log this */
+    } catch (out_of_range &) { /*TODO log this */
     }
 }
 
-std::string ProbabilityMatrix::generate_word(int word_size) {
+string ProbabilityMatrix::generate_word(int word_size) {
     // sum cols to determine weights, the highest sum denotes highest
     // chance to end up picking that letter in a chain
-    std::vector<double> weights(characters.length());
+    vector<double> weights(characters.length());
     for (auto &row : data)
-        for (auto j = 0ul; j != std::size(row); ++j)
+        for (auto j = 0ul; j != size(row); ++j)
             weights[j] += row[j].probability;
 
     // invert probabilities
-    invert_values(weights,
-                  *std::max_element(std::begin(weights), std::end(weights)));
+    invert_values(weights, *max_element(begin(weights), end(weights)));
 
     // TODO BUG after inversion max el becomes zero making it impossible to
     // be chosen.
@@ -176,13 +175,13 @@ std::string ProbabilityMatrix::generate_word(int word_size) {
     // wrong. This should also update the accuracy value before simulating
     // next character. This allows simulation of a whole sentence the user
     // would type
-    std::string out = "";
+    string out = "";
     while (word_size--) {
         out.push_back(ch);
 
         auto const row = data[ch_idx];
-        std::vector<double> inverse_probs;
-        inverse_probs.reserve(std::size(row));
+        vector<double> inverse_probs;
+        inverse_probs.reserve(size(row));
         for (auto el : row)
             inverse_probs.push_back(1 - el.probability);
 
@@ -195,8 +194,8 @@ std::string ProbabilityMatrix::generate_word(int word_size) {
     return out;
 }
 
-std::string ProbabilityMatrix::generate_sentence(const int num_words) {
-    std::string sentence = "";
+string ProbabilityMatrix::generate_sentence(const int num_words) {
+    string sentence = "";
     for (int i = 0; i != num_words; ++i)
         sentence.append(generate_word(4) + ' ');
 
@@ -211,7 +210,7 @@ double ProbabilityMatrix::proficiency() {
     for (auto &&row : data)
         for (auto &&el : row)
             sum += el.probability;
-    return sum / std::pow(data.size(), 2);
+    return sum / pow(data.size(), 2);
 };
 
-std::string ProbabilityMatrix::get_characters() { return characters; }
+string ProbabilityMatrix::get_characters() { return characters; }

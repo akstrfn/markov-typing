@@ -16,7 +16,7 @@ struct CharPair {
     double probability{};
     size_t correct{};
     size_t wrong{};
-    long typing_time{}; // TODO should I make all time units unsigned long?
+    long typing_time{};
 };
 
 } // namespace impl
