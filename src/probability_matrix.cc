@@ -150,7 +150,7 @@ void ProbabilityMatrix::update_element(char const predecessor,
     }
 }
 
-string ProbabilityMatrix::generate_word(int word_size) {
+string ProbabilityMatrix::generate_sentence(int word_size) {
     // sum cols to determine weights, the highest sum denotes highest
     // chance to end up picking that letter in a chain
     vector<double> weights(characters.length());
@@ -177,6 +177,11 @@ string ProbabilityMatrix::generate_word(int word_size) {
     // would type
     string out = "";
     while (word_size--) {
+        if (word_size % 5 == 0) { // size of one word is 4
+            out.push_back(' ');
+            continue;
+        }
+
         out.push_back(ch);
 
         auto const row = data[ch_idx];
@@ -191,16 +196,10 @@ string ProbabilityMatrix::generate_word(int word_size) {
         ch = *choice(characters, inverse_probs);
         ch_idx = char_map.at(ch);
     }
+
+    if (out.back() == ' ')
+        out.pop_back(); // remove possible last space
     return out;
-}
-
-string ProbabilityMatrix::generate_sentence(const int num_words) {
-    string sentence = "";
-    for (int i = 0; i != num_words; ++i)
-        sentence.append(generate_word(4) + ' ');
-
-    sentence.pop_back(); // remove last space
-    return sentence;
 }
 
 // how close are we to 1 i.e. whole matrix is perfect? albeit this is

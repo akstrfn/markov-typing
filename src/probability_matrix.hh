@@ -31,8 +31,6 @@ class ProbabilityMatrix {
     friend void to_json(nlohmann::json &, ProbabilityMatrix &);
     friend void from_json(const nlohmann::json &, ProbabilityMatrix &);
 
-    std::string generate_word(int);
-
 public:
     ProbabilityMatrix();
     ProbabilityMatrix(std::string_view);
@@ -42,7 +40,7 @@ public:
     std::string get_characters();
     std::string to_string();
     void update_element(char const, char const, long const, bool const);
-    std::string generate_sentence(const int);
+    std::string generate_sentence(int);
     double proficiency();
 };
 

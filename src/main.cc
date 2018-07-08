@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
             matrix = ProbabilityMatrix{characters};
     }
 
-    PracticeSentence psec{matrix.generate_sentence(8)};
+    PracticeSentence psec{matrix.generate_sentence(40)};
 
     curses::initialize();
     auto const [mid_y, mid_x] =
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
         // handle disable enter if we are not at the end
         if (ch.is_enter()) {
             if (at_the_end) {
-                psec.refresh_sentence(matrix.generate_sentence(8));
+                psec.refresh_sentence(matrix.generate_sentence(40));
                 curses::print_begin(mid_y, mid_x, psec.get_sentence().c_str());
             }
             continue;
