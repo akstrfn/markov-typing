@@ -63,22 +63,20 @@ int main(int argc, char *argv[]) {
         if (characters.empty())
             characters = all_chars;
     } else {
-        // TODO only latin chars will work
+        // TODO utf does not work still some problem with addch?
         characters = custom;
     }
 
-    // TODO based on input one should be able to slice the matrix and update
-    // only specific elements of it i.e. if only numbers are practiced then
-    // only numbers are updated, so some sort of mutable view of full matrix
-    // should be made...
+    // TODO maybe based on input one should be able to slice the matrix and
+    // update only specific elements of it i.e. if only numbers are practiced
+    // then only numbers are updated, so some sort of mutable view of full
+    // matrix should be made...
     ProbabilityMatrix matrix;
-    if (*lc || *uc || *sy || *num || !custom.empty()) {
+    auto tmp_matrix = read_string("matrix.json", characters);
+    if (!tmp_matrix)
         matrix = ProbabilityMatrix{characters};
-    } else {
-        auto matrix = read_string("matrix.json", characters);
-        if (!matrix)
-            matrix = ProbabilityMatrix{characters};
-    }
+    else
+        matrix = std::move(tmp_matrix.value());
 
     PracticeSentence psec{matrix.generate_sentence(40)};
 
