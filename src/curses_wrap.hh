@@ -9,8 +9,11 @@ namespace curses {
 
 class NChar {
     int ch;
+    int attribute;
 
 public:
+    uint8_t color;
+
     NChar();
     NChar(int);
     bool is_backspace();
@@ -49,10 +52,13 @@ void print_begin(const int y, const int x, const std::string_view &str);
 
 void move_to(int y, int x);
 
+void add_char(int ch);
 void add_char(int ch, int attribute);
 
 int lines();
 int cols();
+
+void move(int y, int x);
 
 void end_win();
 
