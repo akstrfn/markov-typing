@@ -130,14 +130,28 @@ int main(int argc, char *argv[]) {
         if (at_the_end)
             continue;
 
-        auto ch_correct = psec.update_typed(ch.data());
-        if (ch_correct) {
-            curses::add_char(ch.data(), Colors::GreenBlack);
-        } else {
-            auto pos = psec.total_typed() - 1;
-            auto tmp_ch = psec.get_sentence()[pos];
-            curses::add_char(tmp_ch, Colors::BlackRed);
+        psec.update_typed(ch.data());
+
+        // sentence paint procedure
+        // save current cursor position
+        auto [y, x] = curses::get_pos();
+        // advance for one typing point...
+        ++x;
+        // go to mid_y and mid_x
+        curses::move(mid_y, mid_x);
+        // iterate over psec and paint characters
+        for (auto &&[ch_sen, ch_typed] : psec) {
+            if (ch_typed) { // not nullopt
+                if (ch_typed == ch_sen)
+                    curses::add_char(*ch_typed, Colors::GreenBlack);
+                else
+                    curses::add_char(ch_sen, Colors::BlackRed);
+            } else { // typed is smaller than sentence
+                curses::add_char(ch_sen);
+            }
         }
+        // restore position
+        curses::move(y, x);
 
         // handle Probability matrix update
         // Prevent checking when typed strings is too small
