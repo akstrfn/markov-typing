@@ -32,7 +32,7 @@ void backspace(int replacement_char) {
     int y, x;
     getyx(stdscr, y, x);
     mvaddch(y, --x, replacement_char);
-    move(y, x);
+    ::move(y, x);
 }
 
 void initialize() {
@@ -69,29 +69,29 @@ void printnm(const int y, const int x, const std::string_view &str) {
     int old_y, old_x;
     getyx(stdscr, old_y, old_x);
     // clear the line and print on it
-    move(y, x);
+    ::move(y, x);
     clrtoeol();
     printw(str.data());
     // return to old position
-    move(old_y, old_x);
+    ::move(old_y, old_x);
 }
 
 void print_begin(const int y, const int x, const std::string_view &str) {
-    move(y, x);
+    ::move(y, x);
     clrtoeol();
     printw(str.data());
-    move(y, x);
+    ::move(y, x);
 }
 
-int get_char() { return getch(); }
+int get_char() { return ::getch(); }
 
-void move_to(int y, int x) { move(y, x); }
+void move(int y, int x) { ::move(y, x); }
 
-void add_char(int ch) { addch(ch); }
+void add_char(int ch) { ::addch(ch); }
 
 void add_char(int ch, int attr) {
     attron(attr);
-    addch(ch);
+    ::addch(ch);
     attroff(attr);
 }
 
@@ -100,7 +100,5 @@ int lines() { return LINES; }
 int cols() { return COLS; }
 
 void end_win() { endwin(); }
-
-void move(int y, int x) { ::move(y, x); }
 
 } // namespace curses

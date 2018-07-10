@@ -50,15 +50,13 @@ void printnm(const int y, const int x, const std::string_view &str);
 // print and go to position from which you started printing
 void print_begin(const int y, const int x, const std::string_view &str);
 
-void move_to(int y, int x);
+void move(int y, int x);
 
 void add_char(int ch);
 void add_char(int ch, int attribute);
 
 int lines();
 int cols();
-
-void move(int y, int x);
 
 void end_win();
 
