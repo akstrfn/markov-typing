@@ -27,7 +27,7 @@ public:
 
         // a bit to complicated for iterator maybe?
         std::optional<char> t_tmp;
-        if (loc < typed->length())
+        if (static_cast<uint8_t>(loc) < typed->length())
             t_tmp = (*typed)[loc];
         else
             t_tmp = std::nullopt;
@@ -70,7 +70,6 @@ public:
                 errors.push_back(s_char);
             error_exist = true;
         }
-        return last_correct;
     }
 
     auto backspace() {
