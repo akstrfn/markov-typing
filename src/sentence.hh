@@ -1,10 +1,10 @@
 #ifndef SENTENCE_HH
 #define SENTENCE_HH
 
+#include <optional>
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <optional>
 
 #include "stats.hh"
 #include "utils.hh"
@@ -12,22 +12,23 @@
 namespace impl {
 
 class PaintIter {
-    std::string* sentence;
-    std::string* typed;
-    std::pair<char*, std::optional<char*>> it;
+    std::string *sentence;
+    std::string *typed;
+    std::pair<char, std::optional<char>> it;
     int loc;
 
 public:
-    PaintIter(std::string* sentence_, std::string* typed_, int loc_): sentence(sentence_), typed(typed_), loc(loc_) {}
+    PaintIter(std::string *sentence_, std::string *typed_, int loc_)
+            : sentence(sentence_), typed(typed_), loc(loc_) {}
 
-    std::pair<char*, std::optional<char*>>& operator*() {
+    std::pair<char, std::optional<char>> &operator*() {
 
-        char* s_tmp = &(*sentence)[loc];
+        char s_tmp = (*sentence)[loc];
 
         // a bit to complicated for iterator maybe?
-        std::optional<char*> t_tmp;
-        if (typed->length() < loc)
-            t_tmp =  &(*typed)[loc];
+        std::optional<char> t_tmp;
+        if (loc < typed->length())
+            t_tmp = (*typed)[loc];
         else
             t_tmp = std::nullopt;
 
@@ -35,11 +36,14 @@ public:
         return it;
     }
 
-    PaintIter& operator++() { ++loc; return *this; }
-    bool operator!=(const PaintIter& other) const { return loc != other.loc; }
+    PaintIter &operator++() {
+        ++loc;
+        return *this;
+    }
+    bool operator!=(const PaintIter &other) const { return loc != other.loc; }
 };
 
-} /* impl */
+} // namespace impl
 
 class PracticeSentence {
     std::string sentence;
@@ -104,8 +108,9 @@ public:
 
     // instead of 0 I could use sentence.begin()?
     impl::PaintIter begin() { return {&sentence, &typed, 0}; }
-    impl::PaintIter end() { return {&sentence, &typed, static_cast<int>(sentence.length())}; }
-
+    impl::PaintIter end() {
+        return {&sentence, &typed, static_cast<int>(sentence.length())};
+    }
 };
 
 #endif /* ifndef SENTENCE_HH */
