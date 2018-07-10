@@ -4,9 +4,42 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <optional>
 
 #include "stats.hh"
 #include "utils.hh"
+
+namespace impl {
+
+class PaintIter {
+    std::string* sentence;
+    std::string* typed;
+    std::pair<char*, std::optional<char*>> it;
+    int loc;
+
+public:
+    PaintIter(std::string* sentence_, std::string* typed_, int loc_): sentence(sentence_), typed(typed_), loc(loc_) {}
+
+    std::pair<char*, std::optional<char*>>& operator*() {
+
+        char* s_tmp = &(*sentence)[loc];
+
+        // a bit to complicated for iterator maybe?
+        std::optional<char*> t_tmp;
+        if (typed->length() < loc)
+            t_tmp =  &(*typed)[loc];
+        else
+            t_tmp = std::nullopt;
+
+        it = {std::move(s_tmp), std::move(t_tmp)};
+        return it;
+    }
+
+    PaintIter& operator++() { ++loc; return *this; }
+    bool operator!=(const PaintIter& other) const { return loc != other.loc; }
+};
+
+} /* impl */
 
 class PracticeSentence {
     std::string sentence;
@@ -62,12 +95,17 @@ public:
     auto get_errors() {
         std::vector<short> v(typed.size(), 0);
 
-        char *begin = &sentence[0];
+        char const *begin = &sentence[0];
         for (auto ptr : errors)
             v[ptr - begin] = 1;
 
         return v;
     }
+
+    // instead of 0 I could use sentence.begin()?
+    impl::PaintIter begin() { return {&sentence, &typed, 0}; }
+    impl::PaintIter end() { return {&sentence, &typed, static_cast<int>(sentence.length())}; }
+
 };
 
 #endif /* ifndef SENTENCE_HH */
