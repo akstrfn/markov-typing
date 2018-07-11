@@ -86,17 +86,20 @@ int main(int argc, char *argv[]) {
     curses::print_begin(mid_y, mid_x, psec.get_sentence());
 
     // timer is in milliseconds, are nanoseconds better choice?
-    Timer timer;
+    Timer char_timer;
+    Timer sentence_timer;
+    long sentence_duration{};
     curses::NChar ch;
     while (!ch.is_f4()) {
-        // TODO add attributes to NChar and then always repaint the whole
-        // sentence at the beginning of this loop
+        if (psec.total_typed() == 1) // start when the first char is typed
+            sentence_timer.start();
+
         auto [mid_y, mid_x] =
                 curses::get_mid(0, psec.get_sentence().size() / 2);
 
-        timer.start();
+        char_timer.start();
         ch = curses::get_char();
-        auto const duration = timer.duration();
+        auto const duration = char_timer.duration();
 
         // only predefined characters are allowed
         if (!is_in(all_chars, ch.data()) && !ch.is_enter() && !ch.is_backspace()
@@ -110,6 +113,12 @@ int main(int argc, char *argv[]) {
             if (at_the_end) {
                 psec.refresh_sentence(matrix.generate_sentence(40));
                 curses::print_begin(mid_y, mid_x, psec.get_sentence().c_str());
+                sentence_duration = sentence_timer.duration();
+                int d = sentence_duration / 1000.0;
+                // clang-format off
+                curses::printnm(2, 2, "Sentence typing time: "
+                                      + std::to_string(d) + " seconds.");
+                // clang-format on
             }
             continue;
         }
