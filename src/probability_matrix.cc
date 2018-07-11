@@ -45,6 +45,7 @@ void from_json(const json &j, CharPair &p) {
 void to_json(json &js, ProbabilityMatrix &pm) {
     js["Characters"] = pm.characters;
     js["average_typing_time"] = pm.average_typing_time;
+    js["typing_time"] = pm.typing_time;
     for (auto &row : pm.data)
         for (auto &el : row)
             js["Matrix"].push_back(el);
@@ -58,6 +59,7 @@ void from_json(const json &js, ProbabilityMatrix &pm) {
            == pm.characters.end());
 
     pm.average_typing_time = js.at("average_typing_time").get<long>();
+    pm.typing_time = js.at("typing_time").get<vector<int>>();
 
     auto const sz = size(pm.characters);
     map<char, int> char_map;
@@ -203,3 +205,5 @@ double ProbabilityMatrix::proficiency() {
 };
 
 string ProbabilityMatrix::get_characters() { return characters; }
+
+void ProbabilityMatrix::update_time(int t) { typing_time.push_back(t); }

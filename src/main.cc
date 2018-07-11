@@ -119,6 +119,7 @@ int main(int argc, char *argv[]) {
                 curses::printnm(2, 2, "Sentence typing time: "
                                       + std::to_string(d) + " seconds.");
                 // clang-format on
+                matrix.update_time(d);
             }
             continue;
         }
