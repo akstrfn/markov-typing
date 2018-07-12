@@ -55,9 +55,6 @@ void from_json(const json &js, ProbabilityMatrix &pm) {
 
     pm.characters = js.at("Characters").get<string>();
 
-    assert(unique(pm.characters.begin(), pm.characters.end())
-           == pm.characters.end());
-
     pm.average_typing_time = js.at("average_typing_time").get<long>();
     pm.typing_time = js.at("typing_time").get<vector<int>>();
 
@@ -79,7 +76,12 @@ ProbabilityMatrix::ProbabilityMatrix() = default;
 
 ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
         : characters(_characters) {
-    assert(unique(characters.begin(), characters.end()) == characters.end());
+
+    // make sure characters are unique and sorted
+    sort(characters.begin(), characters.end());
+    auto last = unique(characters.begin(), characters.end());
+    characters.erase(last, characters.end());
+
     int const len = characters.length();
     data.reserve(len);
     for (int i = 0; i != len; ++i) {
