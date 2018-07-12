@@ -1,5 +1,9 @@
 # Markov typing tutor
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/akstrfn/markov-typing/blob/master/LICENCE)
+
+[[!typing](https://asciinema.org/a/jWkjpdBxkjWrfb3hBFDBB8z4z.png)][https://asciinema.org/a/jWkjpdBxkjWrfb3hBFDBB8z4z/?autoplay=1&speed=2&theme=solarized-dark]
+
 An experimental typing tutor in alpha stage. A shot at implementing typing
 tutor that generates random characters in such a way that maximizes the chance
 that a mistake will be made. This means that the weakest character combinations
@@ -51,7 +55,7 @@ cmake --build build
 
 After building you can run the executable ``./build/typing``. After practicing
 the Markov matrix is stored in JSON format either in
-``$XDG_DATA_HOME/DeliberateTyping`` or ``$HOME/.local/share/DeliberateTyping``
+``$XDG_DATA_HOME/MarkovTyping`` or ``$HOME/.local/share/MarkovTyping``
 and is loaded from the same location on new start of the program.
 
 You can get command line options with ``./build/typing --help`` with the
