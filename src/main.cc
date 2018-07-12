@@ -72,11 +72,11 @@ int main(int argc, char *argv[]) {
     // then only numbers are updated, so some sort of mutable view of full
     // matrix should be made...
     ProbabilityMatrix matrix;
-    auto tmp_matrix = read_string("matrix.json", characters);
-    if (!tmp_matrix)
+    auto opt_matrix = read_string("matrix.json", characters);
+    if (!opt_matrix)
         matrix = ProbabilityMatrix{characters};
     else
-        matrix = std::move(tmp_matrix.value());
+        matrix = std::move(opt_matrix.value());
 
     PracticeSentence psec{matrix.generate_sentence(40)};
 
@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
         curses::printnm(lines - 1, cols - std::size(exit_msg) - 2, exit_msg);
 #ifdef DEBUG
         // clang-format off
-        curses::printnm(0, 2, "DEBUG MODE");
+        curses::printnm(0, cols - 12, "DEBUG MODE");
 
         std::stringstream ss;
         ss << "last: " << last
