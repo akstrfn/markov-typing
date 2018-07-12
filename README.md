@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/akstrfn/markov-typing/blob/master/LICENCE)
 
-[[!typing](https://asciinema.org/a/jWkjpdBxkjWrfb3hBFDBB8z4z.png)][https://asciinema.org/a/jWkjpdBxkjWrfb3hBFDBB8z4z/?autoplay=1&speed=2&theme=solarized-dark]
+[![typing](https://asciinema.org/a/jWkjpdBxkjWrfb3hBFDBB8z4z.png)](https://asciinema.org/a/jWkjpdBxkjWrfb3hBFDBB8z4z/?autoplay=1&speed=2&theme=tango&size=big)
 
 An experimental typing tutor in alpha stage. A shot at implementing typing
 tutor that generates random characters in such a way that maximizes the chance
