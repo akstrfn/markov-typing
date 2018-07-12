@@ -29,29 +29,29 @@ int NChar::data() { return ch; }
 void backspace(int replacement_char) {
     // TODO KEY_BACKSPACE is inconsistent so for now do it manually...  check
     // terminfo and terminal configuration since something is wrong there
-    int y, x;
-    getyx(stdscr, y, x);
+    int y = getcury(stdscr);
+    int x = getcurx(stdscr);
     mvaddch(y, --x, replacement_char);
     ::move(y, x);
 }
 
 void initialize() {
-    setlocale(LC_ALL, "");
-    initscr();
-    raw();
+    ::setlocale(LC_ALL, "");
+    ::initscr();
+    ::raw();
     // cbreak(); // use to enable ctrl-c
-    noecho();
-    keypad(stdscr, 1);
-    start_color();
+    ::noecho();
+    ::keypad(stdscr, 1);
+    ::start_color();
 
     // separate into new function?
-    init_pair(1, COLOR_RED, COLOR_BLACK);
-    init_pair(2, COLOR_GREEN, COLOR_BLACK);
-    init_pair(3, COLOR_RED, COLOR_RED);
-    init_pair(4, COLOR_BLACK, COLOR_RED);
+    ::init_pair(1, COLOR_RED, COLOR_BLACK);
+    ::init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    ::init_pair(3, COLOR_RED, COLOR_RED);
+    ::init_pair(4, COLOR_BLACK, COLOR_RED);
 
-    init_pair(30, COLOR_WHITE, COLOR_BLACK);
-    bkgd(COLOR_PAIR(30));
+    ::init_pair(30, COLOR_WHITE, COLOR_BLACK);
+    ::bkgd(COLOR_PAIR(30));
 }
 
 std::array<int, 2> get_mid(int y_offset, int x_offset) {
@@ -59,27 +59,27 @@ std::array<int, 2> get_mid(int y_offset, int x_offset) {
 }
 
 std::array<int, 2> get_pos() {
-    int y, x;
-    getyx(stdscr, y, x);
+    int y = getcury(stdscr);
+    int x = getcurx(stdscr);
     return {y, x};
 }
 
 void printnm(const int y, const int x, const std::string_view &str) {
     // sve old position
-    int old_y, old_x;
-    getyx(stdscr, old_y, old_x);
+    int old_y = getcury(stdscr);
+    int old_x = getcurx(stdscr);
     // clear the line and print on it
     ::move(y, x);
-    clrtoeol();
-    printw(str.data());
+    ::clrtoeol();
+    ::printw(str.data());
     // return to old position
     ::move(old_y, old_x);
 }
 
 void print_begin(const int y, const int x, const std::string_view &str) {
     ::move(y, x);
-    clrtoeol();
-    printw(str.data());
+    ::clrtoeol();
+    ::printw(str.data());
     ::move(y, x);
 }
 
@@ -90,9 +90,9 @@ void move(int y, int x) { ::move(y, x); }
 void add_char(int ch) { ::addch(ch); }
 
 void add_char(int ch, int attr) {
-    attron(attr);
+    ::attron(attr);
     ::addch(ch);
-    attroff(attr);
+    ::attroff(attr);
 }
 
 int lines() { return LINES; }
