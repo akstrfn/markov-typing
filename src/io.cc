@@ -31,11 +31,11 @@ void write_string(string_view file_name, ProbabilityMatrix &mat) {
     auto home = getenv("XDG_DATA_HOME");
     if (home) {
         fpath /= home;
-        fpath /= "DeliberateTyping";
+        fpath /= "MarkovTyping";
     } else {
         home = getenv("HOME");
         fpath /= home; // this will throw is home is not found
-        fpath /= ".local/share/DeliberateTyping";
+        fpath /= ".local/share/MarkovTyping";
     }
 
     fs::create_directories(fpath);
@@ -83,11 +83,11 @@ optional<ProbabilityMatrix> read_string(string_view file_name,
     fs::path fpath;
     auto home = getenv("XDG_DATA_HOME");
     if (home) {
-        fpath /= string(home) + "/DeliberateTyping/" + file_name.data();
+        fpath /= string(home) + "/MarkovTyping/" + file_name.data();
     } else {
         home = getenv("HOME");
         fpath /= home; // this will throw is home is not found
-        fpath /= ".local/share/DeliberateTyping/"s + file_name.data();
+        fpath /= ".local/share/MarkovTyping/"s + file_name.data();
     }
 
     if (fs::exists(fpath)) {
