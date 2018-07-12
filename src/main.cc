@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
         if (characters.empty())
             characters = all_chars;
     } else {
-        // TODO utf does not work still some problem with addch?
+        // TODO utf does not work
         characters = custom;
     }
 
@@ -85,7 +85,6 @@ int main(int argc, char *argv[]) {
 
     curses::print_begin(mid_y, mid_x, psec.get_sentence());
 
-    // timer is in milliseconds, are nanoseconds better choice?
     Timer char_timer;
     Timer sentence_timer;
     long sentence_duration{};
@@ -116,8 +115,8 @@ int main(int argc, char *argv[]) {
                 sentence_duration = sentence_timer.duration();
                 int d = sentence_duration / 1000.0;
                 // clang-format off
-                curses::printnm(2, 2, "Sentence typing time: "
-                                      + std::to_string(d) + " seconds.");
+                curses::printnm(1, 2, "Sentence typing time: "
+                                      + std::to_string(d) + "s");
                 // clang-format on
                 matrix.update_time(d);
             }
@@ -178,16 +177,15 @@ int main(int argc, char *argv[]) {
         auto lines = curses::lines();
         auto cols = curses::cols();
         curses::printnm(lines - 2, 2,
-                        "Proficiency:            "
-                                + std::to_string(matrix.proficiency()));
+                        "Proficiency: " + std::to_string(matrix.proficiency()));
         curses::printnm(lines - 1, 2,
-                        "Typing speed (milisec): " + std::to_string(duration));
+                        "Speed (ms):  " + std::to_string(duration));
 
         constexpr char exit_msg[] = "Press F4 to exit.";
         curses::printnm(lines - 1, cols - std::size(exit_msg) - 2, exit_msg);
 #ifdef DEBUG
         // clang-format off
-        curses::printnm(0, cols - 12, "DEBUG MODE");
+        curses::printnm(1, cols - 12, "DEBUG MODE");
 
         std::stringstream ss;
         ss << "last: " << last
