@@ -9,8 +9,8 @@
 
 namespace impl {
 struct CharPair {
-    std::string row_char;
-    std::string col_char;
+    char row_char;
+    char col_char;
     double probability{};
     size_t correct{};
     size_t wrong{};
