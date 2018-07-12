@@ -19,9 +19,7 @@ using namespace std;
 namespace impl {
 
 void to_json(json &j, const CharPair &p) {
-    j = json{{"row", p.row},
-             {"col", p.col},
-             {"row_char", p.row_char},
+    j = json{{"row_char", p.row_char},
              {"col_char", p.col_char},
              {"probability", p.probability},
              {"correct", p.correct},
@@ -30,8 +28,6 @@ void to_json(json &j, const CharPair &p) {
 }
 
 void from_json(const json &j, CharPair &p) {
-    p.row = j.at("row").get<int>();
-    p.col = j.at("col").get<int>();
     p.row_char = j.at("row_char").get<string>();
     p.col_char = j.at("col_char").get<string>();
     p.probability = j.at("probability").get<double>();
@@ -66,8 +62,12 @@ void from_json(const json &js, ProbabilityMatrix &pm) {
     pm.char_map = move(char_map);
 
     decltype(pm.data) data(sz, vector<impl::CharPair>(sz));
-    for (auto &d : js.at("Matrix").get<vector<impl::CharPair>>())
-        data[d.row][d.col] = d;
+    // this mess with subscriptions is because I use string in CharPair
+    for (auto &d : js.at("Matrix").get<vector<impl::CharPair>>()) {
+        int i = char_map[d.row_char[0]];
+        int j = char_map[d.col_char[0]];
+        data[i][j] = d;
+    }
     pm.data = move(data);
 }
 // Matrix whose each entry is a probability that the next typed characted will
@@ -89,7 +89,7 @@ ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
         vector<impl::CharPair> row;
         row.reserve(len);
         for (int j = 0; j != len; ++j) {
-            impl::CharPair chp{i, j, characters.substr(i, 1),
+            impl::CharPair chp{characters.substr(i, 1),
                                characters.substr(j, 1)};
             row.push_back(move(chp));
         }
