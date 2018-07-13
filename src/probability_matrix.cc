@@ -63,8 +63,8 @@ void from_json(const json &js, ProbabilityMatrix &pm) {
 
     decltype(pm.data) data(sz, vector<impl::CharPair>(sz));
     for (auto &d : js.at("Matrix").get<vector<impl::CharPair>>()) {
-        int i = char_map[d.row_char];
-        int j = char_map[d.col_char];
+        int i = pm.char_map.at(d.row_char);
+        int j = pm.char_map.at(d.col_char);
         data[i][j] = d;
     }
     pm.data = move(data);
