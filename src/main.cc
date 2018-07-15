@@ -88,64 +88,11 @@ int main(int argc, char *argv[]) {
     Timer char_timer;
     Timer sentence_timer;
     long sentence_duration{};
+    long char_duration{};
     curses::NChar ch;
     while (!ch.is_f4()) {
-        if (psec.total_typed() == 1) // start when the first char is typed
-            sentence_timer.start();
-
-        auto [mid_y, mid_x] =
-                curses::get_mid(0, psec.get_sentence().size() / 2);
-
-        char_timer.start();
-        ch = curses::get_char();
-        auto const duration = char_timer.duration();
-
-        // only predefined characters are allowed
-        if (!is_in(all_chars, ch.data()) && !ch.is_enter() && !ch.is_backspace()
-            && ch.data() != ' ')
-            continue;
-
-        bool at_the_end = psec.total_typed() == psec.get_sentence().size();
-
-        // handle disable enter if we are not at the end
-        if (ch.is_enter()) {
-            if (at_the_end) {
-                psec.refresh_sentence(matrix.generate_sentence(40));
-                curses::print_begin(mid_y, mid_x, psec.get_sentence().c_str());
-                sentence_duration = sentence_timer.duration();
-                int d = sentence_duration / 1000.0;
-                // clang-format off
-                curses::printnm(1, 2, "Sentence typing time: "
-                                      + std::to_string(d) + "s");
-                // clang-format on
-                matrix.update_time(d);
-            }
-            continue;
-        }
-
-        // handle backspace
-        if (ch.is_backspace()) {
-            // there are errors and typed is bigger than 0
-            if (psec.get_error_exists() && psec.total_typed() > 0) {
-                auto pos = psec.total_typed() - 1;
-                auto tmp_ch = psec.get_sentence()[pos];
-                curses::backspace(tmp_ch);
-                psec.backspace();
-            }
-            continue;
-        }
-
-        // we are at the end but backspace and enter were not pressed
-        if (at_the_end)
-            continue;
-
-        psec.update_typed(ch.data());
 
         // sentence paint procedure
-        // save current cursor position
-        auto [y, x] = curses::get_pos();
-        // advance for one typing point...
-        ++x;
         // go to mid_y and mid_x
         curses::move(mid_y, mid_x);
         // iterate over psec and paint characters
@@ -160,26 +107,19 @@ int main(int argc, char *argv[]) {
             }
         }
         // restore position
-        curses::move(y, x);
+        curses::move(mid_y, mid_x + psec.get_typed().size());
 
-        // handle Probability matrix update
-        // Prevent checking when typed strings is too small
-        assert(!ch.is_backspace());
-        assert(!ch.is_enter());
-
-        auto len = psec.total_typed();
-        // If there was error in the past don't count as correct
-        bool correct = !psec.full_error_check();
-        char current = psec.get_sentence()[len - 1];
-        char last = psec.get_sentence()[len - 2];
-        matrix.update_element(last, current, duration, correct);
-
+        // paints stats and info
         auto lines = curses::lines();
         auto cols = curses::cols();
         curses::printnm(lines - 2, 2,
                         "Proficiency: " + std::to_string(matrix.proficiency()));
         curses::printnm(lines - 1, 2,
-                        "Speed (ms):  " + std::to_string(duration));
+                        "Speed (ms):  " + std::to_string(char_duration));
+        // clang-format off
+        curses::printnm(1, 2, "Sentence typing time: "
+                              + std::to_string(sentence_duration / 1000) + "s");
+        // clang-format on
 
         constexpr char exit_msg[] = "Press F4 to exit.";
         curses::printnm(lines - 1, cols - std::size(exit_msg) - 2, exit_msg);
@@ -204,6 +144,73 @@ int main(int argc, char *argv[]) {
         fs << matrix.to_string();
         // clang-format on
 #endif
+
+        if (psec.total_typed() == 1) // start when the first char is typed
+            sentence_timer.start();
+
+        char_timer.start();
+        ch = curses::get_char();
+
+        // handle resize
+        if (ch.is_resize()) {
+            curses::erase();
+            // not a very good solution
+            auto [mid_y_, mid_x_] =
+                    curses::get_mid(0, psec.get_sentence().size() / 2);
+            mid_y = mid_y_;
+            mid_x = mid_x_;
+            curses::move(mid_y, mid_x + psec.get_typed().size() - 1);
+            continue;
+        }
+
+        char_duration = char_timer.duration();
+
+        // only predefined characters are allowed
+        if (!is_in(all_chars, ch.data()) && !ch.is_enter() && !ch.is_backspace()
+            && ch.data() != ' ')
+            continue;
+
+        bool at_the_end = psec.total_typed() == psec.get_sentence().size();
+
+        // handle disable enter if we are not at the end
+        if (ch.is_enter()) {
+            if (at_the_end) {
+                psec.refresh_sentence(matrix.generate_sentence(40));
+                curses::print_begin(mid_y, mid_x, psec.get_sentence().c_str());
+                sentence_duration = sentence_timer.duration();
+                matrix.update_time(sentence_duration / 1000);
+            }
+            continue;
+        }
+
+        // handle backspace
+        if (ch.is_backspace()) {
+            // there are errors and typed is bigger than 0
+            if (psec.get_error_exists() && psec.total_typed() > 0) {
+                auto pos = psec.total_typed() - 1;
+                auto tmp_ch = psec.get_sentence()[pos];
+                curses::backspace(tmp_ch);
+                psec.backspace();
+            }
+            continue;
+        }
+
+        // we are at the end but backspace and enter were not pressed
+        if (at_the_end)
+            continue;
+
+        psec.update_typed(ch.data());
+
+        // handle Probability matrix update
+        assert(!ch.is_backspace());
+        assert(!ch.is_enter());
+
+        auto len = psec.total_typed();
+        // If there was error in the past don't count as correct
+        bool correct = !psec.full_error_check();
+        char current = psec.get_sentence()[len - 1];
+        char last = psec.get_sentence()[len - 2];
+        matrix.update_element(last, current, char_duration, correct);
     }
 
     write_string("matrix.json", matrix);

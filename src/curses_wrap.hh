@@ -28,6 +28,7 @@ public:
     bool is_backspace();
     bool is_enter();
     bool is_f4();
+    bool is_resize();
     NChar &operator=(NChar);
     NChar &operator=(int);
     int data();
@@ -47,6 +48,7 @@ enum Colors {
 };
 
 void backspace(int);
+void backspace();
 std::array<int, 2> get_mid(int y_offset, int x_offset);
 std::array<int, 2> get_pos();
 int get_char();
@@ -65,6 +67,8 @@ void add_char(int ch, int attribute);
 
 int lines();
 int cols();
+
+void erase();
 
 } // namespace curses
 

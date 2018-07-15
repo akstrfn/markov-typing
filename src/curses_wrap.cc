@@ -39,6 +39,8 @@ bool NChar::is_enter() { return ch == KEY_ENTER || ch == '\n' || ch == 10; }
 
 bool NChar::is_f4() { return ch == KEY_F(4); }
 
+bool NChar::is_resize() { return ch == KEY_RESIZE; }
+
 NChar &NChar::operator=(NChar other) {
     ch = other.ch;
     return *this;
@@ -58,6 +60,12 @@ void backspace(int replacement_char) {
     int x = getcurx(stdscr);
     mvaddch(y, --x, replacement_char);
     ::move(y, x);
+}
+
+void backspace() {
+    int y = getcury(stdscr);
+    int x = getcurx(stdscr);
+    ::move(y, --x);
 }
 std::array<int, 2> get_mid(int y_offset, int x_offset) {
     return {(LINES / 2) - y_offset, (COLS / 2) - x_offset};
@@ -103,5 +111,7 @@ void add_char(int ch, int attr) {
 int lines() { return LINES; }
 
 int cols() { return COLS; }
+
+void erase() { ::erase(); }
 
 } // namespace curses
