@@ -3,6 +3,31 @@
 
 namespace curses {
 
+CursesRuntime::CursesRuntime() { initialize_curses(); }
+
+CursesRuntime::~CursesRuntime() { end_curses(); }
+
+void CursesRuntime::end_curses() { endwin(); }
+
+void CursesRuntime::initialize_curses() {
+    ::setlocale(LC_ALL, "");
+    ::initscr();
+    ::raw();
+    // cbreak(); // use to enable ctrl-c
+    ::noecho();
+    ::keypad(stdscr, 1);
+    ::start_color();
+
+    // separate into new function?
+    ::init_pair(1, COLOR_RED, COLOR_BLACK);
+    ::init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    ::init_pair(3, COLOR_RED, COLOR_RED);
+    ::init_pair(4, COLOR_BLACK, COLOR_RED);
+
+    ::init_pair(30, COLOR_WHITE, COLOR_BLACK);
+    ::bkgd(COLOR_PAIR(30));
+}
+
 NChar::NChar() = default;
 NChar::NChar(int ch_) : ch{ch_} {};
 
@@ -34,26 +59,6 @@ void backspace(int replacement_char) {
     mvaddch(y, --x, replacement_char);
     ::move(y, x);
 }
-
-void initialize() {
-    ::setlocale(LC_ALL, "");
-    ::initscr();
-    ::raw();
-    // cbreak(); // use to enable ctrl-c
-    ::noecho();
-    ::keypad(stdscr, 1);
-    ::start_color();
-
-    // separate into new function?
-    ::init_pair(1, COLOR_RED, COLOR_BLACK);
-    ::init_pair(2, COLOR_GREEN, COLOR_BLACK);
-    ::init_pair(3, COLOR_RED, COLOR_RED);
-    ::init_pair(4, COLOR_BLACK, COLOR_RED);
-
-    ::init_pair(30, COLOR_WHITE, COLOR_BLACK);
-    ::bkgd(COLOR_PAIR(30));
-}
-
 std::array<int, 2> get_mid(int y_offset, int x_offset) {
     return {(LINES / 2) - y_offset, (COLS / 2) - x_offset};
 }
@@ -98,7 +103,5 @@ void add_char(int ch, int attr) {
 int lines() { return LINES; }
 
 int cols() { return COLS; }
-
-void end_win() { endwin(); }
 
 } // namespace curses

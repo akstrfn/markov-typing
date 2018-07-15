@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 
     PracticeSentence psec{matrix.generate_sentence(40)};
 
-    curses::initialize();
+    auto runtime = curses::CursesRuntime();
     auto [mid_y, mid_x] = curses::get_mid(0, psec.get_sentence().size() / 2);
 
     curses::print_begin(mid_y, mid_x, psec.get_sentence());
@@ -208,6 +208,5 @@ int main(int argc, char *argv[]) {
 
     write_string("matrix.json", matrix);
 
-    curses::end_win();
     return 0;
 }

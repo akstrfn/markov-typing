@@ -7,6 +7,15 @@
 // TODO I should wrap WINDOW into its own class... and char...
 namespace curses {
 
+class CursesRuntime {
+    void initialize_curses();
+    void end_curses();
+
+public:
+    CursesRuntime();
+    ~CursesRuntime();
+};
+
 class NChar {
     int ch;
     int attribute;
@@ -38,7 +47,6 @@ enum Colors {
 };
 
 void backspace(int);
-void initialize();
 std::array<int, 2> get_mid(int y_offset, int x_offset);
 std::array<int, 2> get_pos();
 int get_char();
@@ -57,8 +65,6 @@ void add_char(int ch, int attribute);
 
 int lines();
 int cols();
-
-void end_win();
 
 } // namespace curses
 
