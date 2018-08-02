@@ -123,28 +123,6 @@ int main(int argc, char *argv[]) {
 
         constexpr char exit_msg[] = "Press F4 to exit.";
         curses::printnm(lines - 1, cols - std::size(exit_msg) - 2, exit_msg);
-#ifdef DEBUG
-        // clang-format off
-        curses::printnm(1, cols - 12, "DEBUG MODE");
-
-        std::stringstream ss;
-        ss << "last: " << last
-           << " current: " << current
-           << " correct: " << correct;
-        curses::printnm(lines - 8, 2, ss.str());
-
-        ss.str("");
-        for (auto el : psec.get_errors())
-            ss << el;
-
-        curses::printnm(lines - 4, 2, "Error: " + ss.str());
-        curses::printnm(lines - 3, 2, "Typed: " + psec.get_typed());
-
-        std::ofstream fs("matrix_console");
-        fs << matrix.to_string();
-        // clang-format on
-#endif
-
         if (psec.total_typed() == 1) // start when the first char is typed
             sentence_timer.start();
 
@@ -211,6 +189,27 @@ int main(int argc, char *argv[]) {
         char current = psec.get_sentence()[len - 1];
         char last = psec.get_sentence()[len - 2];
         matrix.update_element(last, current, char_duration, correct);
+#ifdef DEBUG
+        // clang-format off
+        curses::printnm(1, cols - 12, "DEBUG MODE");
+
+        std::stringstream ss;
+        ss << "last: " << last
+           << " current: " << current
+           << " correct: " << correct;
+        curses::printnm(lines - 8, 2, ss.str());
+
+        ss.str("");
+        for (auto el : psec.get_errors())
+            ss << el;
+
+        curses::printnm(lines - 4, 2, "Error: " + ss.str());
+        curses::printnm(lines - 3, 2, "Typed: " + psec.get_typed());
+
+        std::ofstream fs("matrix_console");
+        fs << matrix.to_string();
+        // clang-format on
+#endif
     }
 
     write_string("matrix.json", matrix);
