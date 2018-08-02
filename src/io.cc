@@ -75,8 +75,7 @@ void write_string(string_view file_name, ProbabilityMatrix &mat) {
     }
 }
 
-optional<ProbabilityMatrix> read_string(string_view file_name,
-                                        string_view chars) {
+optional<ProbabilityMatrix> read_string(string_view file_name, string chars) {
     // TODO: if loading failed add fallback
     // TODO check on both spaces and prefer xdg?
     using namespace literals::string_literals;
@@ -90,13 +89,29 @@ optional<ProbabilityMatrix> read_string(string_view file_name,
         fpath /= ".local/share/MarkovTyping/"s + file_name.data();
     }
 
+    // TODO this routine is used in a few places already. Make a function.
+    // make sure characters are unique and sorted
+    sort(chars.begin(), chars.end());
+    auto last = unique(chars.begin(), chars.end());
+    chars.erase(last, chars.end());
+
     if (fs::exists(fpath)) {
         // TODO if json cant load file it will throw should this be handled?
-        // c_str because of boost
+        // c_str() because of boost
         // TODO copy constructor works but vector<matr>(json::parse) does not?
         vector<ProbabilityMatrix> mats = json::parse(ifstream{fpath.c_str()});
         auto res = find_if(mats.begin(), mats.end(), [&chars](auto &val) {
-            return val.get_characters() == chars;
+            string tmp = val.get_characters();
+
+            // TODO remove this check when tests are added
+            // failsafe if there was something wrong save in the json
+            // but this should be handled with test
+            // make sure characters are unique and sorted
+            sort(tmp.begin(), tmp.end());
+            auto last = unique(tmp.begin(), tmp.end());
+            tmp.erase(last, tmp.end());
+
+            return tmp == chars;
         });
         if (res != mats.end())
             return *res;
