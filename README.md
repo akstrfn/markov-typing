@@ -13,27 +13,26 @@ make our fingers more prone to subsequent mistakes hence practicing every
 possible pair of characters should improve typing speed and decrease mistakes.
 
 The underlying model is based on Markov chain where probabilities are the ratio
-of correct and wrong hits of character pairs. In addition to this, there is
-a pressure applied from the speed of typing meaning that even if the character
-is typed correctly but the speed was lower that average it would still be
-counted as wrong. To further increase (or decrease) the pressure, the average
-typing speed is smoothened with exponential moving average, meaning that only
-faily recent averages will be counted (the better you get the harder it
-becomes). This also means that if you have a bad streak the pressure is
-decreased faster.
+of correct and wrong hits of character pairs. In addition to this, there is a
+pressure applied from the speed of typing meaning that even if the character is
+typed correctly but the speed was lower that average it would still be counted
+as wrong. To further increase (or decrease) the pressure, the average typing
+speed is smoothened with exponential moving average, meaning that only fairly
+recent averages will be counted (the better you get the harder it becomes).
+This also means that if you have a bad streak the pressure is decreased faster.
 
 Very basic interface is implemented in curses with some bugs around symbols. 
-UTF-8 is not (yet) supported.
+UTF-8 is not (yet) implemented.
 
 # Building
 
-You will probably need GCC 8 to compile the program. Clang should also work but
-due to lack of filesystem support even in Clang 6 you will need at least GCC 8
-support.
+You will probably need GCC 8 to compile the program. Clang 6 will also work but
+it has to use GCC 8 filesystem library (libstdc++). libc++ will have filesystem
+support from clang 7.
 
 Build requirements:
 
-- GCC 8
+- GCC 8.1
 - Curses library
 - CMake
 - make or ninja
@@ -46,7 +45,7 @@ cmake --build build
 ```
 
 If you want to try building with compilers that support C++17 but don't have
-filesystem try the following:
+the filesystem library try the following:
 
 ```
 cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release -DUSE_BOOST_FS=TRUE
@@ -67,11 +66,11 @@ following options:
 ```
 Options:
   -h,--help                   Print this help message and exit
-  --lowercase                 Use lowercase.
-  --uppercase                 Use uppercase.
+  --lowercase                 Use lowercase characters.
+  --uppercase                 Use uppercase characters.
   --symbols                   Use symbols.
   --num                       Use numbers.
-  --custom TEXT               Provide custom set of letters
+  --custom TEXT               Provide custom set of characters.
 ```
 
 # Warning
