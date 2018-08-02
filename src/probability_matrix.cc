@@ -153,9 +153,6 @@ void ProbabilityMatrix::update_element(char const predecessor,
 }
 
 string ProbabilityMatrix::generate_sentence(int word_size) {
-    // TODO BUG after inversion max el becomes zero making it impossible to
-    // be chosen.
-
     // get first character
     char ch = *choice(characters);
     int ch_idx = char_map.at(ch);
@@ -180,11 +177,8 @@ string ProbabilityMatrix::generate_sentence(int word_size) {
         vector<double> inverse_probs;
         inverse_probs.reserve(size(row));
         for (auto el : row)
-            inverse_probs.push_back(1 - el.probability);
+            inverse_probs.push_back(2 - el.probability);
 
-        // TODO BUG: same as above bug for choice. Here we can have
-        // elements being perfect i.e. probability is 1 hence they will
-        // never be chosen.
         ch = *choice(characters, inverse_probs);
         ch_idx = char_map.at(ch);
     }
