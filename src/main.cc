@@ -7,7 +7,7 @@
 #include <sstream>
 #include <vector>
 
-#include <CLI11.hpp>
+#include <CLI/CLI.hpp>
 
 #include "curses_wrap.hh"
 #include "io.hh"
