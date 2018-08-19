@@ -188,6 +188,8 @@ int main(int argc, char *argv[]) {
         bool correct = !psec.full_error_check();
         char current = psec.get_sentence()[len - 1];
         char last = psec.get_sentence()[len - 2];
+        // TODO this is updated even when there is an error in the sentence.
+        // This might be ok but is probably unwanted behaviour.
         matrix.update_element(last, current, char_duration, correct);
 #ifdef DEBUG
         // clang-format off

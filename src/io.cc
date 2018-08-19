@@ -6,6 +6,7 @@
 
 #include "io.hh"
 #include "probability_matrix.hh"
+#include "utils.hh"
 
 #if BOOST_FILESYSTEM
 
@@ -89,11 +90,7 @@ optional<ProbabilityMatrix> read_string(string_view file_name, string chars) {
         fpath /= ".local/share/MarkovTyping/"s + file_name.data();
     }
 
-    // TODO this routine is used in a few places already. Make a function.
-    // make sure characters are unique and sorted
-    sort(chars.begin(), chars.end());
-    auto last = unique(chars.begin(), chars.end());
-    chars.erase(last, chars.end());
+    sort_uniq(chars);
 
     if (fs::exists(fpath)) {
         // TODO if json cant load file it will throw should this be handled?
@@ -103,13 +100,9 @@ optional<ProbabilityMatrix> read_string(string_view file_name, string chars) {
         auto res = find_if(mats.begin(), mats.end(), [&chars](auto &val) {
             string tmp = val.get_characters();
 
-            // TODO remove this check when tests are added
-            // failsafe if there was something wrong save in the json
-            // but this should be handled with test
-            // make sure characters are unique and sorted
-            sort(tmp.begin(), tmp.end());
-            auto last = unique(tmp.begin(), tmp.end());
-            tmp.erase(last, tmp.end());
+            // Failsafe if there was something wrong save in the json. This
+            // should probably issue some warning or something like that.
+            sort_uniq(tmp);
 
             return tmp == chars;
         });

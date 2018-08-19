@@ -69,6 +69,7 @@ void from_json(const json &js, ProbabilityMatrix &pm) {
     }
     pm.data = move(data);
 }
+
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct based on how frequent they were typed correctly
 ProbabilityMatrix::ProbabilityMatrix() = default;
@@ -76,10 +77,7 @@ ProbabilityMatrix::ProbabilityMatrix() = default;
 ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
         : characters(_characters) {
 
-    // make sure characters are unique and sorted
-    sort(characters.begin(), characters.end());
-    auto last = unique(characters.begin(), characters.end());
-    characters.erase(last, characters.end());
+    sort_uniq(characters); // make sure characters are unique and sorted
 
     int const len = characters.length();
     data.reserve(len);

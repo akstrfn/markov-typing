@@ -85,4 +85,11 @@ public:
     }
 };
 
+template <typename T> auto sort_uniq(T &container) {
+    // sortable concept would be nice
+    std::sort(container.begin(), container.end());
+    auto last = std::unique(container.begin(), container.end());
+    container.erase(last, container.end());
+}
+
 #endif /* UTILS_H */
