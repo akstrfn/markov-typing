@@ -87,6 +87,8 @@ int main(int argc, char *argv[]) {
 
     Timer char_timer;
     Timer sentence_timer;
+    Timer total_time;
+    total_time.start();
     long sentence_duration{};
     long char_duration{};
     curses::NChar ch;
@@ -125,6 +127,13 @@ int main(int argc, char *argv[]) {
         curses::printnm(lines - 1, cols - std::size(exit_msg) - 2, exit_msg);
         if (psec.total_typed() == 1) // start when the first char is typed
             sentence_timer.start();
+
+        auto dur = total_time.duration() / 1000;
+        auto hours = dur / 3600;
+        dur -= hours * 3600;
+        std::string st = std::to_string(hours) + ":" + std::to_string(dur/60) + ":" + std::to_string(dur%60);
+        curses::printnm(1, cols - 10, st);
+
 
         char_timer.start();
         ch = curses::get_char();
