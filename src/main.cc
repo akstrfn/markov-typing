@@ -129,11 +129,8 @@ int main(int argc, char *argv[]) {
             sentence_timer.start();
 
         auto dur = total_time.duration() / 1000;
-        auto hours = dur / 3600;
-        dur -= hours * 3600;
-        std::string st = std::to_string(hours) + ":" + std::to_string(dur/60) + ":" + std::to_string(dur%60);
-        curses::printnm(1, cols - 10, st);
-
+        curses::printnm(
+                2, 2, "Practice time: " + std::to_string(dur / 60.0) + " min");
 
         char_timer.start();
         ch = curses::get_char();
