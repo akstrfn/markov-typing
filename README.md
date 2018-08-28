@@ -24,6 +24,11 @@ This also means that if you have a bad streak the pressure is decreased faster.
 Very basic interface is implemented in curses with some bugs around symbols. 
 UTF-8 is not (yet) implemented.
 
+# Packages
+
+Currently only the development package is available for Arch Linux in
+[AUR](https://aur.archlinux.org/packages/markov-typing-git/).
+
 # Building
 
 You will probably need GCC 8 to compile the program. Clang 6 will also work but
