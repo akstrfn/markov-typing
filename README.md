@@ -29,6 +29,13 @@ UTF-8 is not (yet) implemented.
 Currently only the development package is available for Arch Linux in
 [AUR](https://aur.archlinux.org/packages/markov-typing-git/).
 
+After installing you can start the program from the command line. To get
+available options use:
+
+```
+markov-typing --help
+```
+
 # Building
 
 You will probably need GCC 8 to compile the program. Clang 6 will also work but
@@ -59,13 +66,13 @@ cmake --build build
 
 # Running the program
 
-After building you can run the executable ``./build/typing``. The matrix is
+After building you can run the executable ``./build/markov-typing``. The matrix is
 stored in JSON format either in ``$XDG_DATA_HOME/MarkovTyping`` or
 ``$HOME/.local/share/MarkovTyping`` and is loaded from the same location so the
 progress is saved. Since this is experimental so far, the same save file might
 not work between different commits.
 
-You can get command line options with ``./build/typing --help`` with the
+You can get command line options with ``./build/markov-typing --help`` with the
 following options:
 
 ```
