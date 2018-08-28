@@ -46,9 +46,9 @@ set(TYPING_SOURCES
     ${CMAKE_SOURCE_DIR}/src/io.cc
 )
 
-add_executable(typing ${TYPING_SOURCES})
+add_executable(markov-typing ${TYPING_SOURCES})
 
-target_link_libraries(typing 
+target_link_libraries(markov-typing 
     PRIVATE
         ${CURSES_LIBRARIES}
         # TODO it would be better to use boost::filesystem until compilers
@@ -56,19 +56,19 @@ target_link_libraries(typing
         ${FS_LINK}
 )
 
-target_compile_features(typing
+target_compile_features(markov-typing
     PRIVATE
         cxx_std_17
 )
 
-target_compile_options(typing
+target_compile_options(markov-typing
     PRIVATE
         $<$<CXX_COMPILER_ID:GNU>:-Wall>
         $<$<CXX_COMPILER_ID:Clang>:-Weverything>
         $<$<CONFIG:Debug>:-DDEBUG>
 )
 
-target_include_directories(typing PRIVATE third_party)
+target_include_directories(markov-typing PRIVATE third_party)
 
 if(UNIX)
     # YouCompleteMe setup
@@ -89,4 +89,4 @@ if(UNIX AND ${CLANG_FORMAT})
 endif()
 
 include(GNUInstallDirs)
-install(TARGETS typing DESTINATION "${CMAKE_INSTALL_BINDIR}")
+install(TARGETS markov-typing DESTINATION "${CMAKE_INSTALL_BINDIR}")
