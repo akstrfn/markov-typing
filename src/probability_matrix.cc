@@ -42,9 +42,7 @@ void to_json(json &js, ProbabilityMatrix &pm) {
     js["Characters"] = pm.characters;
     js["average_typing_time"] = pm.average_typing_time;
     js["typing_time"] = pm.typing_time;
-    for (auto &row : pm.data)
-        for (auto &el : row)
-            js["Matrix"].push_back(el);
+    js["data"] = pm.data;
 }
 
 void from_json(const json &js, ProbabilityMatrix &pm) {
@@ -60,14 +58,7 @@ void from_json(const json &js, ProbabilityMatrix &pm) {
         char_map[pm.characters[i]] = i;
 
     pm.char_map = move(char_map);
-
-    decltype(pm.data) data(sz, vector<impl::CharPair>(sz));
-    for (auto &d : js.at("Matrix").get<vector<impl::CharPair>>()) {
-        int i = pm.char_map.at(d.row_char);
-        int j = pm.char_map.at(d.col_char);
-        data[i][j] = d;
-    }
-    pm.data = move(data);
+    pm.data = js.at("data").get<vector<vector<impl::CharPair>>>();
 }
 
 // Matrix whose each entry is a probability that the next typed characted will
