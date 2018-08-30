@@ -24,7 +24,8 @@ void to_json(json &j, const CharPair &p) {
              {"probability", p.probability},
              {"correct", p.correct},
              {"wrong", p.wrong},
-             {"typing_time", p.typing_time}};
+             {"typing_time", p.typing_time},
+             {"frequency", p.frequency}};
 }
 
 void from_json(const json &j, CharPair &p) {
@@ -34,6 +35,7 @@ void from_json(const json &j, CharPair &p) {
     p.correct = j.at("correct").get<size_t>();
     p.wrong = j.at("wrong").get<size_t>();
     p.typing_time = j.at("typing_time").get<long>();
+    p.frequency = j.at("frequency").get<double>();
 }
 
 } // namespace impl
@@ -78,6 +80,36 @@ ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
         row.reserve(len);
         for (int j = 0; j != len; ++j) {
             impl::CharPair chp{characters[i], characters[j]};
+            row.push_back(move(chp));
+        }
+        data.push_back(move(row));
+    }
+};
+
+ProbabilityMatrix::ProbabilityMatrix(string_view _characters,
+                                     vector<double> const _frequencies)
+        : characters(_characters) {
+
+    // Just to be sure since this should be user input
+    auto last = std::unique(characters.begin(), characters.end());
+    characters.erase(last, characters.end());
+
+    // Since this is most likely to fail on user input it should be checked
+    // before, notify the user properly, and then this exception is not
+    // necessary
+    if (characters.size() != _frequencies.size())
+        throw std::runtime_error(
+                "all characters must be unique and have frequencies");
+
+    int const len = characters.length();
+    data.reserve(len);
+    for (int i = 0; i != len; ++i) {
+        char_map[characters[i]] = i;
+        vector<impl::CharPair> row;
+        row.reserve(len);
+        for (int j = 0; j != len; ++j) {
+            impl::CharPair chp{characters[i], characters[j]};
+            chp.frequency = _frequencies[i];
             row.push_back(move(chp));
         }
         data.push_back(move(row));
@@ -135,7 +167,8 @@ void ProbabilityMatrix::update_element(char const predecessor,
             chp.wrong += 1;
 
         double const total = chp.correct + chp.wrong;
-        chp.probability = chp.correct / total;
+        // frequency is used to account for how frequent is the pair
+        chp.probability = (chp.correct / total) * chp.frequency;
 
     } catch (out_of_range &) { /*TODO log this */
     }

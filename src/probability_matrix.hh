@@ -15,6 +15,7 @@ struct CharPair {
     size_t correct{};
     size_t wrong{};
     long typing_time{};
+    double frequency = 1.0; // freq is from 0 - 1
 };
 
 } // namespace impl
@@ -33,6 +34,8 @@ class ProbabilityMatrix {
 public:
     ProbabilityMatrix();
     ProbabilityMatrix(std::string_view);
+    ProbabilityMatrix(std::string_view _characters,
+                      std::vector<double> const _frequencies);
 
     void update_time(int);
     std::string get_characters();
