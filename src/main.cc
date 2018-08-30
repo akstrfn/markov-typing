@@ -38,10 +38,10 @@ int main(int argc, char *argv[]) {
 
     CLI::App app("Markov typing tutor");
 
-    CLI::Option *lc = app.add_flag("--lowercase", "Use lowercase.");
-    CLI::Option *uc = app.add_flag("--uppercase", "Use uppercase.");
-    CLI::Option *sy = app.add_flag("--symbols", "Use symbols.");
-    CLI::Option *num = app.add_flag("--num", "Use numbers.");
+    CLI::Option *lc = app.add_flag("-l,--lowercase", "Use lowercase.");
+    CLI::Option *uc = app.add_flag("-u,--uppercase", "Use uppercase.");
+    CLI::Option *sy = app.add_flag("-s,--symbols", "Use symbols.");
+    CLI::Option *num = app.add_flag("-n,--numbers", "Use numbers.");
 
     std::string custom;
     app.add_option("--custom", custom, "Provide custom set of letters");
