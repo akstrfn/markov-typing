@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     // then only numbers are updated, so some sort of mutable view of full
     // matrix should be made...
     ProbabilityMatrix matrix;
-    auto opt_matrix = read_string("matrix.json", characters);
+    auto opt_matrix = read_string("data.json", characters);
     if (!opt_matrix)
         matrix = ProbabilityMatrix{characters};
     else
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
 #endif
     }
 
-    write_string("matrix.json", matrix);
+    write_string("data.json", matrix);
 
     return 0;
 }
