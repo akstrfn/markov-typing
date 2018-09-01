@@ -43,13 +43,24 @@ int main(int argc, char *argv[]) {
     CLI::Option *sy = app.add_flag("-s,--symbols", "Use symbols.");
     CLI::Option *num = app.add_flag("-n,--numbers", "Use numbers.");
 
+    std::vector<std::string> files;
+    CLI::Option *fopt = app.add_option("-f,--files", files,
+                                       "Get and use characters and their "
+                                       "respective frequencies from files.");
+    fopt->check(CLI::ExistingFile);
+
     std::string custom;
     app.add_option("--custom", custom, "Provide custom set of letters");
 
     CLI11_PARSE(app, argc, argv);
 
     std::string characters{};
-    if (custom.empty()) {
+    std::map<char, size_t> frequencies;
+    if (*fopt) {
+        for (auto const &f : files)
+            for (auto const &[ch, num] : count_chars(f))
+                frequencies[ch] += num;
+    } else if (custom.empty()) {
 
         if (*lc)
             characters += lowercase;
@@ -72,11 +83,15 @@ int main(int argc, char *argv[]) {
     // then only numbers are updated, so some sort of mutable view of full
     // matrix should be made...
     ProbabilityMatrix matrix;
-    auto opt_matrix = read_string("data.json", characters);
-    if (!opt_matrix)
-        matrix = ProbabilityMatrix{characters};
-    else
-        matrix = std::move(opt_matrix.value());
+    if (*fopt) {
+        matrix = ProbabilityMatrix(frequencies);
+    } else {
+        auto opt_matrix = read_string("data.json", characters);
+        if (!opt_matrix)
+            matrix = ProbabilityMatrix{characters};
+        else
+            matrix = std::move(opt_matrix.value());
+    }
 
     PracticeSentence psec{matrix.generate_sentence(40)};
 
