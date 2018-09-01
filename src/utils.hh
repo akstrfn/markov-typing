@@ -5,6 +5,10 @@
 #include <chrono>
 #include <random>
 #include <string>
+#include <string_view>
+#include <fstream>
+#include <map>
+#include <iostream>
 
 // from: http://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
 template <class T>
@@ -85,11 +89,28 @@ public:
     }
 };
 
+// std::set does this...
 template <typename T> auto sort_uniq(T &container) {
     // sortable concept would be nice
     std::sort(container.begin(), container.end());
     auto last = std::unique(container.begin(), container.end());
     container.erase(last, container.end());
+}
+
+auto char_counter(std::string_view file_path) {
+    std::ifstream file{file_path.data()};
+    // perhaps this hould not break the whole program?
+    if(!file.is_open()){
+        std::clog << "Unable to open the file: " << file_path;
+        exit(1); 
+    }
+
+    std::map<char, size_t> counter;
+    char ch;
+    while(file >> ch)
+        ++counter[ch];
+
+    return counter;
 }
 
 #endif /* UTILS_H */
