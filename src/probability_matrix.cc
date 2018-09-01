@@ -70,6 +70,7 @@ ProbabilityMatrix::ProbabilityMatrix() = default;
 ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
         : characters(_characters) {
 
+    // std::set does this...
     sort_uniq(characters); // make sure characters are unique and sorted
 
     int const len = characters.length();
@@ -86,30 +87,23 @@ ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
     }
 };
 
-ProbabilityMatrix::ProbabilityMatrix(string_view _characters,
-                                     vector<double> const _frequencies)
-        : characters(_characters) {
+ProbabilityMatrix::ProbabilityMatrix(map<char, size_t> char_frequency_map) {
 
-    // Just to be sure since this should be user input
-    auto last = std::unique(characters.begin(), characters.end());
-    characters.erase(last, characters.end());
-
-    // Since this is most likely to fail on user input it should be checked
-    // before, notify the user properly, and then this exception is not
-    // necessary
-    if (characters.size() != _frequencies.size())
-        throw std::runtime_error(
-                "all characters must be unique and have frequencies");
+    characters = "";
+    for(auto const &pair : char_frequency_map){
+        characters += pair.first;
+    }
 
     int const len = characters.length();
     data.reserve(len);
     for (int i = 0; i != len; ++i) {
-        char_map[characters[i]] = i;
+        char const first = characters[i];
+        char_map[first] = i;
         vector<impl::CharPair> row;
         row.reserve(len);
         for (int j = 0; j != len; ++j) {
-            impl::CharPair chp{characters[i], characters[j]};
-            chp.frequency = _frequencies[i];
+            impl::CharPair chp{first, characters[j]};
+            chp.frequency = char_frequency_map[first];
             row.push_back(move(chp));
         }
         data.push_back(move(row));
