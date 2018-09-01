@@ -53,14 +53,10 @@ void from_json(const json &js, ProbabilityMatrix &pm) {
 
     pm.average_typing_time = js.at("average_typing_time").get<long>();
     pm.typing_time = js.at("typing_time").get<vector<int>>();
-
-    auto const sz = size(pm.characters);
-    map<char, int> char_map;
-    for (auto i = 0ul; i != sz; ++i)
-        char_map[pm.characters[i]] = i;
-
-    pm.char_map = move(char_map);
     pm.data = js.at("data").get<vector<vector<impl::CharPair>>>();
+
+    for (auto i = 0; i != pm.characters.size(); ++i)
+        pm.char_map[pm.characters[i]] = i;
 }
 
 // Matrix whose each entry is a probability that the next typed characted will
