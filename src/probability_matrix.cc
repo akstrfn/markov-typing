@@ -55,7 +55,7 @@ void from_json(const json &js, ProbabilityMatrix &pm) {
     pm.typing_time = js.at("typing_time").get<vector<int>>();
     pm.data = js.at("data").get<vector<vector<impl::CharPair>>>();
 
-    for (auto i = 0; i != pm.characters.size(); ++i)
+    for (auto i = 0ul; i != pm.characters.size(); ++i)
         pm.char_map[pm.characters[i]] = i;
 }
 
@@ -86,7 +86,7 @@ ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
 ProbabilityMatrix::ProbabilityMatrix(map<char, size_t> char_frequency_map) {
 
     characters = "";
-    for(auto const &pair : char_frequency_map){
+    for (auto const &pair : char_frequency_map) {
         characters += pair.first;
     }
 
