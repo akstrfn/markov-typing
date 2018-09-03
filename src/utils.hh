@@ -9,6 +9,7 @@
 #include <random>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 
 // from: http://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
 template <class T>
@@ -97,7 +98,13 @@ template <typename T> auto sort_uniq(T &container) {
     container.erase(last, container.end());
 }
 
+// only ascii...
 inline auto count_chars(std::string_view file_path) {
+
+    std::string_view ascii_str =
+            R"(qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?0123456789)";
+    std::unordered_set<char> ascii{ascii_str.begin(), ascii_str.end()};
+
     std::ifstream file{file_path.data()};
     // perhaps this should not break the whole program?
     if (!file.is_open()) {
@@ -108,7 +115,8 @@ inline auto count_chars(std::string_view file_path) {
     std::map<char, size_t> counter;
     char ch;
     while (file >> ch)
-        ++counter[ch];
+        if (ascii.count(ch))
+            ++counter[ch];
 
     return counter;
 }
