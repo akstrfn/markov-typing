@@ -68,6 +68,7 @@ ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
 
     // std::set does this...
     sort_uniq(characters); // make sure characters are unique and sorted
+    assert(characters.size() > 0);
 
     int const len = characters.length();
     data.reserve(len);
@@ -89,6 +90,7 @@ ProbabilityMatrix::ProbabilityMatrix(map<char, size_t> char_frequency_map) {
     for (auto const &pair : char_frequency_map) {
         characters += pair.first;
     }
+    assert(characters.size() > 0);
 
     int const len = characters.length();
     data.reserve(len);
