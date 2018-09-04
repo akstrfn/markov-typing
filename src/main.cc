@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     // TODO CLI is very fragile and needs to be solved better
     CLI11_PARSE(app, argc, argv);
 
-    std::map<char, size_t> frequencies;
+    std::map<char, double> frequencies;
     if (*lfreq) {
         // well... this is a bad solutions
 

@@ -112,13 +112,22 @@ inline auto count_chars(std::string_view file_path) {
         exit(1);
     }
 
+    // TODO horrible solution to get frequencies between 0 and 1 but I'm sleepy
     std::map<char, size_t> counter;
+    size_t tot{};
     char ch;
-    while (file >> ch)
-        if (ascii.count(ch))
+    while (file >> ch) {
+        if (ascii.count(ch)) {
+            ++tot;
             ++counter[ch];
+        }
+    }
+    std::map<char, double> freq;
+    double total = tot;
+    for (auto &&[ch, val] : counter)
+        freq[ch] = val / total;
 
-    return counter;
+    return freq;
 }
 
 #endif /* UTILS_H */

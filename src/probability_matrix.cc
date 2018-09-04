@@ -84,7 +84,7 @@ ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
     }
 };
 
-ProbabilityMatrix::ProbabilityMatrix(map<char, size_t> char_frequency_map) {
+ProbabilityMatrix::ProbabilityMatrix(map<char, double> char_frequency_map) {
 
     characters = "";
     for (auto const &pair : char_frequency_map) {

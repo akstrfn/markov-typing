@@ -34,7 +34,7 @@ class ProbabilityMatrix {
 public:
     ProbabilityMatrix();
     ProbabilityMatrix(std::string_view);
-    ProbabilityMatrix(std::map<char, size_t>);
+    ProbabilityMatrix(std::map<char, double>);
 
     void update_time(int);
     std::string get_characters();
