@@ -111,3 +111,54 @@ optional<ProbabilityMatrix> read_string(string_view file_name, string chars) {
     }
     return nullopt;
 }
+
+optional<ProbabilityMatrix> read_frequencies(string_view file_name) {
+    // TODO: if loading failed add fallback
+    // TODO check on both spaces and prefer xdg?
+    using namespace literals::string_literals;
+    fs::path fpath;
+    auto home = getenv("XDG_DATA_HOME");
+    if (home) {
+        fpath /= string(home) + "/MarkovTyping/" + file_name.data();
+    } else {
+        home = getenv("HOME");
+        fpath /= home; // this will throw if home is not found
+        fpath /= ".local/share/MarkovTyping/"s + file_name.data();
+    }
+
+    if (fs::exists(fpath)) {
+        // TODO if json cant load file it will throw should this be handled?
+        // c_str() because of boost
+        // TODO copy constructor works but vector<matr>(json::parse) does not?
+        ProbabilityMatrix mat = json::parse(ifstream{fpath.c_str()});
+        return mat;
+    }
+    return nullopt;
+}
+
+void write_frequencies(string_view file_name, ProbabilityMatrix &mat) {
+
+    // Save progress
+    // TODO check these paths before starting to avoid exercising and then not
+    // being able to save
+    fs::path fpath;
+    auto home = getenv("XDG_DATA_HOME");
+    if (home) {
+        fpath /= home;
+        fpath /= "MarkovTyping";
+    } else {
+        home = getenv("HOME");
+        fpath /= home; // this will throw is home is not found
+        fpath /= ".local/share/MarkovTyping";
+    }
+
+    fs::create_directories(fpath);
+    fpath /= string(file_name); // boost cant handle string_view atm
+
+    // TODO for now just break everything if you cant save
+    ofstream file{fpath};
+    if (!file.is_open())
+        throw ios_base::failure("Failed to open a file.");
+    json j = mat;
+    file << j; // write as array, strange constructor trick
+}
