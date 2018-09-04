@@ -50,20 +50,38 @@ int main(int argc, char *argv[]) {
                  "Practice numbers.");
     // clang-format on
 
+    std::string custom;
+    app.add_option("--custom", custom,
+                   "Provide custom set of letters to practice.");
+
     std::vector<std::string> files;
     CLI::Option *fopt = app.add_option("-f,--from_files", files,
                                        "Get and practice characters and their "
                                        "respective frequencies from file(s).");
     fopt->check(CLI::ExistingFile);
+    std::string file_name;
+    CLI::Option *fname = app.add_option("--name", file_name,
+                                        "Specify a file name for frequencies "
+                                        "in order to reuse them later.");
+    fname->needs(fopt);
+    fopt->needs(fname);
 
-    std::string custom;
-    app.add_option("--custom", custom,
-                   "Provide custom set of letters to practice.");
+    std::string freq_name;
+    CLI::Option *lfreq = app.add_option("--load-frequencies", freq_name,
+                                        "Specify the name for frequencies "
+                                        "previously loaded and preacticed.");
 
+    lfreq->excludes(fopt);
+    fopt->excludes(lfreq);
+
+    // TODO CLI is very fragile and needs to be solved better
     CLI11_PARSE(app, argc, argv);
 
     std::map<char, size_t> frequencies;
-    if (*fopt) {
+    if (*lfreq) {
+        // well... this is a bad solutions
+
+    } else if (*fopt) {
         for (auto const &f : files)
             for (auto const &[ch, num] : count_chars(f))
                 frequencies[ch] += num;
@@ -79,7 +97,16 @@ int main(int argc, char *argv[]) {
     // then only numbers are updated, so some sort of mutable view of full
     // matrix should be made...
     ProbabilityMatrix matrix;
-    if (*fopt) {
+    if (*lfreq) {
+        auto opt_matrix = read_frequencies(freq_name);
+        if (!opt_matrix) {
+            std::cout
+                    << "There is no frequency practice session with that name."
+                    << std::endl;
+            exit(1);
+        }
+        matrix = std::move(opt_matrix.value());
+    } else if (*fopt) {
         matrix = ProbabilityMatrix(frequencies);
     } else {
         auto opt_matrix = read_string("data.json", characters);
@@ -231,7 +258,13 @@ int main(int argc, char *argv[]) {
 #endif
     }
 
-    write_string("data.json", matrix);
+    if (*lfreq) {
+        write_frequencies(freq_name, matrix);
+    } else if (*fopt) {
+        write_frequencies(file_name, matrix);
+    } else {
+        write_string("data.json", matrix);
+    }
 
     return 0;
 }
