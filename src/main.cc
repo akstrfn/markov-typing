@@ -18,14 +18,14 @@
 
 using curses::Colors;
 
-constexpr auto lowercase = "qwertyuiopasdfghjklzxcvbnm";
-constexpr auto uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
+constexpr auto lowercase = u8"qwertyuiopasdfghjklzxcvbnm";
+constexpr auto uppercase = u8"QWERTYUIOPASDFGHJKLZXCVBNM";
 
 // TODO BUG some combinations of symbols form escape sequences so crazy stuff
 // gets printed on the screen like numbers or memory address etc. At least I
 // guess thats the reason.
-constexpr auto symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
-constexpr auto numbers = "0123456789";
+constexpr auto symbols = u8R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
+constexpr auto numbers = u8"0123456789";
 const auto all_chars = std::string(lowercase) + uppercase + symbols + numbers;
 
 // TODO add timer to see how fast was typing for current sentence and save
@@ -36,46 +36,42 @@ const auto all_chars = std::string(lowercase) + uppercase + symbols + numbers;
 // symbols appear far to often.
 int main(int argc, char *argv[]) {
 
-    CLI::App app("Markov typing tutor");
+    std::string characters = "";
+    CLI::App app("Markov typing tutor.");
 
-    CLI::Option *lc = app.add_flag("-l,--lowercase", "Use lowercase.");
-    CLI::Option *uc = app.add_flag("-u,--uppercase", "Use uppercase.");
-    CLI::Option *sy = app.add_flag("-s,--symbols", "Use symbols.");
-    CLI::Option *num = app.add_flag("-n,--numbers", "Use numbers.");
+    // clang-format off
+    app.add_flag("-l,--lowercase", [&characters](int) { characters += lowercase; },
+                 "Practice lowercase.");
+    app.add_flag("-U,--uppercase", [&characters](int) { characters += uppercase; },
+                 "Practice uppercase.");
+    app.add_flag("-s,--symbols", [&characters](int) { characters += symbols; },
+                 "Practice symbols.");
+    app.add_flag("-n,--numbers", [&characters](int) { characters += numbers; },
+                 "Practice numbers.");
+    // clang-format on
 
     std::vector<std::string> files;
-    CLI::Option *fopt = app.add_option("-f,--files", files,
-                                       "Get and use characters and their "
-                                       "respective frequencies from files.");
+    CLI::Option *fopt = app.add_option("-f,--from_files", files,
+                                       "Get and practice characters and their "
+                                       "respective frequencies from file(s).");
     fopt->check(CLI::ExistingFile);
 
     std::string custom;
-    app.add_option("--custom", custom, "Provide custom set of letters");
+    app.add_option("--custom", custom,
+                   "Provide custom set of letters to practice.");
 
     CLI11_PARSE(app, argc, argv);
 
-    std::string characters{};
     std::map<char, size_t> frequencies;
     if (*fopt) {
         for (auto const &f : files)
             for (auto const &[ch, num] : count_chars(f))
                 frequencies[ch] += num;
-    } else if (custom.empty()) {
-
-        if (*lc)
-            characters += lowercase;
-        if (*uc)
-            characters += uppercase;
-        if (*sy)
-            characters += symbols;
-        if (*num)
-            characters += numbers;
-
-        if (characters.empty())
+    } else if (characters.empty()) {
+        if (!custom.empty())
+            characters = custom;
+        else
             characters = all_chars;
-    } else {
-        // TODO utf does not work
-        characters = custom;
     }
 
     // TODO maybe based on input one should be able to slice the matrix and
