@@ -54,6 +54,11 @@ int main(int argc, char *argv[]) {
     app.add_option("--custom", custom,
                    "Provide custom set of letters to practice.");
 
+    // TODO frequencies not only take into account total number of a certain
+    // character and don't encode the character pairs frequencies as it should
+    // actually do.
+    // TODO currently character that is the most frequent actually does not
+    // appear often enough.
     std::vector<std::string> files;
     CLI::Option *fopt = app.add_option("-f,--from_files", files,
                                        "Get and practice characters and their "
