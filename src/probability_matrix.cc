@@ -116,7 +116,7 @@ string ProbabilityMatrix::to_string() {
         ss << setw(3) << *el << ", ";
     ss << setw(3) << characters.back() << "\n";
 
-    for (auto i = 0ul; i != size(data); ++i) {
+    for (auto i = 0ul; i != std::size(data); ++i) {
         auto const &row = data[i];
         ss << characters[i] << "| ";
         for (auto el = row.begin(); el != row.end() - 1; ++el) {
@@ -189,7 +189,7 @@ string ProbabilityMatrix::generate_sentence(int word_size) {
 
         auto const row = data[ch_idx];
         vector<double> inverse_probs;
-        inverse_probs.reserve(size(row));
+        inverse_probs.reserve(std::size(row));
         for (auto el : row)
             inverse_probs.push_back(2 - el.probability);
 
@@ -215,3 +215,5 @@ double ProbabilityMatrix::proficiency() {
 string ProbabilityMatrix::get_characters() { return characters; }
 
 void ProbabilityMatrix::update_time(int t) { typing_time.push_back(t); }
+
+std::size_t ProbabilityMatrix::size() { return data.size(); }

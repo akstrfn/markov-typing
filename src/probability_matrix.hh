@@ -42,6 +42,7 @@ public:
     void update_element(char const, char const, long const, bool const);
     std::string generate_sentence(int);
     double proficiency();
+    std::size_t size();
 };
 
 #endif /* SIMPLE_MATRIX_H */
