@@ -53,8 +53,6 @@ int main(int argc, char *argv[]) {
     std::string custom;
     app.add_option("--custom", custom,
                    "Provide custom set of letters to practice.");
-    if (!cutom.empty())
-        characters = custom;
 
     // TODO frequencies only take into account total occurrences of a
     // character and don't encode the character pairs frequencies as it should
@@ -66,6 +64,7 @@ int main(int argc, char *argv[]) {
                                        "Get and practice characters and their "
                                        "respective frequencies from file(s).");
     fopt->check(CLI::ExistingFile);
+
     std::string file_name;
     CLI::Option *fname = app.add_option("--name", file_name,
                                         "Specify a file name for frequencies "
@@ -76,13 +75,23 @@ int main(int argc, char *argv[]) {
     std::string freq_name;
     CLI::Option *lfreq = app.add_option("--load-frequencies", freq_name,
                                         "Specify the name for frequencies "
-                                        "previously loaded and preacticed.");
+                                        "previously loaded and practiced.");
 
     lfreq->excludes(fopt);
     fopt->excludes(lfreq);
 
+    auto *opt_list_freq = app.add_flag("--list-frequencies",
+                                       "List all available frequency files");
     // TODO CLI is very fragile and needs to be solved better
     CLI11_PARSE(app, argc, argv);
+
+    if (!custom.empty())
+        characters = custom;
+
+    if (*opt_list_freq) {
+        ls_frequencies();
+        exit(1);
+    }
 
     // TODO maybe based on input one should be able to slice the matrix and
     // update only specific elements of it i.e. if only numbers are practiced
@@ -93,7 +102,8 @@ int main(int argc, char *argv[]) {
     if (*lfreq) {
         auto opt_matrix = read_frequencies(freq_name);
         if (!opt_matrix) {
-            std::cout << "There is no practice session with that name.\n";
+            std::cout << "There is no practice session with the name "
+                      << freq_name << std::endl;
             exit(1);
         }
         matrix = std::move(opt_matrix.value());
@@ -107,7 +117,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Matrix is still not constructed
-    if (!matrix.size()){
+    if (!matrix.size()) {
         auto opt_matrix = read_string("data.json", characters);
         if (!opt_matrix)
             matrix = ProbabilityMatrix{characters};

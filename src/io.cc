@@ -133,3 +133,12 @@ optional<ProbabilityMatrix> read_frequencies(string_view file_name) {
     }
     return nullopt;
 }
+
+void ls_frequencies() {
+    std::cout << "Available frequencies for practice:\n";
+    fs::path fpath = get_data_dir();
+    for (auto &&p : fs::directory_iterator(fpath)) {
+        if (p.path().extension() == "")
+            std::cout << p.path().filename() << "\n";
+    }
+}
