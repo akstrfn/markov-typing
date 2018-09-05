@@ -23,7 +23,7 @@ constexpr auto uppercase = u8"QWERTYUIOPASDFGHJKLZXCVBNM";
 
 // TODO BUG some combinations of symbols form escape sequences so crazy stuff
 // gets printed on the screen like numbers or memory address etc. At least I
-// guess thats the reason.
+// guess that's the reason.
 constexpr auto symbols = u8R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
 constexpr auto numbers = u8"0123456789";
 const auto all_chars = std::string(lowercase) + uppercase + symbols + numbers;
@@ -59,6 +59,10 @@ int main(int argc, char *argv[]) {
     // actually do.
     // TODO currently character that is the most frequent actually does not
     // appear often enough.
+    // TODO frequencies should be implemented with CLI11 subapp to get:
+    // markov-typing frequencies calculate - to calculate frequencies
+    // markov-typing frequencies list - to list frequencies
+    // markov-typing frequencies load - to load frequencies
     std::vector<std::string> files;
     CLI::Option *fopt = app.add_option("-f,--from-files", files,
                                        "Get and practice characters and their "
