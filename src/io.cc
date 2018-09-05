@@ -23,7 +23,7 @@ namespace fs = std::filesystem;
 using namespace std;
 using json = nlohmann::json;
 
-fs::path get_data_dir() {
+fs::path prepare_data_dir() {
     fs::path fpath;
     auto home = getenv("XDG_DATA_HOME");
     if (home) {
@@ -43,7 +43,7 @@ fs::path get_data_dir() {
 void write_string(string_view file_name, ProbabilityMatrix &mat) {
     // TODO check these paths before starting to avoid exercising and then not
     // being able to save
-    fs::path fpath = get_data_dir();
+    fs::path fpath = prepare_data_dir();
     fpath /= file_name.data(); // boost cant handle string_view atm
 
     if (fs::exists(fpath)) {
@@ -86,7 +86,7 @@ void write_frequencies(string_view file_name, ProbabilityMatrix &mat) {
     // Save progress
     // TODO check these paths before starting to avoid exercising and then not
     // being able to save
-    fs::path fpath = get_data_dir();
+    fs::path fpath = prepare_data_dir();
     fpath /= file_name.data(); // boost cant handle string_view atm
 
     // TODO for now just break everything if you cant save
@@ -98,7 +98,7 @@ void write_frequencies(string_view file_name, ProbabilityMatrix &mat) {
 }
 
 optional<ProbabilityMatrix> read_string(string_view file_name, string chars) {
-    fs::path fpath = get_data_dir();
+    fs::path fpath = prepare_data_dir();
     fpath /= file_name.data();
 
     sort_uniq(chars);
@@ -123,7 +123,7 @@ optional<ProbabilityMatrix> read_string(string_view file_name, string chars) {
 }
 
 optional<ProbabilityMatrix> read_frequencies(string_view file_name) {
-    fs::path fpath = get_data_dir();
+    fs::path fpath = prepare_data_dir();
     fpath /= file_name.data();
 
     if (fs::exists(fpath)) {
@@ -136,7 +136,7 @@ optional<ProbabilityMatrix> read_frequencies(string_view file_name) {
 
 void ls_frequencies() {
     std::cout << "Available frequencies for practice:\n";
-    fs::path fpath = get_data_dir();
+    fs::path fpath = prepare_data_dir();
     for (auto &&p : fs::directory_iterator(fpath)) {
         if (p.path().extension() == "")
             std::cout << p.path().filename() << "\n";
