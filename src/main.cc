@@ -53,14 +53,16 @@ int main(int argc, char *argv[]) {
     std::string custom;
     app.add_option("--custom", custom,
                    "Provide custom set of letters to practice.");
+    if (!cutom.empty())
+        characters = custom;
 
-    // TODO frequencies not only take into account total number of a certain
+    // TODO frequencies only take into account total occurrences of a
     // character and don't encode the character pairs frequencies as it should
     // actually do.
     // TODO currently character that is the most frequent actually does not
     // appear often enough.
     std::vector<std::string> files;
-    CLI::Option *fopt = app.add_option("-f,--from_files", files,
+    CLI::Option *fopt = app.add_option("-f,--from-files", files,
                                        "Get and practice characters and their "
                                        "respective frequencies from file(s).");
     fopt->check(CLI::ExistingFile);
@@ -82,38 +84,30 @@ int main(int argc, char *argv[]) {
     // TODO CLI is very fragile and needs to be solved better
     CLI11_PARSE(app, argc, argv);
 
-    std::map<char, double> frequencies;
-    if (*lfreq) {
-        // well... this is a bad solutions
-
-    } else if (*fopt) {
-        for (auto const &f : files)
-            for (auto const &[ch, num] : count_chars(f))
-                frequencies[ch] += num;
-    } else if (characters.empty()) {
-        if (!custom.empty())
-            characters = custom;
-        else
-            characters = all_chars;
-    }
-
     // TODO maybe based on input one should be able to slice the matrix and
     // update only specific elements of it i.e. if only numbers are practiced
     // then only numbers are updated, so some sort of mutable view of full
     // matrix should be made...
     ProbabilityMatrix matrix;
+    std::map<char, double> frequencies;
     if (*lfreq) {
         auto opt_matrix = read_frequencies(freq_name);
         if (!opt_matrix) {
-            std::cout
-                    << "There is no frequency practice session with that name."
-                    << std::endl;
+            std::cout << "There is no practice session with that name.\n";
             exit(1);
         }
         matrix = std::move(opt_matrix.value());
     } else if (*fopt) {
-        matrix = ProbabilityMatrix(frequencies);
-    } else {
+        for (auto const &f : files)
+            for (auto const &[ch, num] : count_chars(f))
+                frequencies[ch] += num;
+        matrix = ProbabilityMatrix{frequencies};
+    } else if (characters.empty()) {
+        characters = all_chars;
+    }
+
+    // Matrix is still not constructed
+    if (!matrix.size()){
         auto opt_matrix = read_string("data.json", characters);
         if (!opt_matrix)
             matrix = ProbabilityMatrix{characters};
