@@ -15,6 +15,7 @@
 
 using json = nlohmann::json;
 using namespace std;
+using namespace impl;
 
 namespace impl {
 
@@ -40,7 +41,7 @@ void from_json(const json &j, CharPair &p) {
 
 } // namespace impl
 
-void to_json(json &js, ProbabilityMatrix &pm) {
+void to_json(json &js, const ProbabilityMatrix &pm) {
     js["Characters"] = pm.characters;
     js["average_typing_time"] = pm.average_typing_time;
     js["typing_time"] = pm.typing_time;
@@ -53,7 +54,7 @@ void from_json(const json &js, ProbabilityMatrix &pm) {
 
     pm.average_typing_time = js.at("average_typing_time").get<long>();
     pm.typing_time = js.at("typing_time").get<vector<int>>();
-    pm.data = js.at("data").get<vector<vector<impl::CharPair>>>();
+    pm.data = js.at("data").get<vector<vector<CharPair>>>();
 
     for (auto i = 0ul; i != pm.characters.size(); ++i)
         pm.char_map[pm.characters[i]] = i;
@@ -74,10 +75,10 @@ ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
     data.reserve(len);
     for (int i = 0; i != len; ++i) {
         char_map[characters[i]] = i;
-        vector<impl::CharPair> row;
+        vector<CharPair> row;
         row.reserve(len);
         for (int j = 0; j != len; ++j) {
-            impl::CharPair chp{characters[i], characters[j]};
+            CharPair chp{characters[i], characters[j]};
             row.push_back(move(chp));
         }
         data.push_back(move(row));
@@ -97,10 +98,10 @@ ProbabilityMatrix::ProbabilityMatrix(map<char, double> char_frequency_map) {
     for (int i = 0; i != len; ++i) {
         char const first = characters[i];
         char_map[first] = i;
-        vector<impl::CharPair> row;
+        vector<CharPair> row;
         row.reserve(len);
         for (int j = 0; j != len; ++j) {
-            impl::CharPair chp{first, characters[j]};
+            CharPair chp{first, characters[j]};
             chp.frequency = char_frequency_map[first];
             row.push_back(move(chp));
         }
@@ -136,7 +137,7 @@ void ProbabilityMatrix::update_element(char const predecessor,
     try {
         auto const from_idx = char_map.at(predecessor);
         auto const current_idx = char_map.at(current_char);
-        impl::CharPair &chp = data[from_idx][current_idx];
+        CharPair &chp = data[from_idx][current_idx];
 
         // Using exponential moving average update average typing time.
         // Using different aplpha's for CharPair and global average can be
