@@ -5,7 +5,6 @@
 #include <nlohmann/json.hpp>
 
 #include "io.hh"
-#include "probability_matrix.hh"
 #include "utils.hh"
 
 #if BOOST_FILESYSTEM
