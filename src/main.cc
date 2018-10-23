@@ -180,8 +180,10 @@ int main(int argc, char *argv[]) {
             sentence_timer.start();
 
         auto dur = total_time.duration() / 1000;
-        curses::printnm(
-                2, 2, "Practice time: " + std::to_string(dur / 60.0) + " min");
+        auto minutes = dur / 60;
+        curses::printnm(2, 2,
+                        "Practice time: " + std::to_string(minutes) + " min "
+                                + std::to_string(dur - minutes * 60) + " sec");
 
         char_timer.start();
         ch = curses::get_char();
