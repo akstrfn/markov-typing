@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.11)
 project(markov_typing)
 
-#set(CURSES_NEED_WIDE TRUE)
-find_package(Curses REQUIRED)
+find_package(Qt5Widgets REQUIRED)
 find_package(nlohmann_json QUIET)
 find_package(CLI11 QUIET)
 
 set(CLANG_FORMAT FALSE CACHE BOOL "Format the code with clang format.")
 set(USE_BOOST_FS FALSE CACHE BOOL "Use boost filesystem. Does not work atm.")
+
+set(CMAKE_AUTOMOC ON)
 
 if(USE_BOOST_FS)
     find_package(Boost REQUIRED COMPONENTS filesystem)
@@ -34,8 +35,6 @@ if(NOT CLI11_FOUND AND NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/CLI/CLI.hpp)
 endif()
 
 set(TYPING_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/curses_wrap.cc
-    ${CMAKE_SOURCE_DIR}/src/curses_wrap.hh
     ${CMAKE_SOURCE_DIR}/src/main.cc
     ${CMAKE_SOURCE_DIR}/src/probability_matrix.hh
     ${CMAKE_SOURCE_DIR}/src/probability_matrix.cc
@@ -44,13 +43,16 @@ set(TYPING_SOURCES
     ${CMAKE_SOURCE_DIR}/src/utils.hh
     ${CMAKE_SOURCE_DIR}/src/io.hh
     ${CMAKE_SOURCE_DIR}/src/io.cc
+    ${CMAKE_SOURCE_DIR}/src/qt_gui/mainwindow.cc
+    ${CMAKE_SOURCE_DIR}/src/qt_gui/practice_area.cc
+    ${CMAKE_SOURCE_DIR}/src/qt_gui/char_sets_picker.cc
 )
 
 add_executable(markov-typing ${TYPING_SOURCES})
 
 target_link_libraries(markov-typing 
     PRIVATE
-        ${CURSES_LIBRARIES}
+        Qt5::Widgets
         # TODO it would be better to use boost::filesystem until compilers
         # stabilize filesystem support
         ${FS_LINK}
@@ -64,7 +66,7 @@ target_compile_features(markov-typing
 target_compile_options(markov-typing
     PRIVATE
         $<$<CXX_COMPILER_ID:GNU>:-Wall>
-        $<$<CXX_COMPILER_ID:Clang>:-Weverything>
+        $<$<CXX_COMPILER_ID:Clang>:-Weverything -Wno-c++98-compat>
         $<$<CONFIG:Debug>:-DDEBUG>
 )
 

@@ -4,13 +4,14 @@
 #include <map>
 #include <nlohmann/json.hpp>
 #include <string>
-#include <string_view>
 #include <vector>
+
+#include <QString>
 
 namespace impl {
 struct CharPair {
-    char row_char;
-    char col_char;
+    QChar row_char;
+    QChar col_char;
     double probability{};
     size_t correct{};
     size_t wrong{};
@@ -25,9 +26,9 @@ void from_json(const nlohmann::json &, CharPair &);
 
 class ProbabilityMatrix {
     // TODO use set for characters to get uniqueness
-    std::string characters;
+    QString characters;
     std::vector<std::vector<impl::CharPair>> data;
-    std::map<char, int> char_map;
+    std::map<QChar, int> char_map;
     std::vector<int> typing_time; // history of full sentence typing times
     long average_typing_time{};
 
@@ -36,14 +37,14 @@ class ProbabilityMatrix {
 
 public:
     ProbabilityMatrix();
-    ProbabilityMatrix(std::string_view);
-    ProbabilityMatrix(std::map<char, double>);
+    ProbabilityMatrix(QString const);
+    ProbabilityMatrix(std::map<QChar, double>);
 
     void update_time(int);
-    std::string get_characters();
+    QString get_characters();
     std::string to_string();
     void update_element(char const, char const, long const, bool const);
-    std::string generate_sentence(int);
+    QString generate_sentence(int);
     double proficiency();
     std::size_t size();
 };

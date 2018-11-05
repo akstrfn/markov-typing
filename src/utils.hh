@@ -11,6 +11,8 @@
 #include <string_view>
 #include <unordered_set>
 
+#include <QString>
+
 // from: http://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
 template <class T>
 typename std::enable_if_t<!std::numeric_limits<T>::is_integer, bool>
@@ -92,10 +94,16 @@ public:
 
 // std::set does this...
 template <typename T> auto sort_uniq(T &container) {
-    // sortable concept would be nice
+    // sortable, erasable concept would be nice
     std::sort(container.begin(), container.end());
     auto last = std::unique(container.begin(), container.end());
     container.erase(last, container.end());
+}
+
+inline auto sort_uniq(QString &container) {
+    std::sort(container.begin(), container.end());
+    auto last = std::unique(container.begin(), container.end());
+    container.chop(std::distance(last, container.end()));
 }
 
 // only ascii...

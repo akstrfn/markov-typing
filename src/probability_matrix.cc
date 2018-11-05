@@ -6,22 +6,22 @@
 #include <map>
 #include <sstream>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include <nlohmann/json.hpp>
 
 #include "utils.hh"
 
-using json = nlohmann::json;
 using namespace std;
 using namespace impl;
+
+using json = nlohmann::json;
 
 namespace impl {
 
 void to_json(json &j, const CharPair &p) {
-    j = json{{"row_char", p.row_char},
-             {"col_char", p.col_char},
+    j = json{{"row_char", p.row_char.unicode()},
+             {"col_char", p.col_char.unicode()},
              {"probability", p.probability},
              {"correct", p.correct},
              {"wrong", p.wrong},
@@ -42,7 +42,7 @@ void from_json(const json &j, CharPair &p) {
 } // namespace impl
 
 void to_json(json &js, const ProbabilityMatrix &pm) {
-    js["Characters"] = pm.characters;
+    js["Characters"] = pm.characters.toUtf8();
     js["average_typing_time"] = pm.average_typing_time;
     js["typing_time"] = pm.typing_time;
     js["data"] = pm.data;
@@ -50,21 +50,20 @@ void to_json(json &js, const ProbabilityMatrix &pm) {
 
 void from_json(const json &js, ProbabilityMatrix &pm) {
 
-    pm.characters = js.at("Characters").get<string>();
-
+    pm.characters = QString(js.at("Characters").get<string>().c_str());
     pm.average_typing_time = js.at("average_typing_time").get<long>();
     pm.typing_time = js.at("typing_time").get<vector<int>>();
     pm.data = js.at("data").get<vector<vector<CharPair>>>();
 
-    for (auto i = 0ul; i != pm.characters.size(); ++i)
-        pm.char_map[pm.characters[i]] = i;
+    for (int i = 0; i != pm.characters.size(); ++i)
+        pm.char_map[pm.characters[static_cast<int>(i)].unicode()] = i;
 }
 
 // Matrix whose each entry is a probability that the next typed characted will
 // be correct based on how frequent they were typed correctly
 ProbabilityMatrix::ProbabilityMatrix() = default;
 
-ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
+ProbabilityMatrix::ProbabilityMatrix(QString const _characters)
         : characters(_characters) {
 
     // std::set does this...
@@ -83,9 +82,9 @@ ProbabilityMatrix::ProbabilityMatrix(string_view _characters)
         }
         data.push_back(move(row));
     }
-};
+}
 
-ProbabilityMatrix::ProbabilityMatrix(map<char, double> char_frequency_map) {
+ProbabilityMatrix::ProbabilityMatrix(map<QChar, double> char_frequency_map) {
 
     characters = "";
     for (auto const &pair : char_frequency_map) {
@@ -96,7 +95,7 @@ ProbabilityMatrix::ProbabilityMatrix(map<char, double> char_frequency_map) {
     int const len = characters.length();
     data.reserve(len);
     for (int i = 0; i != len; ++i) {
-        char const first = characters[i];
+        QChar const first = characters[i];
         char_map[first] = i;
         vector<CharPair> row;
         row.reserve(len);
@@ -107,19 +106,19 @@ ProbabilityMatrix::ProbabilityMatrix(map<char, double> char_frequency_map) {
         }
         data.push_back(move(row));
     }
-};
+}
 
 string ProbabilityMatrix::to_string() {
     stringstream ss;
     ss << fixed << setprecision(2) << "    ";
 
     for (auto el = characters.begin(); el != characters.end() - 1; ++el)
-        ss << setw(3) << *el << ", ";
-    ss << setw(3) << characters.back() << "\n";
+        ss << setw(3) << (*el).unicode() << ", ";
+    ss << setw(3) << characters.back().unicode() << "\n";
 
     for (auto i = 0ul; i != std::size(data); ++i) {
         auto const &row = data[i];
-        ss << characters[i] << "| ";
+        ss << characters[static_cast<int>(i)].unicode() << "| ";
         for (auto el = row.begin(); el != row.end() - 1; ++el) {
             ss << el->probability << ", ";
         }
@@ -167,9 +166,9 @@ void ProbabilityMatrix::update_element(char const predecessor,
     }
 }
 
-string ProbabilityMatrix::generate_sentence(int word_size) {
+QString ProbabilityMatrix::generate_sentence(int word_size) {
     // get first character
-    char ch = *choice(characters);
+    QChar ch = *choice(characters);
     int ch_idx = char_map.at(ch);
 
     // TODO simulate the state of matrix if the chosen charater would be
@@ -179,7 +178,7 @@ string ProbabilityMatrix::generate_sentence(int word_size) {
     // wrong. This should also update the accuracy value before simulating
     // next character. This allows simulation of a whole sentence the user
     // would type
-    string out = "";
+    QString out = "";
     while (word_size--) {
         if (word_size % 5 == 0) { // size of one word is 4
             out.push_back(' ');
@@ -199,7 +198,7 @@ string ProbabilityMatrix::generate_sentence(int word_size) {
     }
 
     if (out.back() == ' ')
-        out.pop_back(); // remove possible last space
+        out.chop(1); // remove possible last space
     return out;
 }
 
@@ -211,9 +210,9 @@ double ProbabilityMatrix::proficiency() {
         for (auto &&el : row)
             sum += el.probability;
     return sum / pow(data.size(), 2);
-};
+}
 
-string ProbabilityMatrix::get_characters() { return characters; }
+QString ProbabilityMatrix::get_characters() { return characters; }
 
 void ProbabilityMatrix::update_time(int t) { typing_time.push_back(t); }
 
