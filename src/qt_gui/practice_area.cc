@@ -91,9 +91,7 @@ void PracticeArea::new_sentence() {
 }
 
 void PracticeArea::update_errors() {
-    int tmp = 0;
-    for (auto &&el : errors_vec)
-        tmp += el;
+    const int tmp = std::accumulate(errors_vec.begin(), errors_vec.end(), 0);
     if (errors != tmp) {
         errors = tmp;
         errors_updated();
