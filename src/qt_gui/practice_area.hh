@@ -7,6 +7,7 @@
 #include <QElapsedTimer>
 
 #include "../probability_matrix.hh"
+#include "../io.hh"
 
 class PracticeArea : public QTextEdit {
     Q_OBJECT
@@ -15,8 +16,11 @@ private:
     QFont font;
     QTextCursor::MoveOperation direction;
     QTextCursor cursor;
+
     QString current_chars = u8"qwertyuiopasdfghjklzxcvbnm";
-    ProbabilityMatrix matrix{current_chars};
+    ProbabilityMatrix matrix;
+    PracticeDataJson json_data;
+
     int cursor_pos{};
     QVector<int> allowed_keys = {Qt::Key_Space, Qt::Key_Return, Qt::Key_Backspace};
 
@@ -26,6 +30,10 @@ private:
     int errors{};
 
     void update_errors();
+
+    // Not sure if this will leak since it could disable qt's desctructor?
+    // Although it is called on exit therefore OS will clean it up...
+    ~PracticeArea() { save_to_json("data.json", json_data); }
 
 public:
     PracticeArea(QWidget* = nullptr);

@@ -8,6 +8,7 @@
 
 #include <QString>
 
+// TODO forward declare json
 namespace impl {
 struct CharPair {
     QChar row_char;
@@ -27,6 +28,9 @@ void from_json(const nlohmann::json &, CharPair &);
 class ProbabilityMatrix {
     // TODO use set for characters to get uniqueness
     QString characters;
+    // TODO turn data into unique_ptr in order to be able to forward declare
+    // CharPair and hide it inside the implementation file. This will require
+    // the "rule-of-five" in order to work.
     std::vector<std::vector<impl::CharPair>> data;
     std::map<QChar, int> char_map;
     std::vector<int> typing_time; // history of full sentence typing times

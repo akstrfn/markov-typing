@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QCheckBox>
 
+// TODO when opened this class should load all saved sessions in order to be
+// able to change them fast
 class CharacterSetsPicker : public QWidget {
     Q_OBJECT
 public:

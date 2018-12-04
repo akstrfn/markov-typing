@@ -4,12 +4,18 @@
 #include "probability_matrix.hh"
 #include <string_view>
 
-void write_json(std::string_view, ProbabilityMatrix &);
-std::optional<ProbabilityMatrix> read_json(std::string_view, std::string);
+// TODO practice statistics should also go into this object
+struct PracticeDataJson {
+    int version; // keep track of json format changes
+    std::vector<ProbabilityMatrix> matrices; // all matrices
+    std::vector<QString> characters; // characters from corresponding matrices
 
-void write_frequencies(std::string_view, ProbabilityMatrix &);
-std::optional<ProbabilityMatrix> read_frequencies(std::string_view);
+    // I could return a ref and directly expose matrix for modifications?
+    std::optional<ProbabilityMatrix> get_matrix(QString chars);
+    void update(ProbabilityMatrix &mat);
+};
 
-void ls_frequencies();
+void save_to_json(std::string_view, PracticeDataJson &);
+std::optional<PracticeDataJson> load_from_json(std::string_view);
 
 #endif /* ifndef IO_HH */

@@ -14,6 +14,10 @@ PracticeArea::PracticeArea(QWidget *parent) : QTextEdit(parent) {
     font.setStyleHint(QFont::Monospace);
     setFont(font);
 
+    auto opt_mat = json_data.get_matrix(current_chars);
+    matrix = opt_mat.value_or(ProbabilityMatrix{current_chars});
+    json_data.update(matrix);
+
     new_sentence();
 }
 
@@ -43,6 +47,11 @@ void PracticeArea::keyPressEvent(QKeyEvent *e) {
     if (cursor_pos == 0)
         timer.start();
 
+    auto helper = [&](auto &mat, bool val) {
+        mat.update_element(cursor.block().text().at(cursor_pos - 1).unicode(),
+                           e->text().front().unicode(), timer.elapsed(), val);
+    };
+
     if (e->key() == Qt::Key_Backspace) {
         direction = QTextCursor::Left;
         cursor.movePosition(QTextCursor::Left);
@@ -54,20 +63,15 @@ void PracticeArea::keyPressEvent(QKeyEvent *e) {
         direction = QTextCursor::Right;
         errors_vec.push_back(0);
         // TODO how is space handled?
-        if (cursor_pos != 0) {
-            matrix.update_element(
-                    cursor.block().text().at(cursor_pos - 1).unicode(),
-                    e->text().front().unicode(), timer.elapsed(), true);
-        }
+        if (cursor_pos != 0)
+            helper(matrix, true);
+
     } else {
         format.setBackground(QBrush(QColor("red")));
         direction = QTextCursor::Right;
         errors_vec.push_back(1);
-        if (cursor_pos != 0) {
-            matrix.update_element(
-                    cursor.block().text().at(cursor_pos - 1).unicode(),
-                    e->text().front().unicode(), timer.elapsed(), false);
-        }
+        if (cursor_pos != 0)
+            helper(matrix, true);
     }
 
     cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
@@ -80,13 +84,10 @@ void PracticeArea::keyPressEvent(QKeyEvent *e) {
 }
 
 void PracticeArea::set_chars(QString chars) {
-    // TODO reading and writing like this all the time is very slow... probably
-    // the whole json should be kept in memory or at least known character sets
-    // for fast check.
     sort_uniq(chars);
     current_chars = chars;
-    auto opt_matrix = read_json("data.json", chars.toStdString());
-    matrix = opt_matrix.value_or(ProbabilityMatrix(chars));
+    auto opt_mat = json_data.get_matrix(current_chars);
+    matrix = opt_mat.value_or(ProbabilityMatrix{current_chars});
     new_sentence();
 }
 
@@ -97,7 +98,7 @@ void PracticeArea::new_sentence() {
     errors_vec.clear();
     update_errors();
 
-    write_json("data.json", matrix);
+    json_data.update(matrix);
 }
 
 void PracticeArea::update_errors() {
