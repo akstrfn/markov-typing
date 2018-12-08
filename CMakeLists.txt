@@ -66,7 +66,7 @@ target_compile_features(markov-typing
 target_compile_options(markov-typing
     PRIVATE
         $<$<CXX_COMPILER_ID:GNU>:-Wall>
-        $<$<CXX_COMPILER_ID:Clang>:-Weverything -Wno-c++98-compat>
+        $<$<CXX_COMPILER_ID:Clang>:-Wall>
         $<$<CONFIG:Debug>:-DDEBUG>
 )
 
