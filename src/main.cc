@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     a.setCursorFlashTime(0);
 
-    auto typing = new MainWindow();
+    auto typing = std::make_unique<MainWindow>();
     typing->show();
 
     // TODO this leaks like crazy disabled
