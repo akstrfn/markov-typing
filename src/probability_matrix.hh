@@ -15,7 +15,7 @@ struct CharPair {
     double probability{};
     size_t correct{};
     size_t wrong{};
-    long typing_time{};
+    long typing_time{};     // typing time for this char
     double frequency = 1.0; // freq is from 0 - 1
 };
 

@@ -4,6 +4,8 @@
 #include <vector>
 
 #include <QTextEdit>
+#include <QElapsedTimer>
+
 #include "../probability_matrix.hh"
 
 class PracticeArea : public QTextEdit {
@@ -17,6 +19,8 @@ private:
     ProbabilityMatrix matrix{current_chars};
     int cursor_pos{};
     QVector<int> allowed_keys = {Qt::Key_Space, Qt::Key_Return, Qt::Key_Backspace};
+
+    QElapsedTimer timer;
 
     std::vector<int> errors_vec{};
     int errors{};

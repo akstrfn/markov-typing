@@ -45,6 +45,9 @@ void PracticeArea::keyPressEvent(QKeyEvent *e) {
     if (e->key() == Qt::Key_Return)
         return;
 
+    if (cursor_pos == 0)
+        timer.start();
+
     if (e->key() == Qt::Key_Backspace) {
         direction = QTextCursor::Left;
         cursor.movePosition(QTextCursor::Left);
@@ -55,10 +58,21 @@ void PracticeArea::keyPressEvent(QKeyEvent *e) {
         format.setBackground(QBrush(QColor("green")));
         direction = QTextCursor::Right;
         errors_vec.push_back(0);
+        // TODO how is space handled?
+        if (cursor_pos != 0) {
+            matrix.update_element(
+                    cursor.block().text().at(cursor_pos - 1).unicode(),
+                    e->text().front().unicode(), timer.elapsed(), true);
+        }
     } else {
         format.setBackground(QBrush(QColor("red")));
         direction = QTextCursor::Right;
         errors_vec.push_back(1);
+        if (cursor_pos != 0) {
+            matrix.update_element(
+                    cursor.block().text().at(cursor_pos - 1).unicode(),
+                    e->text().front().unicode(), timer.elapsed(), false);
+        }
     }
 
     cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
@@ -67,6 +81,7 @@ void PracticeArea::keyPressEvent(QKeyEvent *e) {
     this->moveCursor(direction);
 
     update_errors();
+    timer.start();
 }
 
 void PracticeArea::set_chars(QString chars) {

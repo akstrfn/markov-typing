@@ -130,7 +130,7 @@ string ProbabilityMatrix::to_string() {
 // TODO BUG updates when some wrong character instead of space is pressed
 void ProbabilityMatrix::update_element(char const predecessor,
                                        char const current_char,
-                                       long const typing_time,
+                                       long const char_time,
                                        bool const correct) {
     // Doesn't count space.
     try {
@@ -138,17 +138,19 @@ void ProbabilityMatrix::update_element(char const predecessor,
         auto const current_idx = char_map.at(current_char);
         CharPair &chp = data[from_idx][current_idx];
 
+        update_time(char_time);
+
         // Using exponential moving average update average typing time.
         // Using different aplpha's for CharPair and global average can be
         // useful to adjust the level of dificulty i.e. one is updated more
         // agresivelly than the other.
         double alpha = 0.7;
-        double diff = typing_time - average_typing_time;
+        double diff = char_time - average_typing_time;
         // truncation will happen long/double but it does not matter
         average_typing_time = average_typing_time + alpha * diff;
 
         // also update the CharPair
-        diff = typing_time - chp.typing_time;
+        diff = char_time - chp.typing_time;
         chp.typing_time = chp.typing_time + alpha * diff;
 
         // if the CharPair average is below global average count as wrong
