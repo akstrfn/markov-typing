@@ -14,11 +14,6 @@ PracticeArea::PracticeArea(QWidget *parent) : QTextEdit(parent) {
     font.setStyleHint(QFont::Monospace);
     setFont(font);
 
-    QPalette p = QPalette();
-    p.setColor(QPalette::Base, QColor("black"));
-    p.setColor(QPalette::Text, QColor("white"));
-    setPalette(p);
-
     new_sentence();
 }
 
@@ -51,7 +46,7 @@ void PracticeArea::keyPressEvent(QKeyEvent *e) {
     if (e->key() == Qt::Key_Backspace) {
         direction = QTextCursor::Left;
         cursor.movePosition(QTextCursor::Left);
-        format.setBackground(QBrush(QColor("black")));
+        format.setBackground(QBrush(QColor("white")));
         if (!errors_vec.empty())
             errors_vec.pop_back();
     } else if (e->text() == cursor.block().text().at(cursor_pos)) {
@@ -96,7 +91,7 @@ void PracticeArea::set_chars(QString chars) {
 }
 
 void PracticeArea::new_sentence() {
-    setTextBackgroundColor(QColor("black"));
+    setTextBackgroundColor(QColor("white"));
     setText(QString(matrix.generate_sentence(40)));
     setAlignment(Qt::AlignCenter);
     errors_vec.clear();
