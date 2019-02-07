@@ -35,9 +35,16 @@ void PracticeArea::keyPressEvent(QKeyEvent *e) {
     // Handle the case when cursor is at the end
     cursor_pos = cursor.position();
     if (cursor_pos == cursor.block().text().size()) {
-        if (e->key() == Qt::Key_Return)
+        if (e->key() == Qt::Key_Return) {
             new_sentence();
-        return;
+            return;
+        }
+        // there are errors but key is different from backspace -> block it
+        if (errors && e->key() != Qt::Key_Backspace)
+            return;
+
+        if (!errors)
+            return;
     }
 
     // now disable enter since it has no use anymore
