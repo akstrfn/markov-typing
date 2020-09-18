@@ -9,6 +9,7 @@ set(CLANG_FORMAT FALSE CACHE BOOL "Format the code with clang format.")
 set(USE_BOOST_FS FALSE CACHE BOOL "Use boost filesystem. Does not work atm.")
 
 set(CMAKE_AUTOMOC ON)
+cmake_policy(SET CMP0100 NEW)
 
 if(USE_BOOST_FS)
     find_package(Boost REQUIRED COMPONENTS filesystem)

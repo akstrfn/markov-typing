@@ -41,11 +41,11 @@ void from_json(const json &j, CharPair &p) {
 
 } // namespace impl
 
-void to_json(json &js, const ProbabilityMatrix &pm) {
-    js["Characters"] = pm.characters.toUtf8();
-    js["average_typing_time"] = pm.average_typing_time;
-    js["typing_time"] = pm.typing_time;
-    js["data"] = pm.data;
+void to_json(json &j, const ProbabilityMatrix &pm) {
+    j = json{{"Characters", pm.characters.toStdString()},
+             {"average_typing_time", pm.average_typing_time},
+             {"typing_time", pm.typing_time},
+             {"data", pm.data}};
 }
 
 void from_json(const json &js, ProbabilityMatrix &pm) {
