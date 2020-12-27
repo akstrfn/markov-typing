@@ -17,7 +17,7 @@ private:
     QTextCursor::MoveOperation direction;
     QTextCursor cursor;
 
-    QString current_chars = u8"qwertyuiopasdfghjklzxcvbnm";
+    QString current_chars = "qwertyuiopasdfghjklzxcvbnm";
     ProbabilityMatrix matrix;
     PracticeDataJson json_data;
 

@@ -72,7 +72,7 @@ void MainWindow::custom_characters() {
 void MainWindow::character_sets() { picker->show(); }
 
 void MainWindow::update_characters() {
-    QString chars = u8"";
+    QString chars = "";
     if (picker->checkbox_lower->isChecked())
         chars += picker->lowercase.toUtf8();
     if (picker->checkbox_upper->isChecked())
@@ -83,7 +83,7 @@ void MainWindow::update_characters() {
         chars += picker->numbers.toUtf8();
 
     if (chars.isEmpty())
-        chars = QString(u8"qwertyuiopasdfghjklzxcvbnm");
+        chars = QString("qwertyuiopasdfghjklzxcvbnm");
 
     text->set_chars(chars);
 }

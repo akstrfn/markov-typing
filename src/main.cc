@@ -21,14 +21,14 @@
 
 // using curses::Colors;
 
-// QString lowercase = u8"qwertyuiopasdfghjklzxcvbnm";
-// QString uppercase = u8"QWERTYUIOPASDFGHJKLZXCVBNM";
+// QString lowercase = "qwertyuiopasdfghjklzxcvbnm";
+// QString uppercase = "QWERTYUIOPASDFGHJKLZXCVBNM";
 
 // TODO BUG some combinations of symbols form escape sequences so crazy stuff
 // gets printed on the screen like numbers or memory address etc. At least I
 // guess that's the reason.
-// QString symbols = u8R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
-// QString numbers = u8"0123456789";
+// QString symbols = R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
+// QString numbers = "0123456789";
 // QString all_chars = lowercase + uppercase + symbols + numbers;
 
 // TODO add timer to see how fast was typing for current sentence and save
