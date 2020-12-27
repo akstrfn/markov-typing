@@ -16,6 +16,11 @@ public:
     QCheckBox *checkbox_sym;
     QCheckBox *checkbox_num;
 
+    QString lowercase = u8"qwertyuiopasdfghjklzxcvbnm";
+    QString uppercase = u8"QWERTYUIOPASDFGHJKLZXCVBNM";
+    QString symbols = u8R"(`~!@#$%^&*()-_=+{[]};:'\|,<.>/?)";
+    QString numbers = u8"0123456789";
+
 signals:
     void checkbox_changed();
 };

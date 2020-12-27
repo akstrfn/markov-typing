@@ -7,10 +7,10 @@ CharacterSetsPicker::CharacterSetsPicker(QWidget *parent) : QWidget(parent) {
     setWindowTitle("Character sets");
     QGroupBox *chars_box = new QGroupBox(this);
 
-    checkbox_lower = new QCheckBox("Lowercase", chars_box);
-    checkbox_upper = new QCheckBox("Uppercase", chars_box);
-    checkbox_sym = new QCheckBox("Symbols", chars_box);
-    checkbox_num = new QCheckBox("Numbers", chars_box);
+    checkbox_lower = new QCheckBox("Lowercase: " + lowercase, chars_box);
+    checkbox_upper = new QCheckBox("Uppercase: " + uppercase, chars_box);
+    checkbox_sym = new QCheckBox("Symbols: " + symbols, chars_box);
+    checkbox_num = new QCheckBox("Numbers: " + numbers, chars_box);
 
     checkbox_lower->setChecked(true);
 

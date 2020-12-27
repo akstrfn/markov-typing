@@ -71,19 +71,15 @@ void MainWindow::custom_characters() {
 void MainWindow::character_sets() { picker->show(); }
 
 void MainWindow::update_characters() {
-    // TODO this should be moved to PracticeArea and char set picker should
-    // contain letters associated with each checkbox. It could return just
-    // empty string when isChecked returns false. Also chars should be added
-    // dynamically.
     QString chars = u8"";
     if (picker->checkbox_lower->isChecked())
-        chars += u8"qwertyuiopasdfghjklzxcvbnm";
+        chars += picker->lowercase.toUtf8();
     if (picker->checkbox_upper->isChecked())
-        chars += u8"QWERTYUIOPASDFGHJKLZXCVBNM";
+        chars += picker->uppercase.toUtf8();
     if (picker->checkbox_sym->isChecked())
-        chars += u8R"(`~!@#$%^&*()-_=+{[]};:'"\|,<.>/?)";
+        chars += picker->symbols.toUtf8();
     if (picker->checkbox_num->isChecked())
-        chars += u8"0123456789";
+        chars += picker->numbers.toUtf8();
 
     if (chars.isEmpty())
         chars = QString(u8"qwertyuiopasdfghjklzxcvbnm");
