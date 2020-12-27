@@ -16,7 +16,8 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
-    setMinimumSize(400, 100);
+    resize(600, 150);
+    setMinimumSize(600, 150);
     text = new PracticeArea(this);
 
     auto vlayout = new QVBoxLayout;

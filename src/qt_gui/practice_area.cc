@@ -6,7 +6,7 @@
 #include "../utils.hh"
 
 PracticeArea::PracticeArea(QWidget *parent) : QTextEdit(parent) {
-    font = QFont{"IBM Plex Mono", 12};
+    font = QFont{"IBM Plex Mono", 14};
 
     QFontMetrics fm(font);
     setCursorWidth(fm.averageCharWidth());
