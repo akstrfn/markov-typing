@@ -2,6 +2,7 @@
 #define IO_HH
 
 #include "probability_matrix.hh"
+#include <optional>
 #include <string_view>
 
 // TODO practice statistics should also go into this object
